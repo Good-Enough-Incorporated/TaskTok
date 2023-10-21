@@ -1,0 +1,26 @@
+{% extends 'layoutNoNav.html' %}
+
+{% block content %}
+
+
+<body>
+  
+  <div class="redirectmain">
+   
+    <p class="sign" align="center">Login</p>
+    <form method="post">
+    <form class="form1">
+      <button  class="submit" type="submit" name="login_button" value="login_button">Login</button>
+      <p class="purpose" align="center"> <a href={{url_for('auth.register')}}>Need an account? Register Here!</a></p>
+    </form>
+
+    
+  
+  
+    </div>
+     
+</body>
+
+
+
+{% endblock %}

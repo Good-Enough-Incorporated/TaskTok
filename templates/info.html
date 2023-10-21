@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+
+<body>
+  
+
+    <div class="tableparent">
+      <table class="mytable">    
+        <tr>
+          {% for header in headers%}
+          <th>{{header}}</th>
+          {% endfor %}
+        </tr>
+        {% for item in content %}
+        <tr>
+          {% for rowitem in item%}
+          <td>{{rowitem}}</td>
+        {% endfor %}
+        </tr>
+        {% endfor %}
+        </table>
+      
+      <label>Source: https://teslike.com/ </label>
+    
+     
+
+  
+  
+    </div>
+     
+</body>
+
+
+
+{% endblock %}

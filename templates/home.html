@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="home">    
+    <div class="container">
+    <h1 text-align: center> {{title}}</h1>
+    <div class="content">
+         <!-- Paragraph information regarding Tesla cars -->
+        <div class="paragraphcontent" >
+            <p>{{paragraph1}}</p>
+            <p>{{paragraph2}}</p>
+            <h1> Information from Tesla.com </h1>
+            <h3>Model 3</h3>
+            <p>{{paragraph3}}</p>
+            <h3>Model Y</h3>
+            <p>{{paragraph4}}</p>
+            <h3>Model S</h3>
+            <p>{{paragraph5}}</p>
+            <h3>Model X</h3>
+            <p>{{paragraph6}}</p>
+        </div>
+
+    </div>
+    
+</div>
+    <div class="row">
+        <div class="column">
+             <!-- An ordered list of Tesla Models -->
+            <h2>Ordered List</h2>
+            <ol>
+            <!--uses a for loop to get all models in the dictionary -->
+                {% for item in MODELS%}
+                <li>{{item}}</li>
+                {% endfor %}
+            </ol>
+        </div>
+        <div class="column">
+            <!-- An unordered list of Tesla Models -->
+            <h2>Unordered List</h2>
+            <ul>
+                {% for item in TRIM_PACKAGES%}
+                <li>{{item}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+      </div>
+
+        <div class="main">
+            <div id="wrapper">
+            <!-- A post method to get us to the order page (model selector) -->
+            <form method="POST" action={{url_for("views.order")}}>  
+                <button class="btn">Tesla Model Selector</button>
+                </form>         
+            </div>
+                    </div>
+
+</div>
+  
+        
+    
+
+{% endblock %}

@@ -1,0 +1,27 @@
+<div class=mynavbar>
+<header>
+   <nav>
+     <div>
+
+      <div class="leftwebgeneratedatetime"> 
+
+        {% for link in nav%}
+        <a href="{{ link.url }}">{{ link.name }}</a>
+        {% endfor %}
+      </div>
+
+      <div class="webgeneratedatetime">
+        
+        {% if session['is_loggedin'] == True %}
+        <a href="{{ url_for('auth.logout', logout='logout') }}">Log Out</a>
+        <label class="webstatus">|</label>
+        <a href="{{ url_for('auth.updatePassword', username=session['username']) }}">Update Password</a>
+        <label class="webstatus">|</label>
+        
+        {% endif %}
+        <label class="webstatus">Web site generated at: {{pythondatetime}}</label>
+      </div>
+  </nav>
+</header>
+</div>
+
