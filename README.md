@@ -22,7 +22,21 @@ then you should be able to run python .\app.py
 
 
 
-to create users, i'm using postman
+to create users, i'm using postman:
+
+POST 192.168.1.26/auth/register
+
+BODY: JSON
+
+{
+
+    "username": "test",
+    "email": "test123@gmail.com",
+    "password": "hello"
+
+
+}
+
 
 to check database, i'm using DB Browser for SQLite
 
