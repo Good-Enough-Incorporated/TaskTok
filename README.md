@@ -1,3 +1,7 @@
+**This project is a collaborative effort for Team 5 in UMGC 495 for our capstone project. This developement is purely for school and is not used in any production environment.**
+
+Team instructions: 
+
 Install Python (3.11)
 
 Install VSCode and install any python dependencies (easiest is to just make a test.py > Print "test" > run. VSCode should do the rest for you
