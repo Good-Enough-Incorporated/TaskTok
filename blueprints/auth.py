@@ -18,6 +18,7 @@ from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, se
 from werkzeug.utils import redirect
 from flask import render_template, current_app, Response
 from functools import wraps
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 from extensions import db
 
@@ -48,12 +49,34 @@ def register_user():
     
     new_user = User(username= registrationUserData.get('username'),
                 email= registrationUserData.get('email')    )
-    new_user.set_password(password=registrationUserData.get('password'))
+    new_user.setPassword(password=registrationUserData.get('password'))
     new_user.add()
     return jsonify({"Message": f"Created {new_user}"}), 200
 
     
-
+@auth.route('/login',methods=['POST'] )
+def loginUser():
+    requestInformation = request.get_json()
+    #attempt to find the user passed by the login endpoint
+    user = User.getUserByUsername(username=requestInformation.get('username'))
+    if user and (user.verifyPassword(password=requestInformation.get('password'))):
+        accessToken = create_access_token(identity=user.username)
+        refreshToken = create_refresh_token(identity=user.username)
+        return jsonify(
+            {
+                "message": "User authenticated!",
+                "tokens" : {
+                    "AccessToken": accessToken,
+                    "RefreshToken": refreshToken
+                }            
+            }
+        ), 200
+    else: 
+        return jsonify(
+            {
+                "message": "invalid username or password"
+            }
+        ),403
 
 def login_required(f):
     @wraps(f)
@@ -64,7 +87,7 @@ def login_required(f):
     return decorated_function
 
 
-@auth.route('/login', methods=['GET'])
+@auth.route('/loginOld', methods=['GET'])
 def login():
     """ Initiate authentication """
     print(f"Current Callback_URI={kc.callback_uri}")
@@ -76,35 +99,6 @@ def login():
     except:
         return f"Unable to redirect to Keycloak"
 
-
-
-@auth.route('/kc/callback', methods=['GET'])
-def login_callback():
-    """ Authentication callback handler """
-
-    # validate state
-    
-    state = request.args.get('state', 'unknown')
-    _state = session.pop('state', None)
-    if state != _state:
-        return Response('Whoopsies, you might have used the browser back button during authentication...', status=403)
-
-    # retrieve tokens
-    code = request.args.get('code')
-    tokens = kc.callback(code)
-
-    # retrieve userinfo
-    access_token = tokens["access_token"]
-    refresh_token = tokens['refresh_token']
-    userinfo = kc.fetch_userinfo(access_token)
-    session["user"] = userinfo
-    session['access_token'] = refresh_token
-    session['refresh_token'] = refresh_token
-    session["logged_in"] = True
-    # send userinfo to user
-    #return jsonify(userinfo)
-    print(f"Redirecting to URL: {url_for('views.home')}")
-    return redirect(url_for('views.home'))
 
 
 

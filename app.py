@@ -3,7 +3,7 @@
 
 from flask import Flask, jsonify, request
 
-from extensions import db
+from extensions import db, jwtManager
 from models import User
 
 #keycloak_client = Client('192.168.1.26/kc/callback')
@@ -12,8 +12,9 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite3"
     app.config['SQLALCHEMY_ECHO'] = True
     app.config['SECRET_KEY'] = r'HJDNUIWQEYH156345357564@@!@$'
-    
+    app.config['JWT_SECRET_KEY'] = r'CHANGEMELATER-JWTSECRET'    
     db.init_app(app)  # Initialize the db extension with app
+    jwtManager.init_app(app)
 
     # Register blueprints:
     from blueprints import api as api_blueprint
@@ -44,7 +45,7 @@ if __name__ == "__main__":
             print("Creating database and default admin for first run.")
             db.create_all()
             defaultAcc = User(username= "admin", email="admin@tasktok.com")
-            defaultAcc.set_password('superpassword')
+            defaultAcc.setPassword('superpassword')
             defaultAcc.add()
        
    
