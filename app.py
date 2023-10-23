@@ -20,7 +20,7 @@ def create_app():
     from blueprints import api as api_blueprint
     from blueprints import auth as auth_blueprint
     from blueprints import views as views_blueprint
-    #app.register_blueprint(api_blueprint.api, url_prefix='/api')
+    app.register_blueprint(api_blueprint.api, url_prefix='/api')
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
 
