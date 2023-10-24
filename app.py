@@ -24,6 +24,14 @@ def create_app():
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
 
+    @jwtManager.expired_token_loader
+    def expiredTokenCallback(jwt_header, jwt_data):
+        return jsonify({"Message": "Token has expired", "Error": "token_expired"})
+    @jwtManager.invalid_token_loader
+    def expiredTokenCallback(jwt_header, jwt_data):
+        return jsonify({"Message": "Token is invalid", "Error": "token_invalid"})
+
+
     return app
 
 app = create_app()
