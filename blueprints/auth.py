@@ -18,7 +18,7 @@ from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, se
 from werkzeug.utils import redirect
 from flask import render_template, current_app, Response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt
 
 from extensions import db
 
@@ -98,6 +98,13 @@ def login():
         return redirect(url)
     except:
         return f"Unable to redirect to Keycloak"
+
+
+@auth.route('/getJWTInfo')
+@jwt_required()
+def getJWTInfo():
+    userJWTInfo = get_jwt()
+    return jsonify({"message": userJWTInfo})
 
 
 

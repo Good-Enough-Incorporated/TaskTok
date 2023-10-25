@@ -24,15 +24,25 @@ def create_app():
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
 
+    #additional claims for roles 'admin'?
+    @jwtManager.additional_claims_loader
+    def addAdditionalClaims(identity):
+        if identity == "admin":
+            return {"is_admin" : True}
+        else:
+            return {"is_admin" : False}
+
     @jwtManager.expired_token_loader
     def expiredTokenCallback(jwt_header, jwt_data):
-        return jsonify({"Message": "Token has expired", "Error": "token_expired"})
+        return jsonify({"Message": "Token has expired", "Error": "token_expired"}),401
+    
     @jwtManager.invalid_token_loader
     def expiredTokenCallback(error):
-        return jsonify({"Message": "Signature validation failed", "Error": "token_invalid"})
+        return jsonify({"Message": "Signature validation failed", "Error": "token_invalid"}),401
+    
     @jwtManager.unauthorized_loader
     def unauthorizedTokenCallback(error):
-        return jsonify({"Message": "Request doesn't contain a token", "Error": ""})
+        return jsonify({"Message": "Request doesn't contain a token", "Error": "token_missing"}),401
 
 
     return app
@@ -57,7 +67,5 @@ if __name__ == "__main__":
             db.create_all()
             defaultAcc = User(username= "admin", email="admin@tasktok.com")
             defaultAcc.setPassword('superpassword')
-            defaultAcc.add()
-       
-   
+            defaultAcc.add()     
     app.run(host='0.0.0.0', port=80, debug=True)

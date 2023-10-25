@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models import User
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
+
 from schema import UserSchema
 api = Blueprint('api', __name__)
 
@@ -15,14 +16,19 @@ def get_tasks():
 @api.route('/get_users',methods=['GET'])
 @jwt_required()
 def get_users():
-    page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=3, type=int)
+    jwtInfo = get_jwt()
+    if jwtInfo.get('is_admin') == True:
+       
+        page = request.args.get('page', default=1, type=int)
+        per_page = request.args.get('per_page', default=3, type=int)
     
-    users = User.query.paginate(
-        page=page,
-        per_page = per_page
-    )
-    jsonUsers = UserSchema().dump(users,many=True)
-    return jsonify({
-        "users": jsonUsers
-    }),200
+        users = User.query.paginate(
+            page=page,
+            per_page = per_page
+        )
+        jsonUsers = UserSchema().dump(users,many=True)
+        return jsonify({
+            "users": jsonUsers
+        }),200
+    else:
+        return jsonify({"message": "User unauthorized"}),401
