@@ -28,8 +28,11 @@ def create_app():
     def expiredTokenCallback(jwt_header, jwt_data):
         return jsonify({"Message": "Token has expired", "Error": "token_expired"})
     @jwtManager.invalid_token_loader
-    def expiredTokenCallback(jwt_header, jwt_data):
-        return jsonify({"Message": "Token is invalid", "Error": "token_invalid"})
+    def expiredTokenCallback(error):
+        return jsonify({"Message": "Signature validation failed", "Error": "token_invalid"})
+    @jwtManager.unauthorized_loader
+    def unauthorizedTokenCallback(error):
+        return jsonify({"Message": "Request doesn't contain a token", "Error": ""})
 
 
     return app
