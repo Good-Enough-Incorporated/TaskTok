@@ -1,6 +1,7 @@
-from extensions import db
+from extensions import db, jwtManager
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(), primary_key=True, default = str(uuid4()))
@@ -32,3 +33,7 @@ class User(db.Model):
     def remove(self):
         db.session.delete(self)
         db.session.commit()
+
+@jwtManager.user_identity_loader
+def UserIdentityLookup(user):
+    return user.username

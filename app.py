@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request
 
 from extensions import db, jwtManager
 from models import User
+from schema import UserSchema
 
 #keycloak_client = Client('192.168.1.26/kc/callback')
 def create_app():
@@ -24,6 +25,18 @@ def create_app():
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
 
+
+    @jwtManager.user_identity_loader
+    def UserIdentityLookup(user):
+        return user.id
+    
+    @jwtManager.user_lookup_loader
+    def searchLoggedInUser(_jwt_header, jwt_data):
+        identity = jwt_data['sub']
+        print(identity)
+           
+        return User.query.get(identity)
+        
     #additional claims for roles 'admin'?
     @jwtManager.additional_claims_loader
     def addAdditionalClaims(identity):

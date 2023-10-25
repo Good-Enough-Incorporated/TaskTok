@@ -18,7 +18,7 @@ from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, se
 from werkzeug.utils import redirect
 from flask import render_template, current_app, Response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user
 
 from extensions import db
 
@@ -60,8 +60,8 @@ def loginUser():
     #attempt to find the user passed by the login endpoint
     user = User.getUserByUsername(username=requestInformation.get('username'))
     if user and (user.verifyPassword(password=requestInformation.get('password'))):
-        accessToken = create_access_token(identity=user.username)
-        refreshToken = create_refresh_token(identity=user.username)
+        accessToken = create_access_token(identity=user)#was username
+        refreshToken = create_refresh_token(identity=user)#was username
         return jsonify(
             {
                 "message": "User authenticated!",
@@ -100,11 +100,11 @@ def login():
         return f"Unable to redirect to Keycloak"
 
 
-@auth.route('/getJWTInfo')
+@auth.route('/getCurrentUser')
 @jwt_required()
 def getJWTInfo():
-    userJWTInfo = get_jwt()
-    return jsonify({"message": userJWTInfo})
+    
+    return jsonify({"message": "useraccount", "user_details": {"username": current_user.username, "email": current_user.email}})
 
 
 
