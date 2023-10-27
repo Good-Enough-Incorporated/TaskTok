@@ -4,7 +4,7 @@
 from flask import Flask, jsonify, request
 
 from extensions import db, jwtManager
-from models import User
+from models import User, NoNoTokens
 from schema import UserSchema
 
 #keycloak_client = Client('192.168.1.26/kc/callback')
@@ -40,7 +40,8 @@ def create_app():
     #additional claims for roles 'admin'?
     @jwtManager.additional_claims_loader
     def addAdditionalClaims(identity):
-        if identity == "admin":
+        
+        if identity.username == "admin":
             return {"is_admin" : True}
         else:
             return {"is_admin" : False}
@@ -56,6 +57,25 @@ def create_app():
     @jwtManager.unauthorized_loader
     def unauthorizedTokenCallback(error):
         return jsonify({"Message": "Request doesn't contain a token", "Error": "token_missing"}),401
+
+
+    @jwtManager.token_in_blocklist_loader
+    def tokenIsRevokedCallback(jwt_header, jwt_data):
+        jti = jwt_data['jti']
+
+        token = db.session.query(NoNoTokens).filter(NoNoTokens.jti == jti).scalar()
+
+        if token is not None:
+            return True
+        else: 
+            return False
+        
+    @jwtManager.revoked_token_loader
+    def tokenWasRevoked(jwt_header, jwt_data):
+        return jsonify({"Message": "The supplied token was revoked already", "Error": "token_revoked"}),401
+
+
+    
 
 
     return app
