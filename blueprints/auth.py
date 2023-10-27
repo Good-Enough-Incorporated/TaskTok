@@ -18,8 +18,8 @@ from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, se
 from werkzeug.utils import redirect
 from flask import render_template, current_app, Response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user
-
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity
+from models import NoNoTokens
 from extensions import db
 
 
@@ -108,112 +108,25 @@ def getJWTInfo():
 
 
 
-
+@auth.route('/refreshAccessToken')
+@jwt_required(refresh=True)
+def refreshAccessToken():
+    #token may be expired, so we can't use current_user
+    #therefore, we use get_jwt_identity() to get the username
+    username = get_jwt_identity()
+    #create_access_token needs to User object, not just the username, so query the user
+    userObject = User.query.get(username)
+    #create a new access token.
+    accessToken = create_access_token(identity=userObject)
+    return jsonify({"message": accessToken})
 
 
 
 @auth.route('/logout')
+@jwt_required()
 def logout():
-    if 'access_token' in session:
-        try:
-            logout_response = kc.logout(access_token=session['access_token'], refresh_token=session['refresh_token'])
-            #session.clear()  # Clear the user session
-            #session["logged_in"] = False
-            return "logged out"
-        except Exception as e:
-            #logging.error("Error during logout: %s", str(e))
-            return jsonify({"error": "Logout failed"}), 500
-    else:
-        #logging.warning("No refresh token found in session")
-        return jsonify({"error": "No session found"}), 400
-
-
-
-
-
-def loginOld():
-    """
-    route to login our guests.
-    """
-    homeurl = url_for("views.home")
-    nav = [{"name": "Home", "url": homeurl}]
-    password_correct_flag = False
-    login_required = False
-    error = None
-    session.pop("_flashes", None)
-
-    if request.args.get("next") is not None:
-        login_required = True
-
-    if request.method == "POST":
-
-        if session.get("is_loggedin", None) is True:
-            login_required = True
-            print(request.args.get("next"))
-            return redirect(request.args.get("next"))
-        else:
-            login_username = request.form.get("username")
-            login_password = request.form.get("password")
-            error = None
-            if len(login_username) == 0:
-                error = "Please enter your username"
-            if len(login_password) == 0:
-                if error is not None:
-                    error = error + " and password"
-                else:
-                    error = "Please enter your password"
-            if error is None:
-                # if user gives us a valid username/password,
-                # check if there are any user accounts(passfile exists), then validate login.
-
-                if not exists(os.path.join(sys.path[0], "passfile")):
-                    error = "No accounts found. Please register first!"
-                else:
-                    # do login check
-                    print("checking login")
-                    print(login_password)
-                if validate_password(
-                    os.path.join(sys.path[0], "passfile"),
-                    login_username,
-                    login_password,
-                ):
-                    print("running refactored password def")
-                    print("Password correct!")
-                    password_correct_flag = True
-                    session["is_loggedin"] = True
-                    session["username"] = login_username
-
-            if error is None:
-                if password_correct_flag:
-                    flash("You've entered the correct password... redirecting.")
-                    if request.args.get("next") is None:
-                        # if user went directly to /auth,
-                        #  there's no next to redirect them to...
-                        # so go to / page
-                        return redirect(url_for("views.home"))
-                    return redirect(request.args.get("next"))
-                else:
-                    flash("Incorrect username/password. Please try again.")
-                    # lets log it for security reasons
-                    with open(os.path.join(sys.path[0], "failed_login.txt"), "a") as f:
-                        log_string = (
-                            "["
-                            + str(datetime.datetime.now())
-                            + "] "
-                            + "failed login from IP:"
-                            + request.remote_addr
-                        )
-                        f.writelines(log_string)
-                        f.writelines("\n")
-
-    if error is not None:
-        flash(error)
-    print("before returning, login_required= " + str(error))
-    return render_template(
-        "auth.html",
-        pythondatetime=datetime.datetime.now(),
-        nav=nav,
-        request=request,
-        login_required=login_required,
-    )
-
+   jwt = get_jwt()
+   jti = jwt['jti']
+   blockedToken = NoNoTokens(jti=jti)
+   blockedToken.add()
+   return jsonify({"Message": "token_blocked"}),200
