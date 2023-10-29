@@ -9,7 +9,7 @@ import datetime
 import fileinput
 import sys
 import os
-from models import User
+from TaskTok.models import User
 from os.path import exists
 from flask import Blueprint
 from flask import jsonify
@@ -18,9 +18,9 @@ from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, se
 from werkzeug.utils import redirect
 from flask import render_template, current_app, Response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity
-from models import NoNoTokens
-from extensions import db
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies
+from TaskTok.models import NoNoTokens
+from TaskTok.extensions import db
 
 
 auth = Blueprint("auth", __name__)
@@ -55,13 +55,35 @@ def register_user():
 
     
 @auth.route('/login',methods=['POST'] )
-def loginUser():
+def login():
+    formUsername = request.form.get('username')
+    formPassword = request.form.get('password')
+    #attempt to find the user passed by the login endpoint
+    user = User.getUserByUsername(username=formUsername)
+    if user and (user.verifyPassword(password=formPassword)):
+        accessToken = create_access_token(identity=user)#was username
+        refreshToken = create_refresh_token(identity=user)#was username
+        response = redirect(url_for('views.home'))
+        set_access_cookies(response, accessToken)
+        set_refresh_cookies(response, refreshToken)
+        
+        return response
+    else: 
+        return jsonify(
+            {
+                "message": "invalid username or password"
+            }
+        ),403
+
+@auth.route('/loginAPIUser',methods=['POST'] )
+def loginAPIUser():
     requestInformation = request.get_json()
     #attempt to find the user passed by the login endpoint
     user = User.getUserByUsername(username=requestInformation.get('username'))
     if user and (user.verifyPassword(password=requestInformation.get('password'))):
         accessToken = create_access_token(identity=user)#was username
         refreshToken = create_refresh_token(identity=user)#was username
+
         return jsonify(
             {
                 "message": "User authenticated!",
@@ -87,22 +109,9 @@ def login_required(f):
     return decorated_function
 
 
-@auth.route('/loginOld', methods=['GET'])
-def login():
-    """ Initiate authentication """
-    print(f"Current Callback_URI={kc.callback_uri}")
-    #kc.callback_uri = 'http://192.168.1.26/kc/callback'
-    try:
-        url, state = kc.login()
-        session['state'] = state
-        return redirect(url)
-    except:
-        return f"Unable to redirect to Keycloak"
-
-
 @auth.route('/getCurrentUser')
 @jwt_required()
-def getJWTInfo():
+def getCurrentUser():
     
     return jsonify({"message": "useraccount", "user_details": {"username": current_user.username, "email": current_user.email}})
 

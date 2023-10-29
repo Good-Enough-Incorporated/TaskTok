@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
-from models import User
+from TaskTok.models import User
 from flask_jwt_extended import jwt_required, get_jwt
 
-from schema import UserSchema
+from TaskTok.schema import UserSchema
 api = Blueprint('api', __name__)
 
 
