@@ -1,62 +1,107 @@
-{% extends 'layout.html' %}
+<!DOCTYPE>
+<html>  
+<style>
 
-{% block content %}
-<div class="home">    
-    <div class="container">
-    <h1 text-align: center> {{title}}</h1>
-    <div class="content">
-         <!-- Paragraph information regarding Tesla cars -->
-        <div class="paragraphcontent" >
-            <p>{{paragraph1}}</p>
-            <p>{{paragraph2}}</p>
-            <h1> Information from Tesla.com </h1>
-            <h3>Model 3</h3>
-            <p>{{paragraph3}}</p>
-            <h3>Model Y</h3>
-            <p>{{paragraph4}}</p>
-            <h3>Model S</h3>
-            <p>{{paragraph5}}</p>
-            <h3>Model X</h3>
-            <p>{{paragraph6}}</p>
-        </div>
+    table {
+      position: absolute;
+      right: 40px;
+      bottom: 70px;
+      background-color: #D6EEEE;
+      border-collapse: collapse;
+      width: 80%;
+	}    
+    tr {
+  		border-bottom: 1px solid #ddd;
+		}
+    td {
+        padding: 10px;
+        }
+{
+  font-family: "Lato", sans-serif;
+}
 
-    </div>
-    
-</div>
-    <div class="row">
-        <div class="column">
-             <!-- An ordered list of Tesla Models -->
-            <h2>Ordered List</h2>
-            <ol>
-            <!--uses a for loop to get all models in the dictionary -->
-                {% for item in MODELS%}
-                <li>{{item}}</li>
-                {% endfor %}
-            </ol>
-        </div>
-        <div class="column">
-            <!-- An unordered list of Tesla Models -->
-            <h2>Unordered List</h2>
-            <ul>
-                {% for item in TRIM_PACKAGES%}
-                <li>{{item}}</li>
-                {% endfor %}
-            </ul>
-        </div>
+    .sidenav {
+      height: 100%;
+      width: 175px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .sidenav a {
+      padding: 6px 6px 6px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+    }
+
+    .sidenav a:hover {
+      color: #f1f1f1;
+    }
+
+    .main {
+      margin-left: 200px; /* Same as the width of the sidenav */
+    }
+
+    @media screen and (max-height: 450px) {
+      .sidenav {padding-top: 15px;}
+      .sidenav a {font-size: 18px;}
+    }        
+</style>
+
+<body>  
+      <div class="sidenav">
+        <a href="#">Menu</a>
+        <a href="#">Menu</a>
+        <a href="#">Menu</a>
+        <a href="#">Menu</a>
       </div>
 
-        <div class="main">
-            <div id="wrapper">
-            <!-- A post method to get us to the order page (model selector) -->
-            <form method="POST" action={{url_for("views.order")}}>  
-                <button class="btn">Tesla Model Selector</button>
-                </form>         
-            </div>
-                    </div>
+      <div class="main">
+        <h2>TaskTok</h2>
+        <p>Fancy Slogan</p>
+      </div>
+      <table> 
 
-</div>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Event</th>
+        </tr> 
   
-        
-    
+  <form>   
+        <td><input type="text" id="Date" /> </td>
+        <td><input type="text" id="Time" /> </td>  
+        <td><input type="text" id="Disc" /> </td>
+        <td><input type="submit" value="Submit"></td>
+  </form> 
+  
+  <form>
+        <tr><td>Example</td><td>Example</td><td>Example</td>
+          <td><input type="submit" value="Delete"></td>
 
-{% endblock %}
+        <tr><td>Example</td><td>Example</td><td>Example</td> 
+          <td><input type="submit" value="Delete"></td>
+
+        <tr><td>Example</td><td>Example</td><td>Example</td>
+          <td><input type="submit" value="Delete"></td>
+
+        <tr><td>Example</td><td>Example</td><td>Example</td>
+          <td><input type="submit" value="Delete"></td>
+
+        <tr><td>Example</td><td>Example</td><td>Example</td>
+          <td><input type="submit" value="Delete"></td>
+
+        <tr><td>Example</td><td>Example</td><td>Example</td>
+          <td><input type="submit" value="Delete"></td> 
+  </form>
+  
+</table>  
+
+</body>
+</html>  

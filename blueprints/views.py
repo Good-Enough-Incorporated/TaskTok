@@ -24,10 +24,10 @@ def mainPage():
         #return redirect(url_for('auth.login'))
         return redirect(url_for('views.home'))
     #otherwise, render the mainPage
-    return render_template('NewmainPage.html')
+    return render_template('landingPage.html')
 
 
    
 @views.route('/home')
 def home():
-    return render_template('TaskTok-ExampleHome.html')
+    return render_template('home.html')
