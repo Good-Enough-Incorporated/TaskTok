@@ -4,21 +4,18 @@ Team instructions:
 
 Install Python (3.11)
 
-Install VSCode and install any python dependencies (easiest is to just make a test.py > Print "test" > run. VSCode should do the rest for you
+Download Github desktop, VSCode
 
-cd to the directory you pulled the repo to (i.e. cd D:\CapStone\TaskTok)
+add the TaskTok repository and make a local copy. From Github Desktop it should also ask to open project in VSCode
 
-In the console of vs code, create a venv:  python -m venv jasontasktokvenv
+Create the virtual environment with VSCode Control Shift P: Python: Create Environment
 
-the venv is created in the directory you're in.
+It should ask if you want to install from requirements.txt
 
-once created, run jasontasktokvenv\scripts\activate.ps1
-
-(should see (jasontasktokvenv) before PS now
-
+(or manually)
 run pip install -r .\requirements.txt
 
-then you should be able to run python .\app.py
+then you should be able to run python .\run.py
 
 
 
