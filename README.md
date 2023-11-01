@@ -41,3 +41,21 @@ BODY: JSON
 to check database, i'm using DB Browser for SQLite
 
 db is located: TaskTok\instance\db.sqlite3
+
+
+For celery/rabbitmq:
+
+Under Server.py > Update the broker_url to your rabitmq instance
+
+Be sure to install the rabbitmq management plugin, and create the vhost
+
+vhost: tasktok
+
+user admin:password
+
+give permissions for admin to tasktok vhost
+
+to run celery, activate the python virtual environment
+
+celery -A RemindMeClient.Client.celery worker --infolevel=INFO
+
