@@ -6,6 +6,8 @@ from TaskTok.schema import UserSchema
 from RemindMeClient.task import send_email, create_file
 from RemindMeClient import task as cTask
 import datetime
+import subprocess
+import socket
 api = Blueprint('api', __name__)
 
 @api.route('/addTask')
@@ -20,11 +22,9 @@ def addTask():
 
 @api.route('/listTask')
 def listTask():
-    #send_email.delay()
-    result = cTask.add.delay(1,2)
-    print(result)
-    
-    #create_file.delay("test.txt", "another test!")
+    #create file async test.
+
+    create_file.delay("test.txt", "another test!")
     
     return "Ran test task!"
 @api.route('/removeTask')
@@ -55,3 +55,6 @@ def get_users():
         }),200
     else:
         return jsonify({"message": "User unauthorized"}),401
+
+
+

@@ -5,7 +5,12 @@ from TaskTok.extensions import db, jwtManager
 from TaskTok.models import User, NoNoTokens
 from TaskTok.schema import UserSchema
 from RemindMeClient import task
+from TaskTok.functions import verifyCeleryWorker
+from TaskTok.functions import verifyMessageBrokerOnline
+
 app = create_app()
+
+
 
 
 
@@ -26,5 +31,7 @@ if __name__ == "__main__":
             db.create_all()
             defaultAcc = User(username= "admin", email="admin@tasktok.com")
             defaultAcc.setPassword('superpassword')
-            defaultAcc.add()     
+            defaultAcc.add()
+    print(f"*************CELERY STATUS: {verifyCeleryWorker()}*************************")
+    print(f"*********************MESSAGE_BROKER STATUS: {verifyMessageBrokerOnline(host='localhost', port=5672, timeout=5)}***************")
     app.run(host='0.0.0.0', port=80, debug=True)

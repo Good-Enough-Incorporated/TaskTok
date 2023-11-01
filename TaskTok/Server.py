@@ -21,8 +21,8 @@ def create_app():
     #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
     app.config.from_mapping(
     CELERY=dict(
-        broker_url='pyamqp://admin:password@localhost/tasktok',
-        result_backend='rpc://',
+        broker_url='pyamqp://admin:password@localhost:5672/tasktok',
+        #result_backend='rpc://admin:password@localhost:5672/tasktok',
         task_ignore_result=True,
     ),
 )
@@ -33,7 +33,7 @@ def create_app():
     jwtManager.init_app(app)
     celery_app = celery_init_app(app)
 
-    
+
     # Register blueprints:
     from .blueprints import api as api_blueprint
     from .blueprints import auth as auth_blueprint
