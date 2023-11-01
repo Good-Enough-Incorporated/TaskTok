@@ -50,3 +50,27 @@ class NoNoTokens(db.Model):
     def remove(self):
         db.session.delete(self)
         db.session.commit()
+
+class taskReminder(db.Model):
+    __tablename__ = "taskreminders"
+    id = db.Column(db.Integer, primary_key=True)
+    owner_username = db.Column(db.String(120), nullable=False)
+    task_emailList = db.Column(db.JSON, nullable=True)
+    task_reminderOffSetTime   = db.Column(db.DateTime, nullable=True)
+    task_dueDate   = db.Column(db.DateTime, nullable=False)
+    task_description = db.Column(db.String(255), nullable=False)
+    task_name = db.Column(db.String(255), nullable=False)
+    task_message = db.Column(db.String(255), nullable=False)
+    def __repr__(self) -> str:
+        return f"<taskReminder {self.task_description}>"
+    #add blocked token to the database
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+    #remove blocked token to the database
+    def remove(self):
+        db.session.delete(self)
+        db.session.commit()
+    @classmethod
+    def findTaskByUsername(cls, username):
+        cls.query.filter_by(owner_username=username).first()
