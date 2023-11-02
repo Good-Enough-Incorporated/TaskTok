@@ -9,6 +9,7 @@ from .schema import UserSchema
 from RemindMeClient.celeryManager import celery_init_app
 from celery import Celery
 from RemindMeClient import task
+import inspect
 #keycloak_client = Client('192.168.1.26/kc/callback')
 def create_app():
     app = Flask(__name__)
@@ -17,6 +18,7 @@ def create_app():
     app.config['SECRET_KEY'] = r'HJDNUIWQEYH156345357564@@!@$'
     app.config['JWT_SECRET_KEY'] = r'CHANGEMELATER-JWTSECRET'
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    
     #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
     #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
     app.config.from_mapping(
