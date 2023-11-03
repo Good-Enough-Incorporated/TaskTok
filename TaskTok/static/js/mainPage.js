@@ -2,10 +2,10 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
+canvas.style.backgroundColor = '#FFBF00';
 let particles = [];
 const properties = {
-    bgColor: 'rgba(255, 255, 255, 1)',
+    bgColor: '#17171c', // change this line to set the background color
     particleColor: 'rgba(107, 91, 149, 0.5)',
     particleRadius: 3,
     particleCount: 60,

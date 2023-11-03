@@ -24,7 +24,7 @@ def mainPage():
     #If user clicked 'login' redirect to keycloak.
   
     #otherwise, render the mainPage
-    return render_template('landingPage.html')
+    return render_template('loginPage.html')
 
 
    
