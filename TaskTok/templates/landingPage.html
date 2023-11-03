@@ -52,21 +52,26 @@ button:hover {
 
 <body>
 	<canvas id="canvas"></canvas>
-	<script src="{{ url_for('static', filename='js/mainPage.js')}}"></script>
+	
+
 <body class="landing-page">
+<script type="text/javascript">
+    const loginUrl = "{{ url_for('auth.login') }}";
+  </script>
+  
+  <script src="{{ url_for('static', filename='js/mainPage.js')}}"></script>
 <div class="center-box">
 	<center> <h1> TaskTok </h1> </center>            
-<form>
-</form>  
-	<form action="/" method="post">
+
+	<form id="loginForm" action="{{ url_for('auth.login') }}" method="post">
 	<div class="container"> 
 		<label>Username: </label> 
-			<input type="text" placeholder="Enter Username" name="username" required>
+			<input id="username" type="text" placeholder="Enter Username" name="username" required>
 		<label>Password: </label> 
-			<input type="password" placeholder="Enter Password" name="password" required>
+			<input id="password" type="password" placeholder="Enter Password" name="password" required>
 					
 		<button type="submit" class="login-btn">Login</button>
-					
+		<div id="error-message" style="color: red;"></div>			
 		<input type="checkbox" checked="checked"> Remember me 
 		<button type="button" class="cancelbtn"> Cancel</button> 
 					
