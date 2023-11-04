@@ -17,6 +17,7 @@ import requests
 
 #our root route (home)
 @views.route('/', methods=['GET','POST'])
+#need optional=True so we can check current_user to see if they're already authenticated.
 @jwt_required(optional=True)
 def mainPage():
     """

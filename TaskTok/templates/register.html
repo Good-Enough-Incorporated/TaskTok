@@ -1,24 +1,128 @@
-{% extends 'layout.html' %}
 
 {% block content %}
+<style> 
+Body {
+	font-family: Calibri, Helvetica, sans-serif;
+    color: #FFBF00; 
+	background: #0F0F12 url("/images/smiley.png") no-repeat scroll 0 0;
+	}
+	
+h1{
+	color: #FFBF00; 
+	}
+button { 
+	background-color: #ad7231 ; 
+	width: 100%;
+	color: black; 
+	padding: 15px; 
+	margin: 10px 0px; 
+	border: none; 
+	cursor: pointer; 
+    
+	} 
 
+input[type=text], input[type=password] { 
+	width: 100%; 
+    background: #17171c;
+    color: white;  
+	margin: 8px 0;
+	padding: 12px 20px; 
+	display: inline-block; 
+    box-sizing: border-box;     
+	border: 2px solid rgba(51,51,61,0.48);
+	border-radius: 4px;
+	-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+	box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+	}
+    
+button:hover { 
+	opacity: 0.5; 
+	} 
+	
+.cancelbtn { 
+	width: auto; 
+	padding: 10px 18px;
+	margin: 10px 5px;
+	} 
+
+.main { 
+	position: absolute;
+    left: auto;
+	padding: 25px; 
+	background: #17171c;
+	width: 500px;
+	margin: auto;
+	border-right: 3px inset #ad7231;
+	border-radius: 0px 12px 3px 0px;
+-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
+box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+	}
+/* Style for flash message box */
+.flash-text {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+/* Different categories of messages */
+.success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+/* Animation */
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flash-animate {
+  animation: slideDown 0.5s ease forwards;
+}
+
+</style> 
 
 <body>
     <div class="main">
       <p class="sign" align="center">Register</p>
-      <form method="post">
+      <form action="{{ url_for('auth.register') }}" method="post">
+      
       <form class="form1">
-        <input class="username" type="text" align="center" placeholder="Username" name="username" id="username">
-        <input class="password" type="password" align="center" placeholder="Password" name="password" id="password">
+		<input class="email" type="text" align="center" placeholder="Enter E-Mail" name="email" id="email">	
+        <input class="username" type="text" align="center" placeholder="Enter Username" name="username" id="username">
+        <input class="password" type="password" align="center" placeholder="Enter Password" name="password" id="password">
         <button  class="submit" type="submit" name="register_button" value="register_button">Register</button>
-        <p class="purpose" align="center"> <a href={{url_for('auth.login')}}>Have an account? Login!</a></p>
-        {% for flashtext in get_flashed_messages() %}
-        {% if flashtext == "Username already exists. Please login" %}
-        <p class="flashtext" align="center"> <a class="flashtext" href={{url_for('auth.login')}}>{{flashtext}}</p>
-        {% else %}
-        <p class="flashtext" align="center">{{flashtext}}</p>
-        {% endif%}
-        {% endfor %}
+       
+       <p class="purpose" align="center"> <a href={{url_for('auth.login')}}>Have an account? Login!</a></p>
+	   {% with messages = get_flashed_messages(with_categories=true) %}
+	   {% if messages %}
+		 {% for category, message in messages %}
+		   <div class="flash-text {{ category }} flash-animate">
+			 {{ message }}
+		   </div>
+		 {% endfor %}
+	   {% endif %}
+	 {% endwith %}
         
       </form>       
       </div>
