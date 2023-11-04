@@ -1,66 +1,24 @@
 <!DOCTYPE>
 <html>  
 <style>
-Body {
-	font-family: Calibri, Helvetica, sans-serif;
-    color: #FFBF00; 
-	background: #0F0F12 ;
-	}
-    button { 
-	background-color: #ad7231 ; 
-	width: 100%;
-	color: black; 
-	padding: 15px; 
-	margin: 10px 0px; 
-	border: none; 
-	cursor: pointer;     
-	} 
-    
+
     table {
-      position: fixed;
-        right: 40px;
-        bottom: 70px;
-      border: 3px solid #0F0F12;
-      
-      background-color: #17171C;
+      position: absolute;
+      right: 40px;
+      bottom: 70px;
+      background-color: #D6EEEE;
       border-collapse: collapse;
-      width: 1000px;
-      text-align: right;
+      width: 80%;
 	}    
     tr {
   		border-bottom: 1px solid #ddd;
 		}
     td {
-    	color: #FFBF00;
-        padding: 10px;       
+        padding: 10px;
         }
-   	tr:nth-child(even) {
- 	 background: #24242C;
-		} 
-        
-    table.table thead {
-  background: #17171c;
-  border-bottom: 0px solid #444444;
-    }
-    
-     th {
-      font-size: 19px;
-      font-weight: bold;
-      color: #FFBF00;
-      text-align: center;
-      border-left: 0px solid #AD7231;
-      border-bottom: 5px solid #24242C;
-    }
-    table.table thead th:first-child {
-      border-left: none;
-    }
-
-
-
-
-        {
-  		font-family: "Lato", sans-serif;
-		}
+{
+  font-family: "Lato", sans-serif;
+}
 
     .sidenav {
       height: 100%;
@@ -69,7 +27,7 @@ Body {
       z-index: 1;
       top: 0;
       left: 0;
-      background-color: #17171c;
+      background-color: #111;
       overflow-x: hidden;
       padding-top: 20px;
     }
@@ -147,4 +105,4 @@ Body {
 </table>  
 
 </body>
-</html> 
+</html>  

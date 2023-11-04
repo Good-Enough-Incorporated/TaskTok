@@ -16,7 +16,7 @@ from flask import jsonify
 from passlib.hash import sha256_crypt
 from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, session
 from werkzeug.utils import redirect
-from flask import render_template, current_app, Response
+from flask import render_template, current_app, Response, make_response
 from functools import wraps
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies
 from TaskTok.models import NoNoTokens
@@ -134,8 +134,22 @@ def refreshAccessToken():
 @auth.route('/logout')
 @jwt_required()
 def logout():
-   jwt = get_jwt()
-   jti = jwt['jti']
-   blockedToken = NoNoTokens(jti=jti)
-   blockedToken.add()
-   return jsonify({"Message": "token_blocked"}),200
+    acceptHeader = request.headers.get('Accept','')
+    response = make_response()
+    jwt = get_jwt()
+    jti = jwt['jti']
+    blockedToken = NoNoTokens(jti=jti)
+    blockedToken.add()
+    if 'application/json' in acceptHeader:
+        response.data = jsonify({"Message": "Log Out Successful", "token_info": "token_revoked"})
+        response.status_code = 401
+        response.content_type = 'application/json'
+        
+    else:
+        response.data = render_template("error/loggedOut.html")
+        response.status_code = 401
+        response.content_type = 'text/html'
+    #set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
+    #this will set up future requests to say not authenticated (or redirect to login)
+    response.set_cookie("access_token_cookie", "", max_age=0)
+    return response,200
