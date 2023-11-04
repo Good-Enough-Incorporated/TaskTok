@@ -4,7 +4,7 @@
 Body {
 	font-family: Calibri, Helvetica, sans-serif;
     color: #FFBF00; 
-	background: #0F0F12 url("/images/smiley.png") no-repeat scroll 0 0;
+	background: #0F0F12 ;
 	}
 	
 h1{
@@ -18,7 +18,8 @@ button {
 	margin: 10px 0px; 
 	border: none; 
 	cursor: pointer; 
-    
+    align: right;
+    position: relative;
 	} 
 
 input[type=text], input[type=password] { 
@@ -36,13 +37,16 @@ input[type=text], input[type=password] {
 	}
     
 button:hover { 
-	opacity: 0.5; 
+	opacity: 0.5;
+
 	} 
 	
 .cancelbtn { 
+	position: relative;
 	width: auto; 
 	padding: 10px 18px;
 	margin: 10px 5px;
+    float: center;
 	} 
 
 .container { 
@@ -52,7 +56,7 @@ button:hover {
 	width: 500px;
 	margin: auto;
 	border-right: 3px inset #ad7231;
-	border-radius: 0px 12px 3px 0px;
+	border-radius: 0px 12px 12px 0px;
 -webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
 box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
 	}     
@@ -74,24 +78,27 @@ box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
 <form>
 </form>  
 	<form action="{{ url_for('auth.login') }}" method="post">
-	<div class="container"> 
+	
+    <div class="container"> 
+    
 		<label>Username: </label> 
 			<input type="text" placeholder="Enter Username" name="username" required>
 		<label>Password: </label> 
 			<input type="password" placeholder="Enter Password" name="password" required>
 					
-		<button type="submit" class="login-btn">Login</button>
-					
-		<input type="checkbox" checked="checked"> Remember me 
-		<button type="button" class="cancelbtn"> Cancel</button> 
-					
+		<button type="submit" class="login-btn">Login</button>	
+        
+        <div style= "float:right;">
+        	<input type="checkbox" checked="checked"> Remember me
+        </div>
+        
 		<a href="#"> Forgot password? </a> 
 				
 	</div> 
 
 </form>
 </div>
-	<div class="version">v0.0.1</div>
+	<div class="version">v0.1.0</div>
 </body>
 </body>
 </html>
