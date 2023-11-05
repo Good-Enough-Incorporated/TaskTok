@@ -3,3 +3,4 @@
 *.pyc
 blueprints/__pycache__/auth.cpython-311.pyc
 instance/db.sqlite3
+*.sqlite3
