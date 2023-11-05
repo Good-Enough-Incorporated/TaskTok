@@ -16,7 +16,7 @@ from flask import jsonify
 from passlib.hash import sha256_crypt
 from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, session
 from werkzeug.utils import redirect
-from flask import render_template, current_app, Response
+from flask import render_template, current_app, Response, make_response
 from functools import wraps
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies
 from TaskTok.models import NoNoTokens
@@ -32,27 +32,36 @@ callback_URL = f"http://192.168.1.26/kc/callback"
 
 
 @auth.route('/register', methods=['GET', 'POST'])
-def register_user():
+def register():
     if request.method == "GET":
-        count = User.getUserCount()
-        return jsonify({"UserCount" : f"{count}"})
+        return render_template('register.html')
 
 
 
 
-    registrationUserData = request.get_json()
-    user = User.getUserByUsername(username=registrationUserData.get('username'))
-
+    newUser_username = request.form.get('username')
+    newuser_password = request.form.get('password')
+    newuser_email = request.form.get('email')
+    print(f"Username = {newUser_username}")
+    user = User.getUserByUsername(username=newUser_username)
+    print(user)
     if user is not None:        
-        return jsonify({"Error":"User already exists"}), 403
+        #return json if application/json later
+        #return jsonify({"Error":"User already exists"}), 403
+        print('user already exists')
+        error = 'Username already exists. Please login'
+        flash(error, 'error')
+        return render_template('register.html')
     
-    
-    new_user = User(username= registrationUserData.get('username'),
-                email= registrationUserData.get('email')    )
-    new_user.setPassword(password=registrationUserData.get('password'))
+    #TODO: Need to validate to make sure this is a SAFE string
+    new_user = User(username= newUser_username,
+                email = newuser_email    )
+    new_user.setPassword(password=newuser_password)
     new_user.add()
-    return jsonify({"Message": f"Created {new_user}"}), 200
-
+    #return jsonify({"Message": f"Created {new_user}"}), 200
+    print('Account Created!')
+    flash("Account Created! Please login.", 'success')
+    return render_template('register.html')
     
 @auth.route('/login',methods=['POST'] )
 def login():
@@ -134,8 +143,22 @@ def refreshAccessToken():
 @auth.route('/logout')
 @jwt_required()
 def logout():
-   jwt = get_jwt()
-   jti = jwt['jti']
-   blockedToken = NoNoTokens(jti=jti)
-   blockedToken.add()
-   return jsonify({"Message": "token_blocked"}),200
+    acceptHeader = request.headers.get('Accept','')
+    response = make_response()
+    jwt = get_jwt()
+    jti = jwt['jti']
+    blockedToken = NoNoTokens(jti=jti)
+    blockedToken.add()
+    if 'application/json' in acceptHeader:
+        response.data = jsonify({"Message": "Log Out Successful", "token_info": "token_revoked"})
+        response.status_code = 200
+        response.content_type = 'application/json'
+        
+    else:
+        response.data = render_template("error/loggedOut.html")
+        response.status_code = 200
+        response.content_type = 'text/html'
+    #set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
+    #this will set up future requests to say not authenticated (or redirect to login)
+    response.set_cookie("access_token_cookie", "", max_age=0)
+    return response,200

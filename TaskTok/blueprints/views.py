@@ -17,14 +17,20 @@ import requests
 
 #our root route (home)
 @views.route('/', methods=['GET','POST'])
+#need optional=True so we can check current_user to see if they're already authenticated.
+@jwt_required(optional=True)
 def mainPage():
     """
-    function for the home page
+    function for the main page. If the user is already authenticated, just send him to /home
+    otherwise, make them login first.
     """
-    #If user clicked 'login' redirect to keycloak.
-  
-    #otherwise, render the mainPage
-    return render_template('landingPage.html')
+    if current_user:
+        print('User already authenticated')
+        
+        return redirect(url_for('views.home'))
+    
+    print('User is not authenticated')
+    return render_template('loginPage.html')
 
 
    
@@ -32,13 +38,19 @@ def mainPage():
 @jwt_required()
 def home():
     #check for JWT in cookie
+    sideNavMenuItems = [
+        {'title': 'Home', 'url': url_for('views.home')},
+        {'title': 'Profile', 'url': url_for('views.home')},
+        {'title': 'Admin', 'url': url_for('views.home')},
+        {'title': 'Log Out', 'url': url_for('auth.logout')},
+        ]
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     #response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
     
     
     
 
-    return render_template('home.html', username=current_user.username)
+    return render_template('home.html', username=current_user.username, sideNavMenuItems = sideNavMenuItems)
         
         
     
