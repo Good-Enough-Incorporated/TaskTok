@@ -21,7 +21,7 @@ from functools import wraps
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
-
+from sqlalchemy.exc import OperationalError
 
 auth = Blueprint("auth", __name__)
 
@@ -63,12 +63,18 @@ def register():
     flash("Account Created! Please login.", 'success')
     return render_template('register.html')
     
-@auth.route('/login',methods=['POST'] )
+@auth.route('/login',methods=['GET', 'POST'] )
 def login():
+
+    if request.method == "GET":
+        return redirect(url_for("views.mainPage"))
     formUsername = request.form.get('username')
     formPassword = request.form.get('password')
     #attempt to find the user passed by the login endpoint
-    user = User.getUserByUsername(username=formUsername)
+    try:
+        user = User.getUserByUsername(username=formUsername)
+    except OperationalError as e:
+        return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDatabase | flask makeAdminUser"
     if user and (user.verifyPassword(password=formPassword)):
         accessToken = create_access_token(identity=user)#was username
         refreshToken = create_refresh_token(identity=user)#was username

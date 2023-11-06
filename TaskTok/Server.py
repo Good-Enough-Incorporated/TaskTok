@@ -18,6 +18,7 @@ def create_app():
     app.config['SECRET_KEY'] = r'HJDNUIWQEYH156345357564@@!@$'
     app.config['JWT_SECRET_KEY'] = r'CHANGEMELATER-JWTSECRET'
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     
     #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
     #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'

@@ -73,4 +73,5 @@ class taskReminder(db.Model):
         db.session.commit()
     @classmethod
     def findTaskByUsername(cls, username):
-        cls.query.filter_by(owner_username=username).first()
+        print(f'looking for {username} tasks')
+        return cls.query.filter_by(owner_username=username).all()
