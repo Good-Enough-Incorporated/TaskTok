@@ -23,6 +23,10 @@ class User(db.Model):
         return cls.query.filter_by(username = username).first()
     
     @classmethod
+    def getUserById(cls, id):
+        return cls.query.filter_by(id = id).first()
+    
+    @classmethod
     def getUserCount(cls):
         return (cls.query.count())
     
