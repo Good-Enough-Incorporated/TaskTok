@@ -21,6 +21,7 @@ def create_app():
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
     
     #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
     #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
@@ -55,7 +56,7 @@ def create_app():
             exp_timestamp = get_jwt()["exp"]
             now = datetime.now(timezone.utc)
             
-            target_timestamp = datetime.timestamp(now + timedelta(minutes=60))
+            target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
         
             if target_timestamp > exp_timestamp:
                 
