@@ -23,7 +23,7 @@ def addTask():
 @api.route('/listTask')
 @jwt_required()
 def listTask():
-    #create file async test.
+    #TODO: Probably need to returned a paged list for a lot of tasks
     userData = current_user
     taskList = taskReminder.findTaskByUsername(username= userData.username)
     taskList_string = TaskSchema().dump(taskList, many=True)
