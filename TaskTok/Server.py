@@ -2,7 +2,7 @@
 #import logging
 
 from flask import Flask, jsonify, request, render_template, make_response
-
+from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
 from .extensions import db, jwtManager
 from .models import User, NoNoTokens
 from .schema import UserSchema
@@ -10,6 +10,7 @@ from RemindMeClient.celeryManager import celery_init_app
 from celery import Celery
 from RemindMeClient import task
 import inspect
+from datetime import timedelta, timezone, datetime
 #keycloak_client = Client('192.168.1.26/kc/callback')
 def create_app():
     app = Flask(__name__)
@@ -18,6 +19,9 @@ def create_app():
     app.config['SECRET_KEY'] = r'HJDNUIWQEYH156345357564@@!@$'
     app.config['JWT_SECRET_KEY'] = r'CHANGEMELATER-JWTSECRET'
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
     
     #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
     #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
@@ -44,6 +48,32 @@ def create_app():
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
 
+#source: https://flask-jwt-extended.readthedocs.io/en/stable/refreshing_tokens.html
+    @app.after_request
+    def refresh_expiring_jwts(response):
+        
+        try:
+            exp_timestamp = get_jwt()["exp"]
+            now = datetime.now(timezone.utc)
+            
+            target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+        
+            if target_timestamp > exp_timestamp:
+                
+                #get_jwt_identity returns id
+                #but currently assigning identity with userObject
+                #probably need to change this to userObject.id
+                id = get_jwt_identity()
+                userObject = User.getUserById(id=id)
+                print(f'Reissuing token for [{userObject.username}]')
+                access_token = create_access_token(identity=userObject)
+               
+                set_access_cookies(response, access_token)
+            return response
+        except (RuntimeError, KeyError):
+            # Case where there is not a valid JWT. Just return the original response
+            return response
+
     @app.errorhandler(404)
     def pageNotFound(error):
         return render_template("error/notFound.html"),404
@@ -62,7 +92,7 @@ def create_app():
     #additional claims for roles 'admin'?
     @jwtManager.additional_claims_loader
     def addAdditionalClaims(identity):
-        
+       # user = User.getUserById(id=identity)
         if identity.username == "admin":
             return {"is_admin" : True}
         else:

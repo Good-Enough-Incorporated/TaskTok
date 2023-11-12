@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from TaskTok.models import User, taskReminder
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 import datetime
-from TaskTok.schema import UserSchema
+from TaskTok.schema import UserSchema, TaskSchema
 from RemindMeClient.task import send_email, create_file
 from RemindMeClient import task as cTask
 import datetime
@@ -18,18 +18,43 @@ def addTask():
     
     task = taskReminder(owner_username=userData.username, task_dueDate=datetime.datetime.now(), task_description="Hello, this is the reminder of the example task", task_name="My Task!", task_message="This is the message")
     task.add()
-    return "Added task to the database"
+    return jsonify({"Message": "Added task to the database", "UserData": userData.username} )
 
 @api.route('/listTask')
+@jwt_required()
 def listTask():
-    #create file async test.
+    #TODO: Probably need to returned a paged list for a lot of tasks
+    userData = current_user
+    taskList = taskReminder.findTaskByUsername(username= userData.username)
+    taskList_string = TaskSchema().dump(taskList, many=True)
+    return jsonify({"TaskList": taskList_string}),200
 
-    create_file.delay("test.txt", "another test!")
+    #create_file.delay("test.txt", "another test!")
     
     return "Ran test task!"
-@api.route('/removeTask')
-def removeTask():
-    return "removeTask"
+@api.route('/removeTask/<taskID>')
+@jwt_required()
+def removeTask(taskID):
+    #Get the current user, check to make sure the supplied taskID belongs to them
+    #TODO: Need to make sure <taskID> is safe
+    print("beginning removeTask")
+    userData = current_user
+    currentTask = taskReminder.query.get(taskID)
+    if currentTask is not None and userData.username == currentTask.owner_username:
+        print(f"[api/removeTask] {userData.username} is the owner, removing task {taskID}")
+        try:
+            currentTask.remove()
+            print("ending removeTask")
+            return jsonify({'Message': "remove_success"})
+        except Exception as e:
+            #TODO:Log the removal error
+            print("ending removeTask")
+            return jsonify({'Message': "remove_fail"})
+        
+
+        
+
+
 @api.route('/')
 def get_tasks():
     

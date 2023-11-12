@@ -18,10 +18,10 @@ from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, se
 from werkzeug.utils import redirect
 from flask import render_template, current_app, Response, make_response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
-
+from sqlalchemy.exc import OperationalError
 
 auth = Blueprint("auth", __name__)
 
@@ -63,12 +63,18 @@ def register():
     flash("Account Created! Please login.", 'success')
     return render_template('register.html')
     
-@auth.route('/login',methods=['POST'] )
+@auth.route('/login',methods=['GET', 'POST'] )
 def login():
+
+    if request.method == "GET":
+        return redirect(url_for("views.mainPage"))
     formUsername = request.form.get('username')
     formPassword = request.form.get('password')
     #attempt to find the user passed by the login endpoint
-    user = User.getUserByUsername(username=formUsername)
+    try:
+        user = User.getUserByUsername(username=formUsername)
+    except OperationalError as e:
+        return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDatabase | flask makeAdminUser"
     if user and (user.verifyPassword(password=formPassword)):
         accessToken = create_access_token(identity=user)#was username
         refreshToken = create_refresh_token(identity=user)#was username
@@ -160,5 +166,6 @@ def logout():
         response.content_type = 'text/html'
     #set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
     #this will set up future requests to say not authenticated (or redirect to login)
-    response.set_cookie("access_token_cookie", "", max_age=0)
+    #response.set_cookie("access_token_cookie", "", max_age=0)
+    unset_jwt_cookies( response=response)
     return response,200
