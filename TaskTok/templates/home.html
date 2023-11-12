@@ -101,6 +101,36 @@ table {
     table.table thead th:first-child {
       border-left: none;
     }
+    .task-edit-btn, .task-delete-btn  {
+      background-color: #E0A900;
+      border: none;
+      color: black;
+      padding: 8px 16px;
+      margin-right: 8px;
+      text-decoration: none;      
+      cursor: pointer;
+      border-radius: 8px;
+      }
+      .toast-container {
+    
+    display: block;
+    visibility: hidden; /* Moved visibility here */
+    min-width: 250px;
+    background-color: #0a0a0a;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+}
+
+.toast-container.show {
+    visibility: visible; /* This will now work as expected */
+}
 
 
 /* Media query for smaller screens *
@@ -119,9 +149,12 @@ table {
     <div class="main">
         <h2>TaskTok</h2>
         <p>Fancy Slogan</p>
-        <p><b>We've made it {{username}}!!!</b></p>
+        <p><b>Welcome back {{username}}</b></p>
     </div>
-
+    <div id="toast-container" class="toast-container">
+        <div id="toast-user-content">
+        </div>
+    </div>
     <div class="table-container">
         <table id="taskTable"> 
             <thead>

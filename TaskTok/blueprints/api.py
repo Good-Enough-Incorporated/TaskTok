@@ -23,7 +23,7 @@ def addTask():
 @api.route('/listTask')
 @jwt_required()
 def listTask():
-    #create file async test.
+    #TODO: Probably need to returned a paged list for a lot of tasks
     userData = current_user
     taskList = taskReminder.findTaskByUsername(username= userData.username)
     taskList_string = TaskSchema().dump(taskList, many=True)
@@ -32,9 +32,29 @@ def listTask():
     #create_file.delay("test.txt", "another test!")
     
     return "Ran test task!"
-@api.route('/removeTask')
-def removeTask():
-    return "removeTask"
+@api.route('/removeTask/<taskID>')
+@jwt_required()
+def removeTask(taskID):
+    #Get the current user, check to make sure the supplied taskID belongs to them
+    #TODO: Need to make sure <taskID> is safe
+    print("beginning removeTask")
+    userData = current_user
+    currentTask = taskReminder.query.get(taskID)
+    if currentTask is not None and userData.username == currentTask.owner_username:
+        print(f"[api/removeTask] {userData.username} is the owner, removing task {taskID}")
+        try:
+            currentTask.remove()
+            print("ending removeTask")
+            return jsonify({'Message': "remove_success"})
+        except Exception as e:
+            #TODO:Log the removal error
+            print("ending removeTask")
+            return jsonify({'Message': "remove_fail"})
+        
+
+        
+
+
 @api.route('/')
 def get_tasks():
     
