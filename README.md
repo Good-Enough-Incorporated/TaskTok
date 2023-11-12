@@ -1,41 +1,28 @@
 **This project is a collaborative effort for Team 5 in UMGC 495 for our capstone project. This developement is purely for school and is not used in any production environment.**
 
-Team instructions: 
+1) Install VSCode, Python 3.11
+2) Download Git or Github Desktop
+3) Clone this repository https://github.com/Good-Enough-Incorporated/TaskTok.git
+4) Open the project folder in VSCode (C:\Users\jason\OneDrive\Documents\GitHub\GEI\TaskTok) or where ever you saved it.
+5) Ctr + Shift + P > Python: Create Environment > Select the requirement.txt file
+6) Run the app.py file and make sure the Flask server runs
+(should see something like below)
+  WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on https://127.0.0.1:443
+ * Running on https://192.168.1.26:443
 
-Install Python (3.11)
-
-Download Github desktop, VSCode
-
-add the TaskTok repository and make a local copy. From Github Desktop it should also ask to open project in VSCode
-
-Create the virtual environment with VSCode Control Shift P: Python: Create Environment
-
-It should ask if you want to install from requirements.txt
-
-(or manually)
-run pip install -r .\requirements.txt
-
-then you should be able to run python .\run.py
-
-
-
-to create users, i'm using postman:
-
-POST 192.168.1.26/auth/register
-
-BODY: JSON
-
-{
-
-    "username": "test",
-    "email": "test123@gmail.com",
-    "password": "hello"
+7) Stop the server by Ctrl + C
+   *(should see (.venv) before your commands now)*
+8) Run the following commands
+   - Flask createDatabase
+   - Flask createAdminUser
+   - Flask createAdminTasks
 
 
-}
 
-
-to check database, i'm using DB Browser for SQLite
+**Other Useful Information**
+to view the database, i'm using DB Browser for SQLite
 
 db is located: TaskTok\instance\db.sqlite3
 
