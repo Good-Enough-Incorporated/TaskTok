@@ -24,7 +24,7 @@ def mainPage():
     function for the main page. If the user is already authenticated, just send him to /home
     otherwise, make them login first.
     """
-    HEADERS = request.environ.get("SSL_CLIENT_CERT")
+    #HEADERS = request.environ.get("SSL_CLIENT_CERT")
     if current_user:
         print('User already authenticated')
         

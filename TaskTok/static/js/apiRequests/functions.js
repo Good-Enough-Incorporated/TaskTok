@@ -1,4 +1,4 @@
- function getCookie(name) {
+function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
@@ -14,7 +14,7 @@
     return cookieValue;
   }
   
-  async function addTask() {
+async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
     try {
         const response = await fetch('/api/addTask', {
@@ -32,39 +32,68 @@
         }
     }
   
-    async function listTask() {
-        const csrfAccessToken = getCookie('csrf_access_token');
-        //pretend long load time
-        //await new Promise(r => setTimeout(r, 10000));
-        try {
-            const response = await fetch('/api/listTask', {
-                method: "GET",
-                headers: {
-                    'X-CSRF-TOKEN': csrfAccessToken,
-                },
-                });
-    
-                //Get our async api call
-                const data = await response.json();
-                
-                console.log(typeof(data));
-                
-                createTableHeader()
-                data.TaskList.forEach(task => {
-                    addRowToTable(task);
-                });
-            
-            //add event handlers for edit/delete buttons
-            addButtonEventHandlers();
- 
-
-
-
-            } catch (error) {
-                console.error("Error:", error)
-            }
+async function removeTask(taskID) {
+    //we need a csrfAccessToken to make our API call
+    console.log("[removeTask]: beginning client api request")
+    const csrfAccessToken = getCookie('csrf_access_token');
+    console.log("[removeTask]: obtained csrf token")
+    try{
+        console.log("[removeTask]: calling /api/removeTask/ call")
+        const response =  await fetch(`api/removeTask/${taskID}`, {
+            method: "GET",
+            headers: {
+                'X-CSRF-TOKEN': csrfAccessToken
+            },
+        });
+        console.log("[removeTask]: waiting for response")
+        const data = await response.json();
+        console.log("[removeTask]: response received!")
+        if (data.Message == 'remove_success'){
+            showToast("Task was successfully removed.", 5000);
+            console.log('Task was deleted from the database')
+            removeRowFromTable(taskID);
+        } else {
+            showToast("Task failed to be removed :(", 5);
+            console.log('Something went wrong when deleting the task')
         }
-  // Call this function after successful login
+        //console.log(data);
+        
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+async function listTask() {
+    const csrfAccessToken = getCookie('csrf_access_token');
+    //pretend long load time
+    //await new Promise(r => setTimeout(r, 10000));
+    try {
+        const response = await fetch('/api/listTask', {
+            method: "GET",
+            headers: {
+                'X-CSRF-TOKEN': csrfAccessToken,
+            },
+            });
+
+            //Get our async api call
+            const data = await response.json();
+            
+            console.log(typeof(data));
+            
+            createTableHeader()
+            data.TaskList.forEach(task => {
+                addRowToTable(task);
+            });
+        
+        //add event handlers for edit/delete buttons
+        addButtonEventHandlers();
+
+        } catch (error) {
+            console.error("Error:", error)
+        }
+}   
+
+        
   
   function createTableHeader(){
     var table = document.getElementById('taskTable').getElementsByTagName('thead')[0];
@@ -94,12 +123,22 @@
       console.log('FOUND BUTTON')
       button.addEventListener('click', function(event) {
           const dataID = this.closest('tr').getAttribute('data-id');
-          console.log('DB Task ID=', dataID)
+          console.log('attempting to remove taskID=', dataID)
+          //TODO: Need a confirmation box before removal
+          removeTask(dataID)
+          
+
       })
     }
       )
   }
 
+  function removeRowFromTable(taskID){
+    const row = document.querySelector(`tr[data-id="${taskID}"]`);
+    if(row){
+        row.remove();
+    }
+  }
   function addRowToTable(task){
     
     var table = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
@@ -122,6 +161,18 @@
     cell7.innerHTML = '<button class="task-edit-btn">Edit</button><button class="task-delete-btn">Delete</button>'
     
   }
+
+  function showToast(message, duration = 3000) {
+    const toast = document.getElementById("toast-container");
+    const toastContent = document.getElementById("toast-user-content");
+    toastContent.textContent = message;
+    toast.classList.add("show");
+
+    // Hide the toast after 'duration' milliseconds
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
   
   document.addEventListener('DOMContentLoaded', function(){
   //Use the DOMContentLoaded to make sure the DOM is fully loaded before trying to load our script.
