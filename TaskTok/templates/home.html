@@ -1,44 +1,91 @@
-<!DOCTYPE>
-<html>  
-<style>
-Body {
-	font-family: Calibri, Helvetica, sans-serif;
-    color: #FFBF00; 
-	background: #0F0F12 ;
-	}
-    button { 
-	background-color: #ad7231 ; 
-	width: 100%;
-	color: black; 
-	padding: 15px; 
-	margin: 10px 0px; 
-	border: none; 
-	cursor: pointer;     
-	} 
-    
-    table {
-      position: fixed;
-        right: 40px;
-        bottom: 70px;
-      border: 3px solid #0F0F12;
-      
-      background-color: #17171C;
-      border-collapse: collapse;
-      width: 1000px;
-      text-align: right;
-	}    
-    tr {
-  		border-bottom: 1px solid #ddd;
-		}
-    td {
-    	color: #FFBF00;
-        padding: 10px;       
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TaskTok</title>
+    <style>
+        body {
+            font-family: Calibri, Helvetica, sans-serif;
+            color: #FFBF00;
+            background: #0F0F12;
+            margin: 0;
+            padding: 0;
         }
-   	tr:nth-child(even) {
- 	 background: #24242C;
-		} 
-        
-    table.table thead {
+
+        .sidenav {
+            height: 100%;
+            width: 175px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #17171c;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .sidenav a {
+            padding: 6px 6px 6px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        .main {
+            margin-left: 200px; /* Same as the width of the sidenav */
+            padding: 0px 10px;
+        }
+
+        .main h2, .main p {
+            color: #FFBF00;
+        }
+
+        .main {
+    margin-left: 200px; /* Same as the width of the sidenav */
+    padding: 0 10px;
+}
+
+.table-container {
+    width: calc(100% - 200px); /* Adjust width to account for sidenav */
+    margin-left: 200px;
+    margin-right: auto;
+    overflow-x: auto; /* Enables horizontal scrolling if the table overflows */
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border: 3px solid #0F0F12;
+    background-color: #17171C;
+    border-collapse: collapse;
+    
+    /* ... other styles ... */
+}
+        table, th, td {
+          border-bottom: 1px solid #ddd;
+          
+        }
+
+        th, td {
+            text-align: left; /* Align text to left */
+            color: #FFBF00;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #17171C;
+            color: #FFBF00;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #24242C;
+        }
+        table.table thead {
   background: #17171c;
   border-bottom: 0px solid #444444;
     }
@@ -54,99 +101,97 @@ Body {
     table.table thead th:first-child {
       border-left: none;
     }
+    .task-edit-btn, .task-delete-btn  {
+      background-color: #E0A900;
+      border: none;
+      color: black;
+      padding: 8px 16px;
+      margin-right: 8px;
+      text-decoration: none;      
+      cursor: pointer;
+      border-radius: 8px;
+      }
+      .toast-container {
+    
+    display: block;
+    visibility: hidden; /* Moved visibility here */
+    min-width: 250px;
+    background-color: #0a0a0a;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+}
+
+.toast-container.show {
+    visibility: visible; /* This will now work as expected */
+}
 
 
+/* Media query for smaller screens *
 
+/* Ensuring content doesn't hide behind sidenav even on very small screens */
 
-      
+    </style>
+</head>
+<body>
+  <div class="sidenav">
+    {% for menuItem in sideNavMenuItems %}
+    <a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
+  {% endfor %}
+  </div>
 
-    .sidenav {
-      height: 100%;
-      width: 175px;
-      position: fixed;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      background-color: #17171c;
-      overflow-x: hidden;
-      padding-top: 20px;
-    }
-
-    .sidenav a {
-      padding: 6px 6px 6px 32px;
-      text-decoration: none;
-      font-size: 25px;
-      color: #818181;
-      display: block;
-    }
-
-    .sidenav a:hover {
-      color: #f1f1f1;
-    }
-
-    .main {
-      margin-left: 200px; /* Same as the width of the sidenav */
-    }
-
-    @media screen and (max-height: 450px) {
-      .sidenav {padding-top: 15px;}
-      .sidenav a {font-size: 18px;}
-    }        
-</style>
-
-<body>  
-      <div class="sidenav">
-        {% for menuItem in sideNavMenuItems %}
-        <!-- <a href="#">Menu</a>
-        <a href="#">Menu</a>
-        <a href="#">Menu</a>
-        <a href="#">Menu</a>
-        -->
-        <a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
-      {% endfor %}
-      </div>
-
-      <div class="main">
+    <div class="main">
         <h2>TaskTok</h2>
         <p>Fancy Slogan</p>
-        <p><b>We've made it {{username}}!!!</b></p>
-      </div>
-      <table> 
+        <p><b>Welcome back {{username}}</b></p>
+    </div>
+    <div id="toast-container" class="toast-container">
+        <div id="toast-user-content">
+        </div>
+    </div>
+    <div class="table-container">
+        <table id="taskTable"> 
+            <thead>
+                <!-- <tr>
+                  <th>Owner</th>
+                  <th>Task Name</th>
+                  <th>Task Description</th>
+                  <th>Due Date</th>
+                  <th>Due Date (Offset)</th>
+                  <th>Task Email Receipients</th>
+                </tr>
+              -->
+            </thead>
+            <tbody>
+                <!-- Example 
+                <tr>
+                  <td>Admin</td>
+                  <td>Task1</td>
+                  <td>An example task</td>
+                  <td>11/6/2023 9:00 PM</td>
+                  <td>0</td>
+                  <td>anotheruser@gmail.com, seconduser@gmail.com, thirduser@gmail.com</td>
+                </tr>
+                <tr>
+                  <td>Admin</td>
+                  <td>Task1</td>
+                  <td>An example task</td>
+                  <td>11/6/2023 9:00 PM</td>
+                  <td>0</td>
+                  <td>anotheruser@gmail.com, seconduser@gmail.com, thirduser@gmail.com</td>
+                </tr>
+                -->
+            </tbody>
+        </table>
+        
+    </div>
 
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Event</th>
-        </tr> 
-  
-  <form>   
-        <td><input type="text" id="Date" /> </td>
-        <td><input type="text" id="Time" /> </td>  
-        <td><input type="text" id="Disc" /> </td>
-        <td><input type="submit" value="Submit"></td>
-  </form> 
-  
-  <form>
-        <tr><td>Example</td><td>Example</td><td>Example</td>
-          <td><input type="submit" value="Delete"></td>
-
-        <tr><td>Example</td><td>Example</td><td>Example</td> 
-          <td><input type="submit" value="Delete"></td>
-
-        <tr><td>Example</td><td>Example</td><td>Example</td>
-          <td><input type="submit" value="Delete"></td>
-
-        <tr><td>Example</td><td>Example</td><td>Example</td>
-          <td><input type="submit" value="Delete"></td>
-
-        <tr><td>Example</td><td>Example</td><td>Example</td>
-          <td><input type="submit" value="Delete"></td>
-
-        <tr><td>Example</td><td>Example</td><td>Example</td>
-          <td><input type="submit" value="Delete"></td> 
-  </form>
-  
-</table>  
-
+    <script src="{{ url_for('static', filename='js/apiRequests/functions.js') }}"></script>
 </body>
-</html> 
+</html>

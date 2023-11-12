@@ -23,6 +23,10 @@ class User(db.Model):
         return cls.query.filter_by(username = username).first()
     
     @classmethod
+    def getUserById(cls, id):
+        return cls.query.filter_by(id = id).first()
+    
+    @classmethod
     def getUserCount(cls):
         return (cls.query.count())
     
@@ -73,4 +77,5 @@ class taskReminder(db.Model):
         db.session.commit()
     @classmethod
     def findTaskByUsername(cls, username):
-        cls.query.filter_by(owner_username=username).first()
+        print(f'looking for {username} tasks')
+        return cls.query.filter_by(owner_username=username).all()

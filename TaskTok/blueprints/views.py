@@ -24,6 +24,7 @@ def mainPage():
     function for the main page. If the user is already authenticated, just send him to /home
     otherwise, make them login first.
     """
+    #HEADERS = request.environ.get("SSL_CLIENT_CERT")
     if current_user:
         print('User already authenticated')
         
@@ -42,7 +43,7 @@ def home():
         {'title': 'Home', 'url': url_for('views.home')},
         {'title': 'Profile', 'url': url_for('views.home')},
         {'title': 'Admin', 'url': url_for('views.home')},
-        {'title': 'Log Out', 'url': url_for('auth.logout')},
+        {'title': 'Sign Out', 'url': url_for('auth.logout')},
         ]
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     #response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
