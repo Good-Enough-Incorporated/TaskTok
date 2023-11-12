@@ -27,8 +27,8 @@ def create_app():
     #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
     app.config.from_mapping(
     CELERY=dict(
-        broker_url='pyamqp://admin:password@localhost:5672/tasktok',
-        #result_backend='rpc://admin:password@localhost:5672/tasktok',
+        broker_url='redis://localhost',
+        result_backend='redis://localhost',
         task_ignore_result=True,
     ),
 )

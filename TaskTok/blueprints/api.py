@@ -10,6 +10,12 @@ import subprocess
 import socket
 api = Blueprint('api', __name__)
 
+@api.route('/sendMail')
+@jwt_required()
+def sendMail():
+    create_file.delay('test.txt', "This is a test email")
+    return 'sendMail'
+
 @api.route('/addTask')
 @jwt_required()
 def addTask():
