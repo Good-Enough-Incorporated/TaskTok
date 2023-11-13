@@ -26,14 +26,21 @@ def create_app():
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=hours)
-    app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
-    app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
+    #app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
+    #app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
     app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT')
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your App Password
-    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')     
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+    app.config.from_mapping(
+    CELERY=dict(
+        broker_url='redis://localhost',
+        result_backend='redis://localhost',
+        task_ignore_result=True,
+    ),
+) 
     #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
     
     #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
