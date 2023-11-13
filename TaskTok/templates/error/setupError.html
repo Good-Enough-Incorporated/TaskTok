@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Up Incomplete</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            max-width: 1170px;
+            margin: auto;
+            overflow: hidden;
+        }
+        .not-found {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 380px;
+            width: 100%;
+            padding: 50px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 86px;
+            margin-top: 0;
+            color: #ff6b6b;
+            letter-spacing: -10px;
+        }
+        p {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        a {
+            text-decoration: none;
+            font-size: 18px;
+            border: 1px solid #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #ff6b6b;
+        }
+        a:hover {
+            background-color: #ff6b6b;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="not-found">
+            <h1>Database Not Found!</h1>
+            <p>Please create your database using </p>
+            <a href="/">Log Back In</a>
+        </div>
+    </div>
+</body>
+</html>
