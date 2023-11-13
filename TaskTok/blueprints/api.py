@@ -14,7 +14,7 @@ api = Blueprint('api', __name__)
 @jwt_required()
 def sendMail():
     #send_email.delay('jason.supple.27@gmail.com', "Test Subject", "Test Body")
-    create_file.delay('test.txt' "hello world")
+    create_file.delay('test.txt', "hello world")
     return 'send_email celery task created :)'
 
 @api.route('/addTask')
