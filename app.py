@@ -7,6 +7,7 @@ from TaskTok.schema import UserSchema
 from RemindMeClient import task
 from TaskTok.functions import verifyCeleryWorker
 from TaskTok.functions import verifyMessageBrokerOnline
+from flask_mail import Mail, Message
 import click
 import datetime
 import os
@@ -87,6 +88,13 @@ def dropDB():
     with app.app_context():
         print("\nDropping all database tables!")
         db.drop_all()
+
+@app.cli.command('testSendMail')
+def testSendMail():
+    with app.app_context():
+        msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
+        msg.body="This email was sent using flask-mail and google's smtp relay"
+        app.mail.send(msg)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ import inspect
 from datetime import timedelta, timezone, datetime
 from dotenv import load_dotenv
 import os
+from flask_mail import Mail,Message
 #keycloak_client = Client('192.168.1.26/kc/callback')
 def create_app():
     app = Flask(__name__)
@@ -27,6 +28,12 @@ def create_app():
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=hours)
     app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
     app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
+    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
+    app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT')
+    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
+    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
+    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your App Password
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')     
     #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
     #app.config.from_mapping(
     #CELERY=dict(
@@ -41,7 +48,7 @@ def create_app():
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
     app.celery_app = celery_init_app(app)
-
+    app.mail = Mail(app)
 
     # Register blueprints:
     from .blueprints import api as api_blueprint
