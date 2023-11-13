@@ -25,9 +25,13 @@ def cli():
     pass
 
 
-@cli.command('checkCeleryStatus')
+@app.cli.command('checkCeleryStatus')
 def checkCeleryStatus():
-    celery_status = verifyCeleryWorker()
+    try:
+        celery_status = verifyCeleryWorker()
+    except: 
+        celery_status = None
+        
     status_message = "OK" if celery_status else "NOT OK"
     box_width = max(len(status_message), 20) + 4  # Adjust the width of the box based on the message length
 
@@ -36,14 +40,15 @@ def checkCeleryStatus():
     print("╚" + "═" * box_width + "╝\n")
 
 
-@cli.command('checkMessageBrokerStatus')
+@app.cli.command('checkMessageBrokerStatus')
 def checkMessageBrokerStatus():
     host = 'localhost'
     port = 5672
     timeout = 5
-
-    message_broker_status = verifyMessageBrokerOnline(host, port, timeout)
-
+    try:
+        message_broker_status = verifyMessageBrokerOnline(host, port, timeout)
+    except:
+        message_broker_status = None
     status_message = "OK" if message_broker_status else "NOT OK"
     box_width = max(len(status_message), 24) + 4
     
@@ -52,7 +57,7 @@ def checkMessageBrokerStatus():
     print("╚" + "═" * box_width + "╝\n")
 
 
-@cli.command('createAdminUser')
+@app.cli.command('createAdminUser')
 def makeAdminUser():
     with app.app_context():
         print("\nCreating Admin User...\n")
@@ -61,7 +66,7 @@ def makeAdminUser():
         defaultAcc.add()
 
 
-@cli.command('createAdminTasks')
+@app.cli.command('createAdminTasks')
 def AddAdminTasks():
     with app.app_context():
         for tasks in range(10):
@@ -69,7 +74,7 @@ def AddAdminTasks():
             task.add()
 
 
-@cli.command('createDB')
+@app.cli.command('createDB')
 def createDB():
     with app.app_context():
         print("\nCreating database and default admin for first run.")
@@ -77,7 +82,7 @@ def createDB():
 
 
 # Use this for testing setupError.html page and other error pages based on DB setup issues.
-@cli.command('dropDB')
+@app.cli.command('dropDB')
 def dropDB():
     with app.app_context():
         print("\nDropping all database tables!")
@@ -87,7 +92,7 @@ def dropDB():
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.
     if len(sys.argv) > 1:
-        cli()
+        cli(app)
     # Else, just run Flask.
     else:
         app.run(host='0.0.0.0', port=443, debug=True, ssl_context='adhoc')

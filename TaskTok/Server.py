@@ -11,33 +11,36 @@ from celery import Celery
 from RemindMeClient import task
 import inspect
 from datetime import timedelta, timezone, datetime
+from dotenv import load_dotenv
+import os
 #keycloak_client = Client('192.168.1.26/kc/callback')
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite3"
-    app.config['SQLALCHEMY_ECHO'] = True
-    app.config['SECRET_KEY'] = r'HJDNUIWQEYH156345357564@@!@$'
-    app.config['JWT_SECRET_KEY'] = r'CHANGEMELATER-JWTSECRET'
-    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    load_dotenv()
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    app.config['SQLALCHEMY_ECHO'] = os.environ.get('SQLALCHEMY_ECHO')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+    app.config['JWT_TOKEN_LOCATION'] = os.environ.get('JWT_TOKEN_LOCATION')
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=hours)
+    app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
+    app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
     #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
-    
-    #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
-    #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
-    app.config.from_mapping(
-    CELERY=dict(
-        broker_url='redis://localhost',
-        #result_backend='redis://localhost',
-        task_ignore_result=True,
-    ),
-)
+    #app.config.from_mapping(
+    #CELERY=dict(
+    #    broker_url='redis://localhost',
+    #    #result_backend='redis://localhost',
+    #    task_ignore_result=True,
+    #),
+#)
 
 
     
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
-    celery_app = celery_init_app(app)
+    app.celery_app = celery_init_app(app)
 
 
     # Register blueprints:
