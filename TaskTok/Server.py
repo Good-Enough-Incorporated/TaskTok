@@ -3,7 +3,7 @@
 
 from flask import Flask, jsonify, request, render_template, make_response
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
-from .extensions import db, jwtManager
+from .extensions import db, jwtManager, flaskMail
 from .models import User, NoNoTokens
 from .schema import UserSchema
 from RemindMeClient.celeryManager import celery_init_app
@@ -13,8 +13,10 @@ import inspect
 from datetime import timedelta, timezone, datetime
 import os
 from dotenv import load_dotenv
-from flask_mail import Mail,Message
+
 #keycloak_client = Client('192.168.1.26/kc/callback')
+
+
 def create_app():
     app = Flask(__name__)
     load_dotenv()
@@ -42,9 +44,7 @@ def create_app():
     ),
 ) 
     #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
-    
-    #app.config['CELERY_BROKER_URL'] = 'pyamqp://admin:password@localhost/tasktok'
-    #app.config['CELERY_RESULT_BACKEND'] = 'rpc://'
+
 
 
 
@@ -53,7 +53,10 @@ def create_app():
     jwtManager.init_app(app)
     celery_app = celery_init_app(app)
     app.celery_app = celery_app
-    app.mail = Mail(app)
+    #app.mail = Mail(app)
+    #mail.init_app(app)
+    flaskMail.init_app(app)
+    
 
 
     # Register blueprints:

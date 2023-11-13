@@ -11,7 +11,7 @@ import click
 import datetime
 from flask_mail import Mail, Message
 import sys
-
+from TaskTok.extensions import flaskMail
 
 app = create_app()
 app.config['HOST'] = '0.0.0.0'
@@ -90,10 +90,10 @@ def dropDB():
 
 @app.cli.command('testSendMail')
 def testSendMail():
-    with app.app_context():
-        msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
-        msg.body="This email was sent using flask-mail and google's smtp relay"
-        app.mail.send(msg)
+    
+    msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
+    msg.body="This email was sent using flask-mail and google's smtp relay"
+    flaskMail.send(msg)
 
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.
@@ -101,6 +101,8 @@ if __name__ == '__main__':
         cli(app)
     # Else, just run Flask.
     else:
-     app.run(host='0.0.0.0', port=443, debug=True, ssl_context='adhoc')
+     app.run(host='0.0.0.0', port=443, debug=True, ssl_context=('/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'))
+     #change ssl_context to below when testing locally
+     #'adhoc'
 
 

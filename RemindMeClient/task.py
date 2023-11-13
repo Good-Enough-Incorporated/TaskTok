@@ -1,19 +1,17 @@
 from celery import shared_task
 import os
 from flask import Flask
-from flask_mail import Mail, Message
+from TaskTok.extensions import flaskMail
+from flask_mail import Message
 
 @shared_task(bind=True)
 def send_email(self, email_to, subject, body):
     #args subject, recipient, body, creationDate
     #from TaskTok.models import taskReminder
     #print(f"[{creationDate}]: Pretending to send an email to *{recipient}* subject= {subject} body = {body}")
-    from TaskTok.Server import create_app
-    app = create_app()
-    with app.app_context():
         msg = Message(subject, recipients=[email_to])
         msg.body=body
-        app.mail.send(msg)
+        flaskMail.send(msg)
 
 
 @shared_task(bind=True)
