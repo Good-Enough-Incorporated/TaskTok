@@ -3,7 +3,7 @@
 
 from flask import Flask, jsonify, request, render_template, make_response
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
-from .extensions import db, jwtManager
+from .extensions import db, jwtManager,flaskMail
 from .models import User, NoNoTokens
 from .schema import UserSchema
 from RemindMeClient.celeryManager import celery_init_app
@@ -26,8 +26,8 @@ def create_app():
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=hours)
-    app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
-    app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
+    #app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
+    #app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
     app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT')
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
@@ -35,20 +35,20 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your App Password
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')     
     #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
-    #app.config.from_mapping(
-    #CELERY=dict(
-    #    broker_url='redis://localhost',
-    #    #result_backend='redis://localhost',
-    #    task_ignore_result=True,
-    #),
-#)
+    app.config.from_mapping(
+    CELERY=dict(
+        broker_url='redis://localhost',
+        result_backend='redis://localhost',
+        task_ignore_result=True,
+    ),
+) 
 
 
     
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
     app.celery_app = celery_init_app(app)
-    app.mail = Mail(app)
+    flaskMail.init_app(app)
 
     # Register blueprints:
     from .blueprints import api as api_blueprint

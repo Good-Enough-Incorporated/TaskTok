@@ -1,13 +1,13 @@
 from TaskTok.Server import create_app
 from flask import Flask, jsonify, request
 from flask.cli import with_appcontext, FlaskGroup
-from TaskTok.extensions import db, jwtManager
+from TaskTok.extensions import db, jwtManager, flaskMail
 from TaskTok.models import User, NoNoTokens, taskReminder
 from TaskTok.schema import UserSchema
 from RemindMeClient import task
 from TaskTok.functions import verifyCeleryWorker
 from TaskTok.functions import verifyMessageBrokerOnline
-from flask_mail import Mail, Message
+from flask_mail import Message
 import click
 import datetime
 import os
@@ -95,7 +95,12 @@ def testSendMail():
         msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
         msg.body="This email was sent using flask-mail and google's smtp relay"
         app.mail.send(msg)
-
+@app.cli.command('testSendMail')
+def testSendMail():
+    
+    msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
+    msg.body="This email was sent using flask-mail and google's smtp relay"
+    flaskMail.send(msg)
 
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.
