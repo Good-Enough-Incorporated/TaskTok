@@ -8,7 +8,7 @@ class User(db.Model):
         return str(uuid4())
     
     __tablename__ = 'users'
-    id = db.Column(db.String(), primary_key=True, default = generate_uuid))
+    id = db.Column(db.String(), primary_key=True, default = generate_uuid)
     username = db.Column(db.String(), nullable=False)
     email = db.Column(db.String())
     password = db.Column(db.Text())
