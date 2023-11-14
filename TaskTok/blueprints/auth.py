@@ -22,6 +22,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
 from sqlalchemy.exc import OperationalError
+from TaskTok.forms import NewUserForm
 
 auth = Blueprint("auth", __name__)
 
@@ -33,35 +34,39 @@ callback_URL = f"http://192.168.1.26/kc/callback"
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    form = NewUserForm()
     if request.method == "GET":
-        return render_template('register.html')
+        return render_template('register.html', form=form)
 
-
-
-
-    newUser_username = request.form.get('username')
-    newuser_password = request.form.get('password')
-    newuser_email = request.form.get('email')
-    print(f"Username = {newUser_username}")
-    user = User.getUserByUsername(username=newUser_username)
-    print(user)
-    if user is not None:        
-        #return json if application/json later
-        #return jsonify({"Error":"User already exists"}), 403
-        print('user already exists')
-        error = 'Username already exists. Please login'
+    #TODO: Enclose this in a validation block
+    if form.validate_on_submit():
+        newUser_username = request.form.get('username')
+        newuser_password = request.form.get('password')
+        newuser_email = request.form.get('email')
+        print(f"Username = {newUser_username}")
+        user = User.getUserByUsername(username=newUser_username)
+        print(user)
+        if user is not None:        
+            #return json if application/json later
+            #return jsonify({"Error":"User already exists"}), 403
+            print('user already exists')
+            error = 'Username already exists. Please login'
+            flash(error, 'error')
+            return render_template('register.html')
+        #TODO: Need to finish validation for email and password
+        new_user = User(username= newUser_username,
+                   email = newuser_email    )
+        new_user.setPassword(password=newuser_password)
+        new_user.add()
+        #return jsonify({"Message": f"Created {new_user}"}), 200
+        print('Account Created!')
+        flash("Account Created! Please login.", 'success')
+        return redirect(url_for('auth.register'))
+    else:
+        error = form.username.errors[0]
         flash(error, 'error')
-        return render_template('register.html')
     
-    #TODO: Need to validate to make sure this is a SAFE string
-    new_user = User(username= newUser_username,
-                email = newuser_email    )
-    new_user.setPassword(password=newuser_password)
-    new_user.add()
-    #return jsonify({"Message": f"Created {new_user}"}), 200
-    print('Account Created!')
-    flash("Account Created! Please login.", 'success')
-    return render_template('register.html')
+    return render_template('register.html', form=form)
     
 @auth.route('/login',methods=['GET', 'POST'] )
 def login():
