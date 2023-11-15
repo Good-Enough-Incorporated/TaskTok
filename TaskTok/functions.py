@@ -4,9 +4,9 @@ import socket
 def verifyCeleryWorker():
     try:
         result = subprocess.check_output(['celery','-A', 'RemindMeClient.Client.celery', 'status'])
-        print(f"OUTPUT RESULT: {result}")
+        #print(f"OUTPUT RESULT: {result}")
         return True if result else False
-    except subprocess.CalledProcessError as error:
+    except Exception as error:
         return False
     
 
