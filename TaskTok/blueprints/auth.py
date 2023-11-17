@@ -43,7 +43,11 @@ def verify_email(token):
     if nonVerifiedUser is not None:
         if nonVerifiedUser.isAccountVerified() is False: 
             nonVerifiedUser.verifyEmailAddress()
-            db.session.commit()
+            try: 
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(e)
         else: 
             return "Email was already verified!"
         
