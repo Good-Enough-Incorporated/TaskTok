@@ -21,6 +21,7 @@ from functools import wraps
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
+from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
 from TaskTok.forms import NewUserForm
 
@@ -30,6 +31,28 @@ auth = Blueprint("auth", __name__)
 #kc = current_app.config['kc']
 callback_URL = f"http://192.168.1.26/kc/callback"
 
+@auth.route('/verify_email/<token>')
+def verify_email(token):
+    #check the token, if valid lookup the user via email and verify their account
+    tokenEmail = verify_email_token(token)
+    
+    if tokenEmail == False:
+        return "Invalid or expired token received."
+    
+    nonVerifiedUser = User.searchEmailAddress(email=tokenEmail)
+    if nonVerifiedUser is not None:
+        if nonVerifiedUser.isAccountVerified() is False: 
+            nonVerifiedUser.verifyEmailAddress()
+            db.session.commit()
+        else: 
+            return "Email was already verified!"
+        
+    else:
+        return "Verification failed - Unknown E-Mail"
+        #valid token, but couldn't find the user?
+
+    
+    return 'verified email'
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -40,9 +63,9 @@ def register():
 
     #TODO: Enclose this in a validation block
     if form.validate_on_submit():
-        newUser_username = request.form.get('username')
+        newUser_username = request.form.get('username').lower()
         newuser_password = request.form.get('password')
-        newuser_email = request.form.get('email')
+        newuser_email = request.form.get('email').lower()
         print(f"Username = {newUser_username}")
         user = User.getUserByUsername(username=newUser_username)
         print(user)
@@ -58,6 +81,8 @@ def register():
                    email = newuser_email    )
         new_user.setPassword(password=newuser_password)
         new_user.add()
+        token = generate_email_token(new_user.email)
+        print(f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
         #return jsonify({"Message": f"Created {new_user}"}), 200
         print('Account Created!')
         flash("Account Created! Please login.", 'success')
