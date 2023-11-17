@@ -1,5 +1,6 @@
 from TaskTok.Server import create_app
 from flask import Flask, jsonify, request
+from flask import render_template
 from flask.cli import with_appcontext, FlaskGroup
 from TaskTok.extensions import db, jwtManager, flaskMail
 from TaskTok.models import User, NoNoTokens, taskReminder
@@ -24,6 +25,10 @@ app.config['INITIALIZED'] = False
 @click.group()
 def cli():
     pass
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
 
 @app.cli.command('checkCeleryStatus')
@@ -89,18 +94,15 @@ def dropDB():
         print("\nDropping all database tables!")
         db.drop_all()
 
+
 @app.cli.command('testSendMail')
 def testSendMail():
     with app.app_context():
         msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
         msg.body="This email was sent using flask-mail and google's smtp relay"
         app.mail.send(msg)
-@app.cli.command('testSendMail')
-def testSendMail():
-    
-    msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
-    msg.body="This email was sent using flask-mail and google's smtp relay"
-    flaskMail.send(msg)
+
+
 
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.

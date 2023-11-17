@@ -178,3 +178,7 @@ def logout():
     #response.set_cookie("access_token_cookie", "", max_age=0)
     unset_jwt_cookies( response=response)
     return response,200
+
+@auth.route('/forgotPassword', methods=['GET', 'POST'])
+def forgot_password():
+    return render_template('forgotPassword.html')

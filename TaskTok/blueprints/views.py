@@ -41,7 +41,7 @@ def home():
     #check for JWT in cookie
     sideNavMenuItems = [
         {'title': 'Home', 'url': url_for('views.home')},
-        {'title': 'Profile', 'url': url_for('views.home')},
+        {'title': 'Profile', 'url': url_for('views.profile')},
         {'title': 'Admin', 'url': url_for('views.home')},
         {'title': 'Sign Out', 'url': url_for('auth.logout')},
         ]
@@ -53,7 +53,9 @@ def home():
 
     return render_template('home.html', username=current_user.username, sideNavMenuItems = sideNavMenuItems)
         
-        
+@views.route('/profile')
+def profile():
+    return render_template('profile.html')
     
 
 
