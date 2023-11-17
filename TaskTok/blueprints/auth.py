@@ -22,7 +22,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
 from sqlalchemy.exc import OperationalError
-from TaskTok.forms import NewUserForm
+from TaskTok.forms import NewUserForm, LoginForm
 
 auth = Blueprint("auth", __name__)
 
@@ -38,7 +38,6 @@ def register():
     if request.method == "GET":
         return render_template('register.html', form=form)
 
-    #TODO: Enclose this in a validation block
     if form.validate_on_submit():
         newUser_username = request.form.get('username')
         newuser_password = request.form.get('password')
@@ -53,7 +52,12 @@ def register():
             error = 'Username already exists. Please login'
             flash(error, 'error')
             return render_template('register.html', form=form)
-        #TODO: Need to finish validation for email and password
+        email = User.searchEmailAddress(email=newuser_email)
+        if email is not None:
+            print('email already exists')
+            error = 'Email already exists. Please login with username'
+            flash(error, 'error')
+            return render_template('register.html', form=form)
         new_user = User(username= newUser_username,
                    email = newuser_email    )
         new_user.setPassword(password=newuser_password)
@@ -77,27 +81,39 @@ def login():
 
     if request.method == "GET":
         return redirect(url_for("views.mainPage"))
-    formUsername = request.form.get('username')
-    formPassword = request.form.get('password')
-    #attempt to find the user passed by the login endpoint
-    try:
-        user = User.getUserByUsername(username=formUsername)
-    except OperationalError as e:
-        return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDatabase | flask makeAdminUser"
-    if user and (user.verifyPassword(password=formPassword)):
-        accessToken = create_access_token(identity=user)#was username
-        refreshToken = create_refresh_token(identity=user)#was username
-        response = redirect(url_for('views.home'))
-        set_access_cookies(response, accessToken)
-        set_refresh_cookies(response, refreshToken)
-        
-        return response
-    else: 
-        return jsonify(
-            {
-                "message": "invalid username or password"
-            }
-        ),403
+    
+    formInput = request.form
+    form = LoginForm(formInput)
+    if form.validate_on_submit():
+        formUsername = request.form.get('username').lower()
+        formPassword = request.form.get('password')
+        #attempt to find the user passed by the login endpoint
+        try:
+            user = User.getUserByUsername(username=formUsername)
+        except OperationalError as e:
+            print(f'Failed to authenticate user: %s', e)
+            return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDatabase | flask makeAdminUser"
+        if user and (user.verifyPassword(password=formPassword)):
+            accessToken = create_access_token(identity=user)#was username
+            refreshToken = create_refresh_token(identity=user)#was username
+            response = redirect(url_for('views.home'))
+            set_access_cookies(response, accessToken)
+            set_refresh_cookies(response, refreshToken)
+            
+            return response
+        else: 
+            return jsonify(
+                {
+                    "message": "invalid username or password"
+                }
+            ),403
+    else:
+        if form.password.errors:
+            error = form.password.errors[0]
+        if form.username.errors:
+            error = form.username.errors[0]
+        flash(error, 'error')
+    return render_template('loginPage.html', form=form)
 
 @auth.route('/loginAPIUser',methods=['POST'] )
 def loginAPIUser():

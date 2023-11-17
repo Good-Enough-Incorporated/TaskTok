@@ -11,7 +11,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(), primary_key=True, default = generate_uuid)
     username = db.Column(db.String(), nullable=False)
-    email = db.Column(db.String())
+    email = db.Column(db.String(), unique=True)
     password = db.Column(db.Text())
 
 
@@ -26,6 +26,7 @@ class User(db.Model):
     
     @classmethod
     def getUserByUsername(cls, username):
+        print('getUserByUsername called with parameters %s %s'%(cls, username))
         return cls.query.filter_by(username = username).first()
     
     @classmethod
