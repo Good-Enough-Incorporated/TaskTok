@@ -26,10 +26,6 @@ app.config['INITIALIZED'] = False
 def cli():
     pass
 
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
 
 @app.cli.command('checkCeleryStatus')
 def checkCeleryStatus():
