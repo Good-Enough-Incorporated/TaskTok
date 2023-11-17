@@ -75,7 +75,7 @@ def register():
             print('user already exists')
             error = 'Username already exists. Please login'
             flash(error, 'error')
-            return render_template('register.html')
+            return render_template('register.html', form=form)
         #TODO: Need to finish validation for email and password
         new_user = User(username= newUser_username,
                    email = newuser_email    )
@@ -88,9 +88,13 @@ def register():
         flash("Account Created! Please login.", 'success')
         return redirect(url_for('auth.register'))
     else:
-        error = form.username.errors[0]
+        if form.email.errors:
+            error = form.email.errors[0]
+        if form.password.errors:
+            error = form.password.errors[0]
+        if form.username.errors:
+            error = form.username.errors[0]
         flash(error, 'error')
-    
     return render_template('register.html', form=form)
     
 @auth.route('/login',methods=['GET', 'POST'] )
