@@ -4,32 +4,53 @@ for all auth related functions
 
 routes for /auth, /updatepassword, etc
 """
-import re
-import datetime
-import fileinput
-import sys
-import os
-from TaskTok.models import User
-from os.path import exists
-from flask import Blueprint
-from flask import jsonify
-from passlib.hash import sha256_crypt
-from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, session
-from werkzeug.utils import redirect
-from flask import render_template, current_app, Response, make_response
+
+from flask import Blueprint, jsonify, request, flash, render_template, redirect, url_for, make_response
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, Length, Regexp
+from flask_jwt_extended import (create_access_token, create_refresh_token, 
+                                jwt_required, get_jwt_identity, set_access_cookies, 
+                                set_refresh_cookies, unset_jwt_cookies)
+from sqlalchemy.exc import OperationalError
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
-from TaskTok.models import NoNoTokens
+from TaskTok.models import User, NoNoTokens
 from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
-from sqlalchemy.exc import OperationalError
-from TaskTok.forms import NewUserForm
+import re
 
 auth = Blueprint("auth", __name__)
 
 #with app.app_context():
 #kc = current_app.config['kc']
-callback_URL = f"http://192.168.1.26/kc/callback"
+CALLBACK_URL = f"http://192.168.1.26/kc/callback"
+EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$)")
+
+
+
+class NewUserForm(FlaskForm):
+    username = StringField('Username', validators=[
+        DataRequired(), Length(min=4, max=12),
+        Regexp('^(?=.*[a-zA-Z])[a-zA-Z0-9]*$', message='Username must contain at least one letter.')])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=20)])
+    submit = SubmitField('Sign Up')
+
+def is_email_valid(email):
+    return EMAIL_REGEX.match(email)
+
+def create_user(username, email, password):
+    new_user = User(username=username, email=email)
+    new_user.setPassword(password)
+    new_user.add()
+    return new_user
+
+def get_user_by_username(username):
+    try:
+        return User.getUserByUsername(username=username)
+    except OperationalError:
+        raise Exception("Database setup not complete. Don't forget to create your database ;)")
+
 
 @auth.route('/verify_email/<token>')
 def verify_email(token):
@@ -68,38 +89,34 @@ def register():
     #TODO: Enclose this in a validation block
     if form.validate_on_submit():
         newUser_username = request.form.get('username').lower()
-        newuser_password = request.form.get('password')
         newuser_email = request.form.get('email').lower()
-        print(f"Username = {newUser_username}")
-        user = User.getUserByUsername(username=newUser_username)
-        print(user)
-        if user is not None:        
-            #return json if application/json later
-            #return jsonify({"Error":"User already exists"}), 403
-            print('user already exists')
-            error = 'Username already exists. Please login'
-            flash(error, 'error')
+        newuser_password = request.form.get('password')
+
+        if get_user_by_username(newUser_username):
+            flash('Username already exists. Please login', 'error')
             return render_template('register.html', form=form)
-        #TODO: Need to finish validation for email and password
-        new_user = User(username= newUser_username,
-                   email = newuser_email    )
-        new_user.setPassword(password=newuser_password)
-        new_user.add()
+        
+
+        if not is_email_valid(newuser_email):
+            flash('Invalid email format', 'error')
+            return render_template('register.html', form=form)
+        
+        new_user = create_user(newUser_username, newuser_email, newuser_password)
+        # send verification  email with the token generated.
         token = generate_email_token(new_user.email)
-        print(f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
-        #return jsonify({"Message": f"Created {new_user}"}), 200
-        print('Account Created!')
-        flash("Account Created! Please login.", 'success')
+
+        flash("Account Created! Please verify your email.", 'success')
         return redirect(url_for('auth.register'))
     else:
-        if form.email.errors:
-            error = form.email.errors[0]
-        if form.password.errors:
-            error = form.password.errors[0]
-        if form.username.errors:
-            error = form.username.errors[0]
-        flash(error, 'error')
-    return render_template('register.html', form=form)
+        # Checking form errors and handling them.
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error in the {getattr(form, field).label.text} field - {error}", 'error')
+        
+        return render_template('register.html', form=form)
+
+
+        
     
 @auth.route('/login',methods=['GET', 'POST'] )
 def login():
@@ -157,7 +174,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get("logged_in"):
-            return redirect(url_for("login", next=request.url))
+            return redirect(url_for("auth.login", next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
