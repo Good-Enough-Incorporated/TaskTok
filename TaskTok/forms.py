@@ -4,6 +4,7 @@ for all web forms
 """
 import re
 from flask_wtf import FlaskForm
+
 from wtforms import (StringField, PasswordField, SubmitField, ValidationError, EmailField)
 from wtforms.validators import DataRequired, InputRequired, Length
 from wtforms.widgets import (SubmitInput)
@@ -30,6 +31,7 @@ def validate_password(form, field):
     raise ValidationError('Password may only contain letters, numbers,'
                          +' and the following characters: . _ @ $ ! % * # ? & ^ -')
 
+
 def validate_username(form, field):
     #if len(field.data) == 0:
     #    raise ValidationError('Username is required')
@@ -44,6 +46,7 @@ def validate_username(form, field):
     if re.match('^[0-9]*$', field.data):
         raise ValidationError('Username must contain letters')
     if re.match('^[A-Za-z0-9]*$', field.data):
+
         return #String contains valid characters only
     raise ValidationError('Username may only contain letters and numbers')
     
@@ -55,3 +58,4 @@ class NewUserForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), validate_username])
     password = PasswordField('Password', validators=[InputRequired(), validate_password])
+
