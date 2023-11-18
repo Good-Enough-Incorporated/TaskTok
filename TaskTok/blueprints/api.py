@@ -10,6 +10,7 @@ import subprocess
 import socket
 api = Blueprint('api', __name__)
 
+
 @api.route('/sendMail')
 @jwt_required()
 def sendMail():
@@ -57,6 +58,21 @@ def removeTask(taskID):
             #TODO:Log the removal error
             print("ending removeTask")
             return jsonify({'Message': "remove_fail"})
+        
+@api.route('/editTask/<taskID>', methods=['PUT'])
+@jwt_required()
+def editTask(taskID):
+    userData = current_user
+    task = taskReminder.query.get(taskID)
+
+    # Checking if the task exists and belongs to the current user.
+    if task is None or task.owner_username != userData.username:
+        return jsonify({'Message': 'Task not found or not authorized'}), 404
+    
+    # Get the updated data from the request.
+    data = request.json
+    new_description = data.get('task_description')
+
         
 
         

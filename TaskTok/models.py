@@ -3,15 +3,21 @@ from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 class User(db.Model):
+
+    
     @staticmethod
     def generate_uuid():
         return str(uuid4())
-    
+
+
     __tablename__ = 'users'
     id = db.Column(db.String(), primary_key=True, default = generate_uuid)
     username = db.Column(db.String(), nullable=False)
-    email = db.Column(db.String())
+    email = db.Column(db.String(), unique=True)
     password = db.Column(db.Text())
+    is_confirmed = db.Column(db.Boolean(), default = False, unique=False)
+    confirmed_date = db.Column(db.DateTime())
+
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -22,9 +28,24 @@ class User(db.Model):
     def verifyPassword(self,password):
         return check_password_hash(self.password, password)
     
+    def verifyEmailAddress(self):
+        self.is_confirmed = True
+        self.confirmed_date = datetime.now()
+
+    def isAccountVerified(self):
+        if self.is_confirmed == True:
+            return True
+        else: 
+            return False
+        
+    
     @classmethod
     def getUserByUsername(cls, username):
+        print('getUserByUsername called with parameters %s %s'%(cls, username))
         return cls.query.filter_by(username = username).first()
+    @classmethod
+    def searchEmailAddress(cls, email):
+        return cls.query.filter_by(email = email).first()
     
     @classmethod
     def getUserById(cls, id):

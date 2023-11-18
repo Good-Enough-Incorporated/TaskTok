@@ -14,7 +14,9 @@ colorama==0.4.6
 cryptography==41.0.5
 Flask==3.0.0
 Flask-JWT-Extended==4.5.3
+Flask-Mail==0.9.1
 Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
 greenlet==3.0.0
 idna==3.4
 itsdangerous==2.1.2
@@ -40,3 +42,4 @@ urllib3==2.0.7
 vine==5.0.0
 wcwidth==0.2.8
 Werkzeug==3.0.0
+

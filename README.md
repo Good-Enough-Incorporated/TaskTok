@@ -15,7 +15,8 @@
 7) Stop the server by Ctrl + C
    *(should see (.venv) before your commands now)*
 8) Run the following commands
-   - Flask createDatabase
+   - Flask createDatabase 
+      - (should this be createDB instead?)
    - Flask createAdminUser
    - Flask createAdminTasks
 
