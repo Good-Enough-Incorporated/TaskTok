@@ -39,6 +39,7 @@ class User(db.Model):
     
     @classmethod
     def getUserByUsername(cls, username):
+        print('getUserByUsername called with parameters %s %s'%(cls, username))
         return cls.query.filter_by(username = username).first()
     @classmethod
     def searchEmailAddress(cls, email):

@@ -12,6 +12,7 @@ from TaskTok.Server import create_app
 views = Blueprint('views', __name__)
 CURRENT_CAR_IMAGE = None
 import requests
+from TaskTok.forms import LoginForm
 
 
 
@@ -30,8 +31,9 @@ def mainPage():
         
         return redirect(url_for('views.home'))
     
+    loginForm = LoginForm()
     print('User is not authenticated')
-    return render_template('loginPage.html')
+    return render_template('loginPage.html', form=loginForm)
 
 
    
