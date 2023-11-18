@@ -1,21 +1,17 @@
 from TaskTok.Server import create_app
 from flask import Flask, jsonify, request
-from flask import render_template
 from flask.cli import with_appcontext, FlaskGroup
-from TaskTok.extensions import db, jwtManager, flaskMail
+from TaskTok.extensions import db, jwtManager
 from TaskTok.models import User, NoNoTokens, taskReminder
 from TaskTok.schema import UserSchema
 from RemindMeClient import task
 from TaskTok.functions import verifyCeleryWorker
 from TaskTok.functions import verifyMessageBrokerOnline
-
-from flask_mail import Message
 import click
 import datetime
-import os
+from flask_mail import Mail, Message
 import sys
-
-
+from TaskTok.extensions import flaskMail
 
 app = create_app()
 app.config['HOST'] = '0.0.0.0'
@@ -85,23 +81,12 @@ def createDB():
         db.create_all()
 
 
-
 # Use this for testing setupError.html page and other error pages based on DB setup issues.
 @app.cli.command('dropDB')
 def dropDB():
     with app.app_context():
         print("\nDropping all database tables!")
         db.drop_all()
-
-
-@app.cli.command('testSendMail')
-def testSendMail():
-    with app.app_context():
-        msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
-        msg.body="This email was sent using flask-mail and google's smtp relay"
-        app.mail.send(msg)
-
-
 
 @app.cli.command('testSendMail')
 def testSendMail():
@@ -122,6 +107,5 @@ if __name__ == '__main__':
      #or for azure
      # '/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'
      
-
 
 

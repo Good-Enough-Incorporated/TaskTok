@@ -3,9 +3,7 @@
 
 from flask import Flask, jsonify, request, render_template, make_response
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
-
-from .extensions import db, jwtManager,flaskMail
-
+from .extensions import db, jwtManager, flaskMail
 from .models import User, NoNoTokens
 from .schema import UserSchema
 from RemindMeClient.celeryManager import celery_init_app
@@ -13,9 +11,8 @@ from celery import Celery
 from RemindMeClient import task
 import inspect
 from datetime import timedelta, timezone, datetime
-from dotenv import load_dotenv
 import os
-from flask_mail import Mail,Message
+from dotenv import load_dotenv
 
 #keycloak_client = Client('192.168.1.26/kc/callback')
 
@@ -38,10 +35,7 @@ def create_app():
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your App Password
-
-    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')     
-    #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
-
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
     app.config.from_mapping(
     CELERY=dict(
         broker_url='redis://localhost',
@@ -49,14 +43,20 @@ def create_app():
         task_ignore_result=True,
     ),
 ) 
+    #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
+
 
 
 
     
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
-    app.celery_app = celery_init_app(app)
+    celery_app = celery_init_app(app)
+    app.celery_app = celery_app
+    #app.mail = Mail(app)
+    #mail.init_app(app)
     flaskMail.init_app(app)
+    
 
 
     # Register blueprints:
