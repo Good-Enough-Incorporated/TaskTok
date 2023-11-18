@@ -18,7 +18,7 @@ button {
 	margin: 10px 0px; 
 	border: none; 
 	cursor: pointer; 
-    align: right;
+    align-self: right;
     position: relative;
 	} 
 
@@ -60,6 +60,38 @@ button:hover {
 -webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
 box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
 	}     
+
+.error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+/* Animation */
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flash-animate {
+  animation: slideDown 0.5s ease forwards;
+}
+
+.flash-text {
+  padding: 15px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+
 </style> 
 
 <head>
@@ -78,26 +110,35 @@ box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
 <form>
 </form>  
 	<form action="{{ url_for('auth.login') }}" method="post">
-	
-    <div class="container"> 
-    
-		<label>Username: </label> 
-			<input type="text" placeholder="Enter Username" name="username" required>
-		<label>Password: </label> 
-			<input type="password" placeholder="Enter Password" name="password" required>
-					
-		<button type="submit" class="login-btn">Login</button>	
-        
-        <div style= "float:right;">
-        	<input type="checkbox" checked="checked"> Remember me
-        </div>
-        
-		<a href="#"> Forgot password? </a>
-		<a href="{{ url_for('auth.register')}}" style="margin-left: 1rem;"> Create new account</a>
-				
-	</div> 
-
-</form>
+		{{ form.csrf_token }}
+		<div class="container"> 
+		
+			<label>Username: </label> 
+			<!--<input type="text" placeholder="Enter Username" name="username" required>-->
+			{{form.username(class_='username', placeholder_='Enter Username', id_='username')}}
+			<label>Password: </label> 
+			<!--<input type="password" placeholder="Enter Password" name="password" required>-->
+			{{form.password(class_='password', placeholder_='Enter Password', id_='password')}}
+						
+			<button type="submit" class="login-btn">Login</button>	
+			
+			<div style= "float:right;">
+				<input type="checkbox" checked="checked"> Remember me
+			</div>
+			
+			<a href="#"> Forgot password? </a>
+			<a href="{{ url_for('auth.register')}}" style="margin-left: 1rem;"> Create new account</a>
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+					<div class="flash-text {{ category }} flash-animate">
+						{{ message }}
+					</div>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}		
+		</div> 
+	</form>
 </div>
 	<div class="version">v0.1.0</div>
 </body>

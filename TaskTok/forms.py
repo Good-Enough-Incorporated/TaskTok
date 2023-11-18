@@ -51,3 +51,7 @@ class NewUserForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), validate_email])
     username = StringField('Username', validators=[InputRequired(), validate_username])
     password = PasswordField('Password', validators=[InputRequired(), validate_password])
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), validate_username])
+    password = PasswordField('Password', validators=[InputRequired(), validate_password])
