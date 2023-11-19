@@ -8,11 +8,13 @@ from TaskTok.schema import UserSchema
 from RemindMeClient import task
 from TaskTok.functions import verifyCeleryWorker
 from TaskTok.functions import verifyMessageBrokerOnline
+
 from flask_mail import Message
 import click
 import datetime
 import os
 import sys
+
 
 
 app = create_app()
@@ -83,6 +85,7 @@ def createDB():
         db.create_all()
 
 
+
 # Use this for testing setupError.html page and other error pages based on DB setup issues.
 @app.cli.command('dropDB')
 def dropDB():
@@ -100,12 +103,25 @@ def testSendMail():
 
 
 
+@app.cli.command('testSendMail')
+def testSendMail():
+    
+    msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
+    msg.body="This email was sent using flask-mail and google's smtp relay"
+    flaskMail.send(msg)
+
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.
     if len(sys.argv) > 1:
         cli(app)
     # Else, just run Flask.
     else:
-        app.run(host='0.0.0.0', port=443, debug=True, ssl_context='adhoc')
+     app.run(host='0.0.0.0', port=443, debug=True, ssl_context=('adhoc'))
+     #change ssl_context to below when testing locally
+     #'adhoc'
+     #or for azure
+     # '/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'
+     
+
 
 

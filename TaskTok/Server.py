@@ -1,20 +1,24 @@
 
 #import logging
 
-from flask import Flask, jsonify, request, render_template, make_response
+from flask import Flask, jsonify, request, render_template, make_response, flash
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
+
 from .extensions import db, jwtManager,flaskMail
+
 from .models import User, NoNoTokens
 from .schema import UserSchema
 from RemindMeClient.celeryManager import celery_init_app
 from celery import Celery
 from RemindMeClient import task
-import inspect
 from datetime import timedelta, timezone, datetime
 from dotenv import load_dotenv
 import os
+from TaskTok.forms import LoginForm
 from flask_mail import Mail,Message
-#keycloak_client = Client('192.168.1.26/kc/callback')
+
+
+
 def create_app():
     app = Flask(__name__)
     load_dotenv()
@@ -25,7 +29,7 @@ def create_app():
     app.config['JWT_TOKEN_LOCATION'] = os.environ.get('JWT_TOKEN_LOCATION')
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=hours)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=hours) #change hours to .001 to test session expires error
     #app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
     #app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
@@ -33,8 +37,10 @@ def create_app():
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your App Password
+
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')     
     #app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here
+
     app.config.from_mapping(
     CELERY=dict(
         broker_url='redis://localhost',
@@ -44,11 +50,13 @@ def create_app():
 ) 
 
 
+
     
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
     app.celery_app = celery_init_app(app)
     flaskMail.init_app(app)
+
 
     # Register blueprints:
     from .blueprints import api as api_blueprint
@@ -118,7 +126,9 @@ def create_app():
             response.content_type = 'application/json'
             
         else:
-            response.data = render_template("error/sessionExpired.html")
+            form = LoginForm()
+            flash('Session expired - Please log in again.', category='error')
+            response.data = render_template("loginPage.html", form=form)
             response.status_code = 401
             response.content_type = 'text/html'
         #set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
@@ -140,7 +150,8 @@ def create_app():
             response.content_type = 'application/json'
             
         else:
-            response.data = render_template("error/notLoggedIn.html")
+            form = LoginForm()
+            response.data = render_template("loginPage.html", form=form)
             response.status_code = 401
             response.content_type = 'text/html'       
         return response

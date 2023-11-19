@@ -60,6 +60,7 @@ async function removeTask(taskID) {
         
 
     } catch (error) {
+        showToast('Oops, looks like your session expired :( Please refresh the page.', 10000)
         console.error("Error:", error);
     }
 }
