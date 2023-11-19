@@ -6,4 +6,5 @@ instance/db.sqlite3
 *.sqlite3
 instance/db.sqlite3
 *.sqlite3
+*.pem
 .env

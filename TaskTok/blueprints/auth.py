@@ -25,6 +25,7 @@ from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
 from TaskTok.forms import NewUserForm, LoginForm
 
+
 auth = Blueprint("auth", __name__)
 
 #with app.app_context():
@@ -65,10 +66,12 @@ def register():
     if request.method == "GET":
         return render_template('register.html', form=form)
 
+
     if form.validate_on_submit():
         newUser_username = request.form.get('username').lower()
         newuser_password = request.form.get('password')
         newuser_email = request.form.get('email').lower()
+
         print(f"Username = {newUser_username}")
         user = User.getUserByUsername(username=newUser_username)
         print(user)
@@ -78,6 +81,7 @@ def register():
             print('user already exists')
             error = 'Username already exists. Please login'
             flash(error, 'error')
+
             return render_template('register.html', form=form)
         email = User.searchEmailAddress(email=newuser_email)
         if email is not None:
@@ -85,17 +89,21 @@ def register():
             error = 'Email already exists. Please login with username'
             flash(error, 'error')
             return render_template('register.html', form=form)
+
         new_user = User(username= newUser_username,
                    email = newuser_email    )
         new_user.setPassword(password=newuser_password)
         new_user.add()
+
         token = generate_email_token(new_user.email)
         print(f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
+
         #return jsonify({"Message": f"Created {new_user}"}), 200
         print('Account Created!')
         flash("Account Created! Please login.", 'success')
         return redirect(url_for('auth.register'))
     else:
+
         if form.email.errors:
             error = form.email.errors[0]
         if form.password.errors:
@@ -103,6 +111,7 @@ def register():
         if form.username.errors:
             error = form.username.errors[0]
         flash(error, 'error')
+
     return render_template('register.html', form=form)
     
 @auth.route('/login',methods=['GET', 'POST'] )
@@ -222,6 +231,7 @@ def logout():
     #this will set up future requests to say not authenticated (or redirect to login)
     #response.set_cookie("access_token_cookie", "", max_age=0)
     unset_jwt_cookies( response=response)
+
     return response,200
 
 @auth.route('/forgotPassword', methods=['GET', 'POST'])
