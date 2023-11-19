@@ -24,6 +24,7 @@ from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
 from TaskTok.forms import NewUserForm, LoginForm
+from datetime import timedelta
 
 
 auth = Blueprint("auth", __name__)
@@ -125,26 +126,44 @@ def login():
     if form.validate_on_submit():
         formUsername = request.form.get('username').lower()
         formPassword = request.form.get('password')
-        #attempt to find the user passed by the login endpoint
+        rememberMe   = request.form.get('rememberMe')
+
         try:
             user = User.getUserByUsername(username=formUsername)
         except OperationalError as e:
             print(f'Failed to authenticate user: %s', e)
-            return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDatabase | flask makeAdminUser"
+            return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDB | flask makeAdminUser"
         if user and (user.verifyPassword(password=formPassword)):
-            accessToken = create_access_token(identity=user)#was username
-            refreshToken = create_refresh_token(identity=user)#was username
-            response = redirect(url_for('views.home'))
-            set_access_cookies(response, accessToken)
-            set_refresh_cookies(response, refreshToken)
+            expirationTime = timedelta(hours=1)
+            if rememberMe == 'on':
+                print('JWT Tokens are no longer session based')
+                expirationTime = timedelta(hours=720) #30 days
+                #attempt to find the user passed by the login endpoint
+                accessToken = create_access_token(identity=user)#was username
+                refreshToken = create_refresh_token(identity=user)#was username
+                response = redirect(url_for('views.home'))
+                set_access_cookies(response, accessToken, max_age=expirationTime)
+                set_refresh_cookies(response, refreshToken, max_age=(expirationTime)*2)
+            else:
+                print('JWT Tokens are session based and will be deleted upon browser close')
+
+                #attempt to find the user passed by the login endpoint
+                accessToken = create_access_token(identity=user)#was username
+                refreshToken = create_refresh_token(identity=user)#was username
+                response = redirect(url_for('views.home'))
+                set_access_cookies(response, accessToken)
+                set_refresh_cookies(response, refreshToken)
             
             return response
         else: 
-            return jsonify(
-                {
-                    "message": "invalid username or password"
-                }
-            ),403
+            #return jsonify(
+            #    {
+            #        "message": "invalid username or password"
+            #    }
+            #),403
+            error="Invalid username or password."
+            flash(error, 'error')
+            return render_template('loginPage.html', form=form)
     else:
         if form.password.errors:
             error = form.password.errors[0]
