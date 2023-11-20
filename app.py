@@ -116,7 +116,7 @@ if __name__ == '__main__':
         cli(app)
     # Else, just run Flask.
     else:
-     app.run(host='0.0.0.0', port=443, debug=True, ssl_context=('adhoc'))
+     app.run(host='0.0.0.0', port=443, debug=True, ssl_context=('/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'))
      #change ssl_context to below when testing locally
      #'adhoc'
      #or for azure
