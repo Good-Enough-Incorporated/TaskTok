@@ -61,25 +61,24 @@ def removeTask(taskID):
             return jsonify({'Message': "remove_fail"})
         
 
-#TODO: Allow user to edit due date, email list and task dueDate offset. Need input validation as well.
-# Bootstrap should be able to solve our form issues with edit.
+
+#TODO: Need input validation. Waiting for Bootstrap to be setup for full functionality. 
 @api.route('/editTask/<taskID>', methods=['PUT'])
 @jwt_required()
 def editTask(taskID):
     userData = current_user
     task = taskReminder.query.get(taskID)
 
-    # Check if the task exists and if it belongs to the current user
+    # Check if the task exists and if it belongs to the current user.
     if task is None or task.owner_username != userData.username:
         return jsonify({'Message': 'Task not found or not authorized'}), 404
 
-    # Get updated data from the request
+    # Get updated data from the request.
     data = request.json
     new_description = data.get('task_description')
     new_dueDate = data.get('task_dueDate')
     new_name = data.get('task_name')
 
-    # Update task details
     # Getting new description.
     if new_description is not None:
         task.task_description = new_description
@@ -104,12 +103,6 @@ def editTask(taskID):
         db.session.rollback()
         return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
 
-
-
-
-        
-
-        
 
 
 @api.route('/')
