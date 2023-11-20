@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>TaskTok</title>
+{% extends "base.html" %}
+{% block title %}TaskTok{% endblock %}
+    
+{% block style %}
     <style>
         body {
             font-family: Calibri, Helvetica, sans-serif;
@@ -66,8 +66,8 @@ table {
     /* ... other styles ... */
 }
         table, th, td {
-          border-bottom: 1px solid #ddd;
-          
+        border-bottom: 1px solid #ddd;
+        
         }
 
         th, td {
@@ -86,32 +86,32 @@ table {
             background-color: #24242C;
         }
         table.table thead {
-  background: #17171c;
-  border-bottom: 0px solid #444444;
+background: #17171c;
+border-bottom: 0px solid #444444;
     }
     
-     th {
-      font-size: 19px;
-      font-weight: bold;
-      color: #FFBF00;
-      text-align: center;
-      border-left: 0px solid #AD7231;
-      border-bottom: 5px solid #24242C;
+    th {
+    font-size: 19px;
+    font-weight: bold;
+    color: #FFBF00;
+    text-align: center;
+    border-left: 0px solid #AD7231;
+    border-bottom: 5px solid #24242C;
     }
     table.table thead th:first-child {
-      border-left: none;
+    border-left: none;
     }
     .task-edit-btn, .task-delete-btn  {
-      background-color: #E0A900;
-      border: none;
-      color: black;
-      padding: 8px 16px;
-      margin-right: 8px;
-      text-decoration: none;      
-      cursor: pointer;
-      border-radius: 8px;
-      }
-      .toast-container {
+    background-color: #E0A900;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    margin-right: 8px;
+    text-decoration: none;      
+    cursor: pointer;
+    border-radius: 8px;
+    }
+    .toast-container {
     
     display: block;
         visibility: visible; /* Moved visibility here */
@@ -138,13 +138,14 @@ table {
 
 /* Ensuring content doesn't hide behind sidenav even on very small screens */
 
-    </style>
-</head>
+</style>
+{% endblock %}
+{% block body %}
 <body>
   <div class="sidenav">
     {% for menuItem in sideNavMenuItems %}
     <a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
-  {% endfor %}
+    {% endfor %}
   </div>
 
     <div class="main">
@@ -195,4 +196,4 @@ table {
 
     <script src="{{ url_for('static', filename='js/apiRequests/functions.js') }}"></script>
 </body>
-</html>
+{% endblock %}
