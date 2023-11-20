@@ -14,6 +14,7 @@ function getCookie(name) {
     return cookieValue;
   }
   
+  
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
     try {
@@ -31,7 +32,52 @@ async function addTask() {
             console.error("Error:", error)
         }
     }
+
+
+async function editTask(taskID) {
+    const csrfAccessToken = getCookie('csrf_access_token');
+        
+    const newDescription = prompt("Enter new description for the task:"); // Use bootstrap instead of this dusty dialog box form.
+    if (!newDescription) return;
+        
+    try {
+        const response = await fetch(`/api/editTask/${taskID}`, {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfAccessToken
+                },
+                body: JSON.stringify({ task_description: newDescription })
+            });
+        
+        const data = await response.json();
+        console.log(data);
+        
+        if (data.Message == 'Task updated successfully') {
+            showToast("Task was successfully updated.", 5000);
+            console.log('Task was updated in the database');
+                
+            // Update the corresponding task in the HTML table with the new description.
+            const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
+            if (taskRow) {
+                // Task description is currently in column 3.
+                const descriptionCell = taskRow.querySelector("td:nth-child(3)")
+                    if (descriptionCell) {
+                        descriptionCell.textContent = newDescription;
+                    }
+                }
+            } else {
+                showToast("Task failed to be updated.", 5000);
+                console.log('Something went wrong when updating the task');
+            }
+        
+        } catch (error) {
+            showToast('Oops, an error occurred. Please try again.', 5000)
+            console.error("Error:", error);
+        }
+    }
   
+
 async function removeTask(taskID) {
     //we need a csrfAccessToken to make our API call
     console.log("[removeTask]: beginning client api request")
@@ -64,6 +110,8 @@ async function removeTask(taskID) {
         console.error("Error:", error);
     }
 }
+
+
 async function listTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
     //pretend long load time
@@ -119,20 +167,19 @@ async function listTask() {
   }
 
   function addButtonEventHandlers(){
-    console.log('querying buttons')
     document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
-      console.log('FOUND BUTTON')
-      button.addEventListener('click', function(event) {
-          const dataID = this.closest('tr').getAttribute('data-id');
-          console.log('attempting to remove taskID=', dataID)
-          //TODO: Need a confirmation box before removal
-          removeTask(dataID)
-          
-
-      })
-    }
-      )
-  }
+        button.addEventListener('click', function(event) {
+            const dataID = this.closest('tr').getAttribute('data-id');
+            if (this.classList.contains('task-edit-btn')) {
+                console.log('attempting to edit taskID=', dataID);
+                editTask(dataID);
+            } else if (this.classList.contains('task-delete-btn')) {
+                console.log('attempting to remove taskID=', dataID);
+                removeTask(dataID);
+            }
+        });
+    });
+}
 
   function removeRowFromTable(taskID){
     const row = document.querySelector(`tr[data-id="${taskID}"]`);
