@@ -1,3 +1,10 @@
+function clearModal(){
+    var modalBody = document.getElementById('modal-body');
+    var modalFooter = document.getElementById('modal-footer')
+    modalBody.innerHTML = "";
+    modalFooter.innerHTML = "";
+}
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -172,18 +179,20 @@ async function listTask() {
             if (this.classList.contains('task-edit-btn')) {
                 console.log('attempting to edit taskID=', dataID);
                 //editTask(dataID);
-                getTableInformation();
+                getTableInformation(dataID);
                 var editModal = document.getElementById('editModal');
                 var close = document.getElementsByClassName("close")[0];
                 editModal.style.display = 'block';
 
                 close.onclick = function() {
                     editModal.style.display = "none";
+                    clearModal();
                   }
                 
                 window.onclick = function(event) {
                     if(event.target == editModal) {
                         editModal.style.display = 'none';
+                        clearModal();
                     }
                 }
             } else if (this.classList.contains('task-delete-btn')) {
@@ -223,12 +232,15 @@ async function listTask() {
     
   }
 
-  function getTableInformation(){
+  function getTableInformation(taskId){
     var table = document.getElementById('taskTable');
     var modal = document.getElementById('modal-body');
     var modalFooter = document.getElementById('modal-footer');
     var headerValues = table.getElementsByTagName('th');
-    var cellValues   = table.getElementsByTagName('td');
+    //need to query the row by using the data-id
+    //otherwise we'll get a list of all values which isn't very helpful.
+    var row   = table.querySelector(`tr[data-id="${taskId}"]`)
+    var cellValues = row.getElementsByTagName('td');
     //do not include this in our list
     const skipHeaders = ['actions', 'owner'];
     for(var i=0; i < headerValues.length; i++){
@@ -240,6 +252,12 @@ async function listTask() {
         label.innerHTML = headerValues[i].innerHTML;
         label.htmlFor = `taskLabel${i}`;
         inputBox = document.createElement('input');
+        if(headerValues[i].innerHTML.trim() === 'Task Due Date'){
+            console.log('setting input to datetime-local');
+            inputBox.type = 'datetime-local';
+        } else {
+            inputBox.type = 'text';
+        }
         inputBox.type = 'text';
         inputBox.value = cellValues[i].innerHTML;
         inputBox.id = `taskInput${i}`;
