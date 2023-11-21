@@ -146,22 +146,21 @@ async function listTask() {
   
   function createTableHeader(){
     var table = document.getElementById('taskTable').getElementsByTagName('thead')[0];
-    var newRow = table.insertRow(-1)
+    var newRow = table.insertRow(-1)//add to the bottom
     
-    var cell1 = newRow.insertCell(0)
-    var cell2 = newRow.insertCell(1)
-    var cell3 = newRow.insertCell(2)
-    var cell4 = newRow.insertCell(3)
-    var cell5 = newRow.insertCell(4)
-    var cell6 = newRow.insertCell(5)
-    var cell7 = newRow.insertCell(6)
-    cell1.innerHTML = "Owner"
-    cell2.innerHTML = "Task Name"
-    cell3.innerHTML = "Task Description"
-    cell4.innerHTML = "Task Due Date"
-    cell5.innerHTML = "Task Due (Offset)"
-    cell6.innerHTML = "E-mail List"
-    cell7.innerHTML = "Actions"
+    function createHeaderCell(text){
+        var cell = document.createElement('th');
+        cell.innerHTML = text;
+        newRow.appendChild(cell)
+    }
+
+    createHeaderCell("Owner");
+    createHeaderCell("Task Name");
+    createHeaderCell("Task Description");
+    createHeaderCell("Task Due Date");
+    createHeaderCell("Task Due (Offset)");
+    createHeaderCell("E-mail List");
+    createHeaderCell("Actions");
 
 
   }
@@ -172,7 +171,21 @@ async function listTask() {
             const dataID = this.closest('tr').getAttribute('data-id');
             if (this.classList.contains('task-edit-btn')) {
                 console.log('attempting to edit taskID=', dataID);
-                editTask(dataID);
+                //editTask(dataID);
+                getTableInformation();
+                var editModal = document.getElementById('editModal');
+                var close = document.getElementsByClassName("close")[0];
+                editModal.style.display = 'block';
+
+                close.onclick = function() {
+                    editModal.style.display = "none";
+                  }
+                
+                window.onclick = function(event) {
+                    if(event.target == editModal) {
+                        editModal.style.display = 'none';
+                    }
+                }
             } else if (this.classList.contains('task-delete-btn')) {
                 console.log('attempting to remove taskID=', dataID);
                 removeTask(dataID);
@@ -210,6 +223,36 @@ async function listTask() {
     
   }
 
+  function getTableInformation(){
+    var table = document.getElementById('taskTable');
+    var modal = document.getElementById('modal-body');
+    var modalFooter = document.getElementById('modal-footer');
+    var headerValues = table.getElementsByTagName('th');
+    var cellValues   = table.getElementsByTagName('td');
+    //do not include this in our list
+    const skipHeaders = ['actions', 'owner'];
+    for(var i=0; i < headerValues.length; i++){
+        //create the label
+        if (skipHeaders.includes(headerValues[i].innerHTML.toLowerCase())){
+            continue; //do not create these elements
+        }
+        label = document.createElement('label');
+        label.innerHTML = headerValues[i].innerHTML;
+        label.htmlFor = `taskLabel${i}`;
+        inputBox = document.createElement('input');
+        inputBox.type = 'text';
+        inputBox.value = cellValues[i].innerHTML;
+        inputBox.id = `taskInput${i}`;
+        inputBox.name =  headerValues[i].innerHTML;
+        inputBox.className = 'modal-fields';
+        modal.appendChild(label);
+        modal.appendChild(inputBox);
+    }
+        updateButton = document.createElement('button');
+        updateButton.textContent = "Update Task";
+        updateButton.className = 'task-update-btn';
+        modalFooter.appendChild(updateButton);
+  }
   function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast-container");
     const toastContent = document.getElementById("toast-user-content");
