@@ -139,8 +139,8 @@ def login():
                 print('JWT Tokens are no longer session based')
                 expirationTime = timedelta(hours=720) #30 days
                 #attempt to find the user passed by the login endpoint
-                accessToken = create_access_token(identity=user)#was username
-                refreshToken = create_refresh_token(identity=user)#was username
+                accessToken = create_access_token(identity=user, expires_delta=expirationTime)#was username
+                refreshToken = create_refresh_token(identity=user, expires_delta=expirationTime*2)#was username
                 response = redirect(url_for('views.home'))
                 set_access_cookies(response, accessToken, max_age=expirationTime)
                 set_refresh_cookies(response, refreshToken, max_age=(expirationTime)*2)
