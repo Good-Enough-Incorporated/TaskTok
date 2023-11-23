@@ -113,7 +113,7 @@
 				<input id= "rememberMe" name='rememberMe' type="checkbox" checked="unchecked"> Remember me </input>
 			</div>
 			
-			<a href="#"> Forgot password? </a>
+			<a href="{{ url_for('auth.forgot_password')}}" style="margin-left: 1rem;"> Forgot password? </a>
 			<a href="{{ url_for('auth.register')}}" style="margin-left: 1rem;"> Create new account</a>	
 		</div> 
 	</form>
