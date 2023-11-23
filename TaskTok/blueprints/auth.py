@@ -25,6 +25,7 @@ from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
 from TaskTok.forms import NewUserForm, LoginForm
 from datetime import timedelta
+from RemindMeClient.task import send_email
 
 
 auth = Blueprint("auth", __name__)
@@ -98,6 +99,16 @@ def register():
 
         token = generate_email_token(new_user.email)
         print(f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
+        #generate the email template
+        verificationURL = url_for('auth.verify_email',_external=True, token=token)          
+        emailBody = render_template('email/verifyEmail.html', verificationLink=verificationURL, username=new_user.username)
+        
+        try:
+            send_email.delay(new_user.email, "TaskTok - Verification Required", emailBody)
+        except:
+            print(emailBody)
+            print(f'Looks like we couldnt send the job to the message broker Are you running on linux with Redis installed?')
+            print(f'Anyways, here is the email template I tried sending out (for testing)')
 
         #return jsonify({"Message": f"Created {new_user}"}), 200
         print('Account Created!')
@@ -139,8 +150,8 @@ def login():
                 print('JWT Tokens are no longer session based')
                 expirationTime = timedelta(hours=720) #30 days
                 #attempt to find the user passed by the login endpoint
-                accessToken = create_access_token(identity=user)#was username
-                refreshToken = create_refresh_token(identity=user)#was username
+                accessToken = create_access_token(identity=user, expires_delta=expirationTime)#was username
+                refreshToken = create_refresh_token(identity=user, expires_delta=expirationTime*2)#was username
                 response = redirect(url_for('views.home'))
                 set_access_cookies(response, accessToken, max_age=expirationTime)
                 set_refresh_cookies(response, refreshToken, max_age=(expirationTime)*2)

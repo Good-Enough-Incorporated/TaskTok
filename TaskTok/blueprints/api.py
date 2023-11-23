@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from TaskTok.models import User, taskReminder
+from TaskTok.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 import datetime
 from TaskTok.schema import UserSchema, TaskSchema
@@ -59,23 +60,49 @@ def removeTask(taskID):
             print("ending removeTask")
             return jsonify({'Message': "remove_fail"})
         
+
+
+#TODO: Need input validation. Waiting for Bootstrap to be setup for full functionality. 
 @api.route('/editTask/<taskID>', methods=['PUT'])
 @jwt_required()
 def editTask(taskID):
     userData = current_user
     task = taskReminder.query.get(taskID)
 
-    # Checking if the task exists and belongs to the current user.
+    # Check if the task exists and if it belongs to the current user.
     if task is None or task.owner_username != userData.username:
         return jsonify({'Message': 'Task not found or not authorized'}), 404
-    
-    # Get the updated data from the request.
+
+    # Get updated data from the request.
     data = request.json
     new_description = data.get('task_description')
+    new_dueDate = data.get('task_dueDate')
+    new_name = data.get('task_name')
 
-        
+    # Getting new description.
+    if new_description is not None:
+        task.task_description = new_description
+    
+    # Getting new due date.
+    if new_dueDate is not None:
+        try:
+            task.task_dueDate = datetime.strptime(new_dueDate, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return jsonify({'Message': 'Invalid date format'}), 400
+    
+    # Getting new name for task.
+    if new_name is not None:
+        task.task_name = new_name
 
-        
+    # Commit the changes to the database
+    try:
+        db.session.commit()
+        return jsonify({'Message': 'Task updated successfully'}), 200
+    except Exception as e:
+        # Rollback incase of error.
+        db.session.rollback()
+        return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
+
 
 
 @api.route('/')

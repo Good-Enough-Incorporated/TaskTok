@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>TaskTok</title>
+{% extends "base.html" %}
+{% block title %}TaskTok{% endblock %}
+    
+{% block style %}
     <style>
         body {
             font-family: Calibri, Helvetica, sans-serif;
@@ -66,8 +66,8 @@ table {
     /* ... other styles ... */
 }
         table, th, td {
-          border-bottom: 1px solid #ddd;
-          
+        border-bottom: 1px solid #ddd;
+        
         }
 
         th, td {
@@ -86,32 +86,32 @@ table {
             background-color: #24242C;
         }
         table.table thead {
-  background: #17171c;
-  border-bottom: 0px solid #444444;
+background: #17171c;
+border-bottom: 0px solid #444444;
     }
     
-     th {
-      font-size: 19px;
-      font-weight: bold;
-      color: #FFBF00;
-      text-align: center;
-      border-left: 0px solid #AD7231;
-      border-bottom: 5px solid #24242C;
+    th {
+    font-size: 19px;
+    font-weight: bold;
+    color: #FFBF00;
+    text-align: center;
+    border-left: 0px solid #AD7231;
+    border-bottom: 5px solid #24242C;
     }
     table.table thead th:first-child {
-      border-left: none;
+    border-left: none;
     }
-    .task-edit-btn, .task-delete-btn  {
-      background-color: #E0A900;
-      border: none;
-      color: black;
-      padding: 8px 16px;
-      margin-right: 8px;
-      text-decoration: none;      
-      cursor: pointer;
-      border-radius: 8px;
-      }
-      .toast-container {
+    .task-edit-btn, .task-delete-btn, .task-update-btn  {
+    background-color: #E0A900;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    margin-right: 8px;
+    text-decoration: none;      
+    cursor: pointer;
+    border-radius: 8px;
+    }
+    .toast-container {
     
     display: block;
         visibility: visible; /* Moved visibility here */
@@ -133,18 +133,105 @@ table {
     visibility: visible; /* This will now work as expected */
 }
 
+/*defining our modal for pop ups (editing tasks)*/
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modal-content {
+  position: relative;
+  background-color: #1c1a1a;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #d9ff00;
+  width: 50%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
 
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  color: white;
+}
+
+.modal-body {
+  padding: 16px;
+  margin: auto;
+  position: relative;
+}
+
+.modal-footer {
+  padding: 2px 16px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+		
+		.modal-fields { 
+			width: 100%; 
+			background: #17171c;
+			color: white;  
+			margin: 8px 0;
+			padding: 12px 20px; 
+			display: inline-block; 
+			box-sizing: border-box;     
+			border: 2px solid rgba(51,51,61,0.48);
+			border-radius: 4px;
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+			}
 /* Media query for smaller screens *
 
 /* Ensuring content doesn't hide behind sidenav even on very small screens */
 
-    </style>
-</head>
+</style>
+{% endblock %}
+{% block body %}
 <body>
   <div class="sidenav">
     {% for menuItem in sideNavMenuItems %}
     <a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
-  {% endfor %}
+    {% endfor %}
   </div>
 
     <div class="main">
@@ -159,40 +246,43 @@ table {
     <div class="table-container">
         <table id="taskTable"> 
             <thead>
-                <!-- <tr>
-                  <th>Owner</th>
-                  <th>Task Name</th>
-                  <th>Task Description</th>
-                  <th>Due Date</th>
-                  <th>Due Date (Offset)</th>
-                  <th>Task Email Receipients</th>
-                </tr>
-              -->
             </thead>
             <tbody>
-                <!-- Example 
-                <tr>
-                  <td>Admin</td>
-                  <td>Task1</td>
-                  <td>An example task</td>
-                  <td>11/6/2023 9:00 PM</td>
-                  <td>0</td>
-                  <td>anotheruser@gmail.com, seconduser@gmail.com, thirduser@gmail.com</td>
-                </tr>
-                <tr>
-                  <td>Admin</td>
-                  <td>Task1</td>
-                  <td>An example task</td>
-                  <td>11/6/2023 9:00 PM</td>
-                  <td>0</td>
-                  <td>anotheruser@gmail.com, seconduser@gmail.com, thirduser@gmail.com</td>
-                </tr>
-                -->
             </tbody>
         </table>
         
     </div>
+<!-- The Modal -->
+    <div id="editModal" class="modal">
 
+        <!-- Modal content -->
+        <div class="modal-content">
+        <div class="modal-header">
+            <h2>Update Task</h2>
+            <span class="close">&times;</span>
+            
+        </div>
+        <div class="modal-body" id="modal-body">
+            <!--<label>Name </label> 
+            <input class="modal-fields" type="text" name="test" id="test" placeholder="Task Name">
+            <label>Description </label> 
+            <input class='modal-fields' type="text" name="test" id="test">
+            <label>Email Message </label> 
+            <input class='modal-fields' type="text" name="test" id="test">
+            <label>Due Date </label> 
+            <input class='modal-fields' type="text" name="test" id="test">
+            <label>Offset </label> 
+            <input class='modal-fields' type="text" name="test" id="test">
+            <button type="submit">Update</button>
+            <p>Some other text...</p>
+            !-->
+        </div>
+        <div class="modal-footer" id="modal-footer">
+            
+        </div>
+        </div>
+    
+    </div>
     <script src="{{ url_for('static', filename='js/apiRequests/functions.js') }}"></script>
 </body>
-</html>
+{% endblock %}
