@@ -101,7 +101,7 @@ def register():
         print(f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
         #generate the email template
         verificationURL = url_for('auth.verify_email',_external=True, token=token)          
-        emailBody = render_template('email/verifyEmail.html', verificationLink=verificationURL)
+        emailBody = render_template('email/verifyEmail.html', verificationLink=verificationURL, username=new_user.username)
         
         try:
             send_email.delay(new_user.email, "TaskTok - Verification Required", emailBody)
