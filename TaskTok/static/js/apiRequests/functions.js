@@ -140,7 +140,18 @@ async function removeTask(taskID) {
         if (data.Message == 'remove_success'){
             showToast("Task was successfully removed.", 5000);
             console.log('Task was deleted from the database')
-            removeRowFromTable(taskID);
+            const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
+            const $taskRow = $(taskRow)
+
+            $taskRow.addClass('fadeOutSlideRight');
+            $taskRow.on('animationend', function() {
+                $taskRow.remove(); // This will remove the row from the DOM after the animation
+              });
+
+            //removeRowFromTable(taskID);
+                
+           
+            
         } else {
             showToast("Task failed to be removed :(", 5);
             console.log('Something went wrong when deleting the task')
@@ -241,6 +252,7 @@ async function listTask() {
     });
 }
 
+ //TODO: will not need if using jQuery
   function removeRowFromTable(taskID){
     const row = document.querySelector(`tr[data-id="${taskID}"]`);
     if(row){

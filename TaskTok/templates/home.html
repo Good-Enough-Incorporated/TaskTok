@@ -34,6 +34,20 @@
         .sidenav a:hover {
             color: #f1f1f1;
         }
+        .fadeOutSlideRight {
+        animation: fadeOutSlideRight 0.5s forwards;
+        }
+
+        @keyframes fadeOutSlideRight {
+        0% {
+        opacity: 1;
+        transform: translateX(0);
+        }
+        100% {
+        opacity: 0;
+        transform: translateX(100%);
+        }
+        }
 
         .main {
             margin-left: 200px; /* Same as the width of the sidenav */
@@ -81,7 +95,20 @@
     
     /* Style your button as needed */
 }
+.fadeOutSlideUp {
+  animation: fadeOutSlideUp 0.5s forwards;
+}
 
+@keyframes fadeOutSlideUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
 
 
 table {

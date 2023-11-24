@@ -100,6 +100,18 @@ def create_app():
     def UserIdentityLookup(user):
         return user.id
     
+    @jwtManager.user_lookup_error_loader
+    def FailedUserLookup(_jwt_header, jwt_data):
+        response = make_response()
+        response.content_type = 'text/html'
+        response.status_code = 404
+        response.set_cookie("access_token_cookie", "", max_age=0)
+        response.set_cookie("refresh_token_cookie", "", max_age=0)
+        response.set_cookie("csrf_access_token", "", max_age=0)
+        response.set_cookie("csrf_refresh_token", "", max_age=0)
+        response.data = render_template('error/accountDeleted.html')
+        return response
+    
     @jwtManager.user_lookup_loader
     def searchLoggedInUser(_jwt_header, jwt_data):
         identity = jwt_data['sub']

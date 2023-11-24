@@ -81,8 +81,12 @@ class NoNoTokens(db.Model):
         db.session.commit()
 
 class taskReminder(db.Model):
+    @staticmethod
+    def generate_uuid():
+        return str(uuid4())
+    
     __tablename__ = "taskreminders"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(), primary_key=True, default = lambda : str(uuid4()))
     owner_username = db.Column(db.String(120), nullable=False)
     task_emailList = db.Column(db.JSON, nullable=True)
     task_reminderOffSetTime   = db.Column(db.DateTime, nullable=True)
