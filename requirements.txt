@@ -43,3 +43,4 @@ vine==5.0.0
 wcwidth==0.2.8
 Werkzeug==3.0.0
 autopep8==2.0.4
+flake8==6.1.0
