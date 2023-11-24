@@ -91,13 +91,13 @@ def editTask(taskID):
     if new_dueDate is not None:
         try:
             print(f"DUE DATE = {new_dueDate}")
-            task.task_dueDate = datetime.datetime.strptime(new_dueDate, f'%Y-%m-%dT%H:%M:%S.%f')
+            task.task_dueDate = datetime.datetime.strptime(new_dueDate, f'%Y-%m-%dT%H:%M:%S')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
         
     if new_reminderOffSet is not None:
         try:
-            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminderOffSet, f'%Y-%m-%dT%H:%M:%S.%f')
+            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminderOffSet, f'%Y-%m-%dT%H:%M:%S')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
     

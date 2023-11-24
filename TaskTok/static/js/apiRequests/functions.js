@@ -227,12 +227,12 @@ async function listTask() {
                     clearModal();
                   }
                 
-                window.onclick = function(event) {
-                    if(event.target == editModal) {
-                        editModal.style.display = 'none';
-                        clearModal();
-                    }
-                }
+                //window.onclick = function(event) {
+                //    if(event.target == editModal) {
+                //        editModal.style.display = 'none';
+                //        clearModal();
+                //    }
+                //}
             } else if (this.classList.contains('task-delete-btn')) {
                 console.log('attempting to remove taskID=', dataID);
                 removeTask(dataID);
@@ -290,12 +290,9 @@ async function listTask() {
         label.innerHTML = headerValues[i].innerHTML;
         label.htmlFor = `taskLabel${i}`;
         inputBox = document.createElement('input');
-        if(headerValues[i].innerHTML.trim() === 'Task Due Date'){
-            console.log('setting input to datetime-local');
-            inputBox.type = 'datetime-local';
-        } else {
-            inputBox.type = 'text';
-        }
+
+        inputBox.type = 'text';
+        
         inputBox.type = 'text';
         inputBox.value = cellValues[i].innerHTML;
         inputBox.id = `taskInput${i}`;
@@ -303,6 +300,22 @@ async function listTask() {
         inputBox.className = 'modal-fields';
         modal.appendChild(label);
         modal.appendChild(inputBox);
+        if(inputBox.id == 'taskInput3'){
+            dateTimeInput = document.getElementById('taskInput3')
+            dateTimeInput.type = 'datetime-local'
+            unparsedDate = cellValues[i].innerHTML.toString()
+            console.log(unparsedDate.indexOf('.'));
+            if(unparsedDate.indexOf('.') == -1){
+                //already in the format we want.
+                formattedDate = unparsedDate
+                
+            } else {
+                //parse to allow the datetime-local to load the correct date.
+                formattedDate = unparsedDate.substring(0, unparsedDate.indexOf('.'))
+            }
+            dateTimeInput.value = formattedDate
+        }
+
     }
         updateButton = document.createElement('button');
         updateButton.textContent = "Update Task";
