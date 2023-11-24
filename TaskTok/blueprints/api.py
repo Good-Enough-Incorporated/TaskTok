@@ -75,10 +75,14 @@ def editTask(taskID):
 
     # Get updated data from the request.
     data = request.json
+    new_name = data.get('task_name')
     new_description = data.get('task_description')
     new_dueDate = data.get('task_dueDate')
-    new_name = data.get('task_name')
+    new_reminderOffSet = data.get('task_reminderOffSet')
+    new_emailList = data.get('task_emailList')
+    #TODO: Validate these inputs as safe 
 
+    
     # Getting new description.
     if new_description is not None:
         task.task_description = new_description
@@ -86,9 +90,19 @@ def editTask(taskID):
     # Getting new due date.
     if new_dueDate is not None:
         try:
-            task.task_dueDate = datetime.strptime(new_dueDate, '%Y-%m-%d %H:%M:%S')
+            print(f"DUE DATE = {new_dueDate}")
+            task.task_dueDate = datetime.datetime.strptime(new_dueDate, f'%Y-%m-%dT%H:%M:%S.%f')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
+        
+    if new_reminderOffSet is not None:
+        try:
+            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminderOffSet, f'%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError:
+            return jsonify({'Message': 'Invalid date format'}), 400
+    
+    if new_emailList is not None:
+        task.task_emailList = new_emailList
     
     # Getting new name for task.
     if new_name is not None:

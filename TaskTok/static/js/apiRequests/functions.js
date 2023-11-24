@@ -43,9 +43,21 @@ async function addTask() {
 
 async function editTask(taskID) {
     const csrfAccessToken = getCookie('csrf_access_token');
-        
-    const newDescription = prompt("Enter new description for the task:"); // Use bootstrap instead of this dusty dialog box form.
-    if (!newDescription) return;
+    //Grab the values from the text fields
+    //ensure we're validating this as safe on our endpoint as it 
+    //make no sense on the client side
+    const taskInput1 = document.getElementById('taskInput1').value;
+    const taskInput2 = document.getElementById('taskInput2').value;
+    const taskInput3 = document.getElementById('taskInput3').value;
+    const taskInput4 = document.getElementById('taskInput4').value;
+    const taskInput5 = document.getElementById('taskInput5').value;
+    console.log(taskInput1);
+    console.log(taskInput2);
+    console.log(taskInput3);
+    console.log(taskInput4);
+    console.log(taskInput5);
+
+  
         
     try {
         const response = await fetch(`/api/editTask/${taskID}`, {
@@ -54,7 +66,16 @@ async function editTask(taskID) {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfAccessToken
                 },
-                body: JSON.stringify({ task_description: newDescription })
+                body: JSON.stringify({ 
+                    
+                    task_name: taskInput1,
+                    task_description: taskInput2,
+                    task_dueDate: taskInput3,
+                    task_reminderOffSetTime: taskInput4,
+                    task_emailList: taskInput5,
+
+                
+                })
             });
         
         const data = await response.json();
@@ -67,10 +88,25 @@ async function editTask(taskID) {
             // Update the corresponding task in the HTML table with the new description.
             const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
             if (taskRow) {
-                // Task description is currently in column 3.
+                const nameCell = taskRow.querySelector("td:nth-child(2)")
                 const descriptionCell = taskRow.querySelector("td:nth-child(3)")
+                const dueDateCell = taskRow.querySelector("td:nth-child(4)")
+                const offSetCell = taskRow.querySelector("td:nth-child(5)")
+                const emailListCell = taskRow.querySelector("td:nth-child(6)")
+                    if (nameCell) {
+                        nameCell.textContent = taskInput1;
+                    }
                     if (descriptionCell) {
-                        descriptionCell.textContent = newDescription;
+                        descriptionCell.textContent = taskInput2;
+                    }
+                    if (dueDateCell) {
+                        dueDateCell.textContent = taskInput3;
+                    }
+                    if (offSetCell) {
+                        offSetCell.textContent = taskInput4;
+                    }
+                    if (emailListCell) {
+                        emailListCell.textContent = taskInput5;
                     }
                 }
             } else {
@@ -143,6 +179,8 @@ async function listTask() {
         
         //add event handlers for edit/delete buttons
         addButtonEventHandlers();
+        const addTableButton = document.getElementById('task-add-btn');
+        addTableButton.style.visibility = 'visible';
 
         } catch (error) {
             console.error("Error:", error)
@@ -270,6 +308,11 @@ async function listTask() {
         updateButton.textContent = "Update Task";
         updateButton.className = 'task-update-btn';
         modalFooter.appendChild(updateButton);
+        updateButton.onclick = function(){
+            console.log("Updating task")
+            editTask(taskId);
+
+        }
   }
   function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast-container");
