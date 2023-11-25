@@ -4,6 +4,7 @@ from TaskTok.models import User, TaskReminder
 from TaskTok.functions import verify_celery_worker
 from TaskTok.functions import verify_message_broker_online
 from flask_mail import Message
+from flask_bootstrap import Bootstrap
 import click
 import datetime
 import sys

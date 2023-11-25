@@ -348,6 +348,7 @@ border-bottom: 0px solid #444444;
     {% for menuItem in sideNavMenuItems %}
     <a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
     {% endfor %}
+    <a href="{{ url_for('views.test_bootstrap') }}">Bootstrap Test</a>
   </div>
 
     <div class="main">

@@ -64,3 +64,9 @@ def profile():
 def request_current_user(access_token):
     api_endpoint = url_for("auth.get_current_user")
     return "test"
+
+
+# Testing for Boostrap routing
+@views.route('/test_bootstrap')
+def test_bootstrap():
+    return render_template('test_bootstrap.html')
