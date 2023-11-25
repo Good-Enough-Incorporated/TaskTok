@@ -29,11 +29,11 @@ def validate_password(form, field):
     min_length = 12
     max_length = 64
     if len(field.data) < min_length:
-        raise ValidationError(f'Password must be at least {
-                              min_length} characters')
+        raise ValidationError('Password must be at least ' /
+                              f'{min_length} characters')
     if len(field.data) > max_length:
-        raise ValidationError(f'Password cannot be more than {
-                              max_length} characters')
+        raise ValidationError('Password cannot be more than ' /
+                              f'{max_length} characters')
     if re.match(r'^[A-Za-z\d._@$!%*#?&^-]*$', field.data):
         return  # String contains valid characters only
     raise ValidationError('Password may only contain letters, numbers,'
@@ -48,11 +48,11 @@ def validate_username(form, field):
     min_length = 4
     max_length = 20
     if len(field.data) < min_length:
-        raise ValidationError(f'Username must be at least {
-                              min_length} characters')
+        raise ValidationError('Username must be at least ' /
+                              f'{min_length} characters')
     if len(field.data) > max_length:
-        raise ValidationError(f'Username cannot be more than {
-                              max_length} characters')
+        raise ValidationError('Username cannot be more than ' /
+                              f'{max_length} characters')
     if re.match(r'^\d*$', field.data):
         raise ValidationError('Username must contain letters')
     if re.match(r'^[A-Za-z\d]*$', field.data):
