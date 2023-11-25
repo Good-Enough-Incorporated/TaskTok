@@ -6,8 +6,8 @@ from TaskTok.extensions import db, jwtManager, flaskMail
 from TaskTok.models import User, NoNoTokens, taskReminder
 from TaskTok.schema import UserSchema
 from RemindMeClient import task
-from TaskTok.functions import verifyCeleryWorker
-from TaskTok.functions import verifyMessageBrokerOnline
+from TaskTok.functions import verify_celery_worker
+from TaskTok.functions import verify_message_broker_online
 
 from flask_mail import Message
 import click
@@ -32,7 +32,7 @@ def cli():
 @app.cli.command('checkCeleryStatus')
 def checkCeleryStatus():
     try:
-        celery_status = verifyCeleryWorker()
+        celery_status = verify_celery_worker()
     except: 
         celery_status = None
         
@@ -50,7 +50,7 @@ def checkMessageBrokerStatus():
     port = 5672
     timeout = 5
     try:
-        message_broker_status = verifyMessageBrokerOnline(host, port, timeout)
+        message_broker_status = verify_message_broker_online(host, port, timeout)
     except:
         message_broker_status = None
     status_message = "OK" if message_broker_status else "NOT OK"
