@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import uuid
-from TaskTok.models import User, NoNoTokens, taskReminder
+from TaskTok.models import User, NoNoTokens, TaskReminder
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from TaskTok.extensions import db, jwtManager
@@ -28,7 +28,7 @@ class TestUserModel(unittest.TestCase):
     # U-6.3
     def test_set_password(self):
         user = User()
-        user.setPassword('password')
+        user.set_password('password')
         self.assertIsNotNone(user.password)
         self.assertNotEqual(user.password, 'password')
         self.assertIsInstance(user.password, str)
@@ -37,19 +37,19 @@ class TestUserModel(unittest.TestCase):
     def test_verify_password_true(self):
         user = User()
         user.password = generate_password_hash('password')
-        self.assertTrue(user.verifyPassword('password'))
-        self.assertFalse(user.verifyPassword('notthepassword'))
+        self.assertTrue(user.verify_password('password'))
+        self.assertFalse(user.verify_password('notthepassword'))
 
     # U-6.4.2
     def test_verify_password_false(self):
         user = User()
         user.password = generate_password_hash('password')
-        self.assertFalse(user.verifyPassword('notthepassword'))
+        self.assertFalse(user.verify_password('notthepassword'))
 
     # U-6.5
     def test_verify_email_address(self):
         user = User()
-        user.verifyEmailAddress()
+        user.verify_email_address()
         self.assertTrue(user.is_confirmed)
         self.assertIsNotNone(user.confirmed_date)
 
@@ -57,35 +57,35 @@ class TestUserModel(unittest.TestCase):
     def test_is_account_verified_true(self):
         user = User()
         user.is_confirmed = True
-        self.assertTrue(user.isAccountVerified())
+        self.assertTrue(user.is_account_verified())
 
     # U-6.6.2
     def test_is_account_verified_false(self):
         user = User()
-        self.assertFalse(user.isAccountVerified())
+        self.assertFalse(user.is_account_verified())
 
     # U-6.7
     @patch('TaskTok.extensions.db.Model.query')
     def test_get_user_by_username(self, mock_query):
-        User.getUserByUsername('testuser')
+        User.get_user_by_username('testuser')
         mock_query.filter_by.assert_called_with(username='testuser')
 
     # U-6.8
     @patch('TaskTok.extensions.db.Model.query')
     def test_search_email_address(self, mock_query):
-        User.searchEmailAddress('user@TaskTok.com')
+        User.search_email_address('user@TaskTok.com')
         mock_query.filter_by.assert_called_with(email='user@TaskTok.com')
 
     # U-6.9
     @patch('TaskTok.extensions.db.Model.query')
     def test_get_user_by_id(self, mock_query):
-        User.getUserById('123')
+        User.get_user_by_id('123')
         mock_query.filter_by.assert_called_with(id='123')
 
     # U-6.10
     @patch('TaskTok.extensions.db.Model.query')
     def test_get_user_count(self, mock_query):
-        User.getUserCount()
+        User.get_user_count()
         mock_query.count.assert_called()
 
     # U-6.11
@@ -127,19 +127,19 @@ class TestTaskReminderModel(unittest.TestCase):
 
     # U-6.16
     def test_repr(self):
-        task = taskReminder(task_description='Test task')
+        task = TaskReminder(task_description='Test task')
         self.assertEqual(task.__repr__(), '<taskReminder Test task>')
 
     # U-6.17
     def test_add(self):
-        task = taskReminder()
+        task = TaskReminder()
         task.add()
         db_session_mock.add.assert_called_with(task)
         db_session_mock.commit.assert_called()
 
     # U-6.18
     def test_remove(self):
-        task = taskReminder()
+        task = TaskReminder()
         task.remove()
         db_session_mock.delete.assert_called_with(task)
         db_session_mock.commit.assert_called()
@@ -147,7 +147,7 @@ class TestTaskReminderModel(unittest.TestCase):
     # U-6.19
     @patch('TaskTok.extensions.db.Model.query')
     def test_find_task_by_username(self, mock_query):
-        taskReminder.findTaskByUsername('testuser')
+        TaskReminder.find_task_by_username('testuser')
         mock_query.filter_by.assert_called_with(owner_username='testuser')
 
 if __name__ == '__main__':

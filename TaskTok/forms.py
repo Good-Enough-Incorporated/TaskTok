@@ -16,9 +16,10 @@ from wtforms.validators import InputRequired
 def validate_email(form, field):
     # Found this regex here:
     # https://emailregex.com/
-    if re.match(r'(^[a-zA-Z\d_.+-]+@[a-zA-Z\d-]+\.[a-zA-Z\d-.]+$)', field.data):
+    if re.match(r"(^[a-zA-Z\d_.+-]+@[a-zA-Z\d-]+\.[a-zA-Z\d-.]+$)", field.data):
         return
-    raise ValidationError('Email must match the standard format: user@domain.tld')
+    raise ValidationError(
+        'Email must match the standard format: user@domain.tld')
 
 
 def validate_password(form, field):
@@ -28,9 +29,11 @@ def validate_password(form, field):
     min_length = 12
     max_length = 64
     if len(field.data) < min_length:
-        raise ValidationError(f'Password must be at least {min_length} characters')
+        raise ValidationError('Password must be at least '
+                              f'{min_length} characters')
     if len(field.data) > max_length:
-        raise ValidationError(f'Password cannot be more than {max_length} characters')
+        raise ValidationError('Password cannot be more than '
+                              f'{max_length} characters')
     if re.match(r'^[A-Za-z\d._@$!%*#?&^-]*$', field.data):
         return  # String contains valid characters only
     raise ValidationError('Password may only contain letters, numbers,'
@@ -45,9 +48,11 @@ def validate_username(form, field):
     min_length = 4
     max_length = 20
     if len(field.data) < min_length:
-        raise ValidationError(f'Username must be at least {min_length} characters')
+        raise ValidationError('Username must be at least '
+                              f'{min_length} characters')
     if len(field.data) > max_length:
-        raise ValidationError(f'Username cannot be more than {max_length} characters')
+        raise ValidationError('Username cannot be more than '
+                              f'{max_length} characters')
     if re.match(r'^\d*$', field.data):
         raise ValidationError('Username must contain letters')
     if re.match(r'^[A-Za-z\d]*$', field.data):
@@ -57,10 +62,14 @@ def validate_username(form, field):
 
 class NewUserForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), validate_email])
-    username = StringField('Username', validators=[InputRequired(), validate_username])
-    password = PasswordField('Password', validators=[InputRequired(), validate_password])
+    username = StringField('Username', validators=[
+                           InputRequired(), validate_username])
+    password = PasswordField('Password', validators=[
+                             InputRequired(), validate_password])
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), validate_username])
-    password = PasswordField('Password', validators=[InputRequired(), validate_password])
+    username = StringField('Username', validators=[
+                           InputRequired(), validate_username])
+    password = PasswordField('Password', validators=[
+                             InputRequired(), validate_password])

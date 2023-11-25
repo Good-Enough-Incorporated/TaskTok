@@ -360,6 +360,21 @@ async function listTask() {
   console.log("testing api calls from js");
   listTask();
   console.log('hello')
+  enableVerticalScroll();
   
   });
   
+  function enableVerticalScroll(){
+    const scrollContainer = document.querySelector('.archived-tasks-container');
+
+    // Check if the container exists
+    if (scrollContainer) {
+        scrollContainer.addEventListener('wheel', (event) => {
+            // Prevent the default vertical scroll
+            event.preventDefault();
+
+            // Scroll horizontally instead
+            scrollContainer.scrollLeft += event.deltaY;
+        });
+    }
+  }
