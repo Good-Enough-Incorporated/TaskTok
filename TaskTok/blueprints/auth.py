@@ -2,23 +2,18 @@
 auth.py serves as the authentication python program
 for all auth related functions
 
-routes for /auth, /updatepassword, etc
+routes for /auth, /update_password, etc
 """
-import re
-import datetime
-import fileinput
-import sys
-import os
+
 from TaskTok.models import User
-from os.path import exists
 from flask import Blueprint
 from flask import jsonify
-from passlib.hash import sha256_crypt
-from flask.helpers import _prepare_send_file_kwargs, url_for, request, flash, session
+from flask.helpers import url_for, request, flash, session
 from werkzeug.utils import redirect
-from flask import render_template, current_app, Response, make_response
+from flask import render_template, make_response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, \
+    get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
@@ -27,90 +22,106 @@ from TaskTok.forms import NewUserForm, LoginForm
 from datetime import timedelta
 from RemindMeClient.task import send_email
 
+#  ------------ Unused imports: Needs review -----------------
+#  from passlib.hash import sha256_crypt
+#  from flask.helpers import prepare_send_file_kwargs
+#  from flask import current_app, Response
+#  import re
+#  import datetime
+#  import fileinput
+# import sys
+# import os
+# from os.path import exists
+#  --------------------------------------------------------------
 
 auth = Blueprint("auth", __name__)
 
-#with app.app_context():
-#kc = current_app.config['kc']
+# with app.app_context():
+# kc = current_app.config['kc']
 callback_URL = f"http://192.168.1.26/kc/callback"
+
 
 @auth.route('/verify_email/<token>')
 def verify_email(token):
-    #check the token, if valid lookup the user via email and verify their account
-    tokenEmail = verify_email_token(token)
-    
-    if tokenEmail == False:
+    # check the token, if valid lookup the user via email and verify their account
+    token_email = verify_email_token(token)
+
+    if not token_email:
         return "Invalid or expired token received."
-    
-    nonVerifiedUser = User.searchEmailAddress(email=tokenEmail)
-    if nonVerifiedUser is not None:
-        if nonVerifiedUser.isAccountVerified() is False: 
-            nonVerifiedUser.verifyEmailAddress()
-            try: 
+
+    non_verified_user = User.searchEmailAddress(email=token_email)
+    if non_verified_user is not None:
+        if non_verified_user.isAccountVerified() is False:
+            non_verified_user.verifyEmailAddress()
+            try:
                 db.session.commit()
             except Exception as e:
                 db.session.rollback()
                 print(e)
-        else: 
+        else:
             return "Email was already verified!"
-        
+
     else:
         return "Verification failed - Unknown E-Mail"
-        #valid token, but couldn't find the user?
+        # valid token, but couldn't find the user?
 
-    
     return 'verified email'
 
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = NewUserForm()
+    error = None
+
     if request.method == "GET":
         return render_template('register.html', form=form)
 
-
     if form.validate_on_submit():
-        newUser_username = request.form.get('username').lower()
-        newuser_password = request.form.get('password')
-        newuser_email = request.form.get('email').lower()
+        new_user_username = request.form.get('username').lower()
+        new_user_password = request.form.get('password')
+        new_user_email = request.form.get('email').lower()
 
-        print(f"Username = {newUser_username}")
-        user = User.getUserByUsername(username=newUser_username)
+        print(f"Username = {new_user_username}")
+        user = User.getUserByUsername(username=new_user_username)
         print(user)
-        if user is not None:        
-            #return json if application/json later
-            #return jsonify({"Error":"User already exists"}), 403
-            print('user already exists')
-            error = 'Username already exists. Please login'
+        if user is not None:
+            # return json if application/json later
+            # return jsonify({"Error":"User already exists"}), 403
+            error = 'user already exists'
             flash(error, 'error')
-
             return render_template('register.html', form=form)
-        email = User.searchEmailAddress(email=newuser_email)
+        email = User.searchEmailAddress(email=new_user_email)
+
         if email is not None:
             print('email already exists')
             error = 'Email already exists. Please login with username'
             flash(error, 'error')
             return render_template('register.html', form=form)
 
-        new_user = User(username= newUser_username,
-                   email = newuser_email    )
-        new_user.setPassword(password=newuser_password)
+        new_user = User(username=new_user_username,
+                        email=new_user_email)
+        new_user.setPassword(password=new_user_password)
         new_user.add()
 
         token = generate_email_token(new_user.email)
-        print(f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
-        #generate the email template
-        verificationURL = url_for('auth.verify_email',_external=True, token=token)          
-        emailBody = render_template('email/verifyEmail.html', verificationLink=verificationURL, username=new_user.username)
-        
+        print(
+            f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
+        # generate the email template
+        verification_url = url_for('auth.verify_email', _external=True, token=token)
+        email_body = render_template('email/verifyEmail.html', verificationLink=verification_url,
+                                     username=new_user.username)
+
         try:
-            send_email.delay(new_user.email, "TaskTok - Verification Required", emailBody)
-        except:
-            print(emailBody)
-            print(f'Looks like we couldnt send the job to the message broker Are you running on linux with Redis installed?')
+            send_email.delay(new_user.email, "TaskTok - Verification Required", email_body)
+        except Exception as e:
+            print(f"An error occured: {e}")
+            print(email_body)
+            print(
+                f'Looks like we couldnt send the job to the message broker Are you running on linux with Redis '
+                f'installed?')
             print(f'Anyways, here is the email template I tried sending out (for testing)')
 
-        #return jsonify({"Message": f"Created {new_user}"}), 200
+        # return jsonify({"Message": f"Created {new_user}"}), 200
         print('Account Created!')
         flash("Account Created! Please login.", 'success')
         return redirect(url_for('auth.register'))
@@ -125,54 +136,45 @@ def register():
         flash(error, 'error')
 
     return render_template('register.html', form=form)
-    
-@auth.route('/login',methods=['GET', 'POST'] )
+
+
+@auth.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
 
     if request.method == "GET":
         return redirect(url_for("views.mainPage"))
-    
-    formInput = request.form
-    form = LoginForm(formInput)
+
+    form_input = request.form
+    form = LoginForm(form_input)
     if form.validate_on_submit():
-        formUsername = request.form.get('username').lower()
-        formPassword = request.form.get('password')
-        rememberMe   = request.form.get('rememberMe')
+        form_username = request.form.get('username').lower()
+        form_password = request.form.get('password')
+        remember_me = request.form.get('rememberMe')
 
         try:
-            user = User.getUserByUsername(username=formUsername)
+            user = User.getUserByUsername(username=form_username)
         except OperationalError as e:
             print(f'Failed to authenticate user: %s', e)
-            return "TODO: Make this pretty and give an error code for setup not complete... Please create your database using flask cli: flask createDB | flask makeAdminUser"
-        if user and (user.verifyPassword(password=formPassword)):
-            expirationTime = timedelta(hours=1)
-            if rememberMe == 'on':
-                print('JWT Tokens are no longer session based')
-                expirationTime = timedelta(hours=720) #30 days
-                #attempt to find the user passed by the login endpoint
-                accessToken = create_access_token(identity=user, expires_delta=expirationTime)#was username
-                refreshToken = create_refresh_token(identity=user, expires_delta=expirationTime*2)#was username
-                response = redirect(url_for('views.home'))
-                set_access_cookies(response, accessToken, max_age=expirationTime)
-                set_refresh_cookies(response, refreshToken, max_age=(expirationTime)*2)
-            else:
-                print('JWT Tokens are session based and will be deleted upon browser close')
+            return "TODO: Make this pretty and give an error code for setup not complete... Please create your " \
+                   "database using flask cli: flask createDB | flask makeAdminUser "
 
-                #attempt to find the user passed by the login endpoint
-                accessToken = create_access_token(identity=user)#was username
-                refreshToken = create_refresh_token(identity=user)#was username
-                response = redirect(url_for('views.home'))
-                set_access_cookies(response, accessToken)
-                set_refresh_cookies(response, refreshToken)
-            
+        if user and (user.verifyPassword(password=form_password)):
+            # Set expiration time based on whether 'remember me' is checked
+            expiration_hours = 720 if remember_me == 'on' else 1
+            expiration_time = timedelta(hours=expiration_hours)
+
+            access_token = create_access_token(identity=user, expires_delta=expiration_time)
+            refresh_token = create_refresh_token(identity=user, expires_delta=expiration_time * 2)
+            response = redirect(url_for('views.home'))
+
+            max_age_seconds = int(expiration_time.total_seconds())
+            set_access_cookies(response, access_token, max_age=max_age_seconds)
+            set_refresh_cookies(response, refresh_token, max_age=max_age_seconds * 2)
+
             return response
-        else: 
-            #return jsonify(
-            #    {
-            #        "message": "invalid username or password"
-            #    }
-            #),403
-            error="Invalid username or password."
+        else:
+            error = "Invalid username or password."
             flash(error, 'error')
             return render_template('loginPage.html', form=form)
     else:
@@ -183,30 +185,32 @@ def login():
         flash(error, 'error')
     return render_template('loginPage.html', form=form)
 
-@auth.route('/loginAPIUser',methods=['POST'] )
-def loginAPIUser():
-    requestInformation = request.get_json()
-    #attempt to find the user passed by the login endpoint
-    user = User.getUserByUsername(username=requestInformation.get('username'))
-    if user and (user.verifyPassword(password=requestInformation.get('password'))):
-        accessToken = create_access_token(identity=user)#was username
-        refreshToken = create_refresh_token(identity=user)#was username
+
+@auth.route('/loginAPIUser', methods=['POST'])
+def login_api_user():
+    request_information = request.get_json()
+    # attempt to find the user passed by the login endpoint
+    user = User.getUserByUsername(username=request_information.get('username'))
+    if user and (user.verifyPassword(password=request_information.get('password'))):
+        access_token = create_access_token(identity=user)  # was username
+        refresh_token = create_refresh_token(identity=user)  # was username
 
         return jsonify(
             {
                 "message": "User authenticated!",
-                "tokens" : {
-                    "AccessToken": accessToken,
-                    "RefreshToken": refreshToken
-                }            
+                "tokens": {
+                    "AccessToken": access_token,
+                    "RefreshToken": refresh_token
+                }
             }
         ), 200
-    else: 
+    else:
         return jsonify(
             {
                 "message": "invalid username or password"
             }
-        ),403
+        ), 403
+
 
 def login_required(f):
     @wraps(f)
@@ -214,55 +218,55 @@ def login_required(f):
         if not session.get("logged_in"):
             return redirect(url_for("login", next=request.url))
         return f(*args, **kwargs)
+
     return decorated_function
 
 
 @auth.route('/getCurrentUser')
 @jwt_required()
-def getCurrentUser():
-    
-    return jsonify({"message": "useraccount", "user_details": {"username": current_user.username, "email": current_user.email}})
-
+def get_current_user():
+    return jsonify(
+        {"message": "useraccount", "user_details": {"username": current_user.username, "email": current_user.email}})
 
 
 @auth.route('/refreshAccessToken')
 @jwt_required(refresh=True)
-def refreshAccessToken():
-    #token may be expired, so we can't use current_user
-    #therefore, we use get_jwt_identity() to get the username
+def refresh_access_token():
+    # token may be expired, so we can't use current_user
+    # therefore, we use get_jwt_identity() to get the username
     username = get_jwt_identity()
-    #create_access_token needs to User object, not just the username, so query the user
-    userObject = User.query.get(username)
-    #create a new access token.
-    accessToken = create_access_token(identity=userObject)
-    return jsonify({"message": accessToken})
-
+    # create_access_token needs to User object, not just the username, so query the user
+    user_object = User.query.get(username)
+    # create a new access token.
+    access_token = create_access_token(identity=user_object)
+    return jsonify({"message": access_token})
 
 
 @auth.route('/logout')
 @jwt_required()
 def logout():
-    acceptHeader = request.headers.get('Accept','')
+    accept_header = request.headers.get('Accept', '')
     response = make_response()
     jwt = get_jwt()
     jti = jwt['jti']
-    blockedToken = NoNoTokens(jti=jti)
-    blockedToken.add()
-    if 'application/json' in acceptHeader:
+    blocked_token = NoNoTokens(jti=jti)
+    blocked_token.add()
+    if 'application/json' in accept_header:
         response.data = jsonify({"Message": "Log Out Successful", "token_info": "token_revoked"})
         response.status_code = 200
         response.content_type = 'application/json'
-        
+
     else:
         response.data = render_template("error/loggedOut.html")
         response.status_code = 200
         response.content_type = 'text/html'
-    #set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
-    #this will set up future requests to say not authenticated (or redirect to login)
-    #response.set_cookie("access_token_cookie", "", max_age=0)
-    unset_jwt_cookies( response=response)
+    # set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
+    # this will set up future requests to say not authenticated (or redirect to login)
+    # response.set_cookie("access_token_cookie", "", max_age=0)
+    unset_jwt_cookies(response=response)
 
-    return response,200
+    return response, 200
+
 
 @auth.route('/forgotPassword', methods=['GET', 'POST'])
 def forgot_password():

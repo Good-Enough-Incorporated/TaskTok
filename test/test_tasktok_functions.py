@@ -5,7 +5,7 @@ from unittest.mock import patch, Mock
 import subprocess
 import socket
 from itsdangerous import URLSafeTimedSerializer
-from TaskTok.functions import verifyCeleryWorker, verifyMessageBrokerOnline, generate_email_token, verify_email_token
+from TaskTok.functions import verify_celery_worker, verify_message_broker_online, generate_email_token, verify_email_token
 
 os_mock = Mock()
 os_mock.environ = {
@@ -19,34 +19,34 @@ class TestSystemChecks(unittest.TestCase):
     @patch('subprocess.check_output')
     def test_verify_celery_worker_running(self, mock_check_output):
         mock_check_output.return_value = b'celery worker is running'
-        self.assertTrue(verifyCeleryWorker())
+        self.assertTrue(verify_celery_worker())
 
     # U-5.1.2
     @patch('subprocess.check_output')
     def test_celery_worker_invalid(self, mock_check_output):
         mock_check_output.return_value = b''
-        result = verifyCeleryWorker()
+        result = verify_celery_worker()
         self.assertFalse(result)
 
     # U-5.1.3
     @patch('subprocess.check_output')
     def test_verify_celery_worker_not_running(self, mock_check_output):
         mock_check_output.side_effect = Exception('error')
-        self.assertFalse(verifyCeleryWorker())
+        self.assertFalse(verify_celery_worker())
 
     # U-5.2.1
     @patch('socket.create_connection')
     def test_verify_message_broker_online(self, mock_create_connection):
         mock_socket = Mock()   
         mock_create_connection.return_value = mock_socket
-        self.assertTrue(verifyMessageBrokerOnline('localhost', 5672, 5))
+        self.assertTrue(verify_message_broker_online('localhost', 5672, 5))
         mock_socket.close.assert_called_once_with()
 
     # U-5.2.2
     @patch('socket.create_connection')
     def test_verify_message_broker_offline(self, mock_socket):
         mock_socket.side_effect = socket.error
-        self.assertFalse(verifyMessageBrokerOnline('localhost', 5672, 5))
+        self.assertFalse(verify_message_broker_online('localhost', 5672, 5))
 
     # U-5.3
     @patch.dict('os.environ', {'EMAIL_VERIFICATION_SECRET': 'secret-key', 'SECURITY_PASSWORD_SALT': 'salt'})
