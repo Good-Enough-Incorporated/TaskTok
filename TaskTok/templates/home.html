@@ -34,6 +34,20 @@
         .sidenav a:hover {
             color: #f1f1f1;
         }
+        .fadeOutSlideRight {
+        animation: fadeOutSlideRight 0.5s forwards;
+        }
+
+        @keyframes fadeOutSlideRight {
+        0% {
+        opacity: 1;
+        transform: translateX(0);
+        }
+        100% {
+        opacity: 0;
+        transform: translateX(100%);
+        }
+        }
 
         .main {
             margin-left: 200px; /* Same as the width of the sidenav */
@@ -50,11 +64,52 @@
 }
 
 .table-container {
-    width: calc(100% - 200px); /* Adjust width to account for sidenav */
+    display: flex; /* Use flexbox to center the child div */
+    justify-content: center; /* Center the child div horizontally */
+    align-items: flex-start; /* Align the child div to the top */
+    position: relative;
+    padding-top: 30px;
+    position: relative;
     margin-left: 200px;
-    margin-right: auto;
-    overflow-x: auto; /* Enables horizontal scrolling if the table overflows */
 }
+.table-wrapper {
+
+  
+    position: relative; /* New positioning context for the button */
+}
+
+.task-add-btn {
+    background-color: #E0A900;
+    border: none;
+    visibility: hidden; /* make button visible once table loads */
+    color: black;
+    padding: 8px 16px;
+    min-width: 93px;
+    text-decoration: none;      
+    cursor: pointer;
+    border-radius: 8px;
+    top: -50px;
+    right: 0;
+    position: absolute;
+   
+    
+    /* Style your button as needed */
+}
+.fadeOutSlideUp {
+  animation: fadeOutSlideUp 0.5s forwards;
+}
+
+@keyframes fadeOutSlideUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
 
 table {
     margin-left: auto;
@@ -111,6 +166,7 @@ border-bottom: 0px solid #444444;
     cursor: pointer;
     border-radius: 8px;
     }
+
     .toast-container {
     
     display: block;
@@ -207,22 +263,20 @@ border-bottom: 0px solid #444444;
 
 
 		
-		.modal-fields { 
-			width: 100%; 
-			background: #17171c;
-			color: white;  
-			margin: 8px 0;
-			padding: 12px 20px; 
-			display: inline-block; 
-			box-sizing: border-box;     
-			border: 2px solid rgba(51,51,61,0.48);
-			border-radius: 4px;
-			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
-			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
-			}
-/* Media query for smaller screens *
+.modal-fields { 
+    width: 100%; 
+    background: #17171c;
+    color: white;  
+    margin: 8px 0;
+    padding: 12px 20px; 
+    display: inline-block; 
+    box-sizing: border-box;     
+    border: 2px solid rgba(51,51,61,0.48);
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+    box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+    }
 
-/* Ensuring content doesn't hide behind sidenav even on very small screens */
 
 </style>
 {% endblock %}
@@ -244,12 +298,17 @@ border-bottom: 0px solid #444444;
         </div>
     </div>
     <div class="table-container">
-        <table id="taskTable"> 
-            <thead>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <button class="task-add-btn" id="task-add-btn">New Task</button>
+            <table id="taskTable">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
         
     </div>
 <!-- The Modal -->
