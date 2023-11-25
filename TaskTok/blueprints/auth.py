@@ -12,8 +12,10 @@ from flask.helpers import url_for, request, flash, session
 from werkzeug.utils import redirect
 from flask import render_template, make_response
 from functools import wraps
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, current_user, \
-    get_jwt_identity, set_access_cookies, set_refresh_cookies, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, \
+    jwt_required, get_jwt, current_user, \
+    get_jwt_identity, set_access_cookies, \
+    set_refresh_cookies, unset_jwt_cookies
 from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
@@ -43,7 +45,8 @@ callback_URL = f"http://192.168.1.26/kc/callback"
 
 @auth.route('/verify_email/<token>')
 def verify_email(token):
-    # check the token, if valid lookup the user via email and verify their account
+    # check the token, if valid lookup the user via email and verify their
+    # account
     token_email = verify_email_token(token)
 
     if not token_email:
@@ -104,22 +107,30 @@ def register():
         new_user.add()
 
         token = generate_email_token(new_user.email)
-        print(
-            f"TODO: Email this token to the email supplied. Accept the token a the endpoint /auth/verify_email/{token}")
         # generate the email template
-        verification_url = url_for('auth.verify_email', _external=True, token=token)
-        email_body = render_template('email/verifyEmail.html', verificationLink=verification_url,
-                                     username=new_user.username)
+        verification_url = url_for(
+            'auth.verify_email',
+            _external=True,
+            token=token)
+        email_body = render_template(
+            'email/verifyEmail.html',
+            verificationLink=verification_url,
+            username=new_user.username)
 
         try:
-            send_email.delay(new_user.email, "TaskTok - Verification Required", email_body)
+            send_email.delay(
+                new_user.email,
+                "TaskTok - Verification Required",
+                email_body)
         except Exception as e:
             print(f"An error occured: {e}")
             print(email_body)
             print(
-                f'Looks like we couldnt send the job to the message broker Are you running on linux with Redis '
-                f'installed?')
-            print(f'Anyways, here is the email template I tried sending out (for testing)')
+                'Looks like we couldnt send the job to the message broker Are '
+                'you running on linux with Redis '
+                'installed?')
+            print('Anyways, here is the email template I tried sending out '
+                  '(for testing)')
 
         # return jsonify({"Message": f"Created {new_user}"}), 200
         print('Account Created!')
@@ -143,7 +154,7 @@ def login():
     error = None
 
     if request.method == "GET":
-        return redirect(url_for("views.mainPage"))
+        return redirect(url_for("views.main_page"))
 
     form_input = request.form
     form = LoginForm(form_input)
@@ -155,22 +166,28 @@ def login():
         try:
             user = User.get_user_by_username(username=form_username)
         except OperationalError as e:
-            print(f'Failed to authenticate user: %s', e)
-            return "TODO: Make this pretty and give an error code for setup not complete... Please create your " \
-                   "database using flask cli: flask createDB | flask makeAdminUser "
+            print('Failed to authenticate user: %s', e)
+            return "TODO: Make this pretty and give an error code for setup " \
+                "not complete... Please create your database using flask cli:"\
+                " flask createDB | flask makeAdminUser "
 
         if user and (user.verify_password(password=form_password)):
             # Set expiration time based on whether 'remember me' is checked
             expiration_hours = 720 if remember_me == 'on' else 1
             expiration_time = timedelta(hours=expiration_hours)
 
-            access_token = create_access_token(identity=user, expires_delta=expiration_time)
-            refresh_token = create_refresh_token(identity=user, expires_delta=expiration_time * 2)
+            access_token = create_access_token(
+                identity=user, expires_delta=expiration_time)
+            refresh_token = create_refresh_token(
+                identity=user, expires_delta=expiration_time * 2)
             response = redirect(url_for('views.home'))
 
             max_age_seconds = int(expiration_time.total_seconds())
             set_access_cookies(response, access_token, max_age=max_age_seconds)
-            set_refresh_cookies(response, refresh_token, max_age=max_age_seconds * 2)
+            set_refresh_cookies(
+                response,
+                refresh_token,
+                max_age=max_age_seconds * 2)
 
             return response
         else:
@@ -225,8 +242,8 @@ def login_required(f):
 @auth.route('/getCurrentUser')
 @jwt_required()
 def get_current_user():
-    return jsonify(
-        {"message": "useraccount", "user_details": {"username": current_user.username, "email": current_user.email}})
+    return jsonify({"message": "useraccount", "user_details": {
+        "username": current_user.username, "email": current_user.email}})
 
 
 @auth.route('/refreshAccessToken')
@@ -235,7 +252,8 @@ def refresh_access_token():
     # token may be expired, so we can't use current_user
     # therefore, we use get_jwt_identity() to get the username
     username = get_jwt_identity()
-    # create_access_token needs to User object, not just the username, so query the user
+    # create_access_token needs to User object, not just the username, so
+    # query the user
     user_object = User.query.get(username)
     # create a new access token.
     access_token = create_access_token(identity=user_object)
@@ -252,7 +270,8 @@ def logout():
     blocked_token = NoNoTokens(jti=jti)
     blocked_token.add()
     if 'application/json' in accept_header:
-        response.data = jsonify({"Message": "Log Out Successful", "token_info": "token_revoked"})
+        response.data = jsonify(
+            {"Message": "Log Out Successful", "token_info": "token_revoked"})
         response.status_code = 200
         response.content_type = 'application/json'
 
@@ -260,8 +279,10 @@ def logout():
         response.data = render_template("error/loggedOut.html")
         response.status_code = 200
         response.content_type = 'text/html'
-    # set the access token to null, otherwise if they keep going to protected pages, they'll get session expired.
-    # this will set up future requests to say not authenticated (or redirect to login)
+    # set the access token to null, otherwise if they keep going
+    # to protected pages, they'll get session expired.
+    # this will set up future requests to say not authenticated
+    # (or redirect to login)
     # response.set_cookie("access_token_cookie", "", max_age=0)
     unset_jwt_cookies(response=response)
 

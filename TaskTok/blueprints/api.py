@@ -49,11 +49,12 @@ def list_task():
     # create_file.delay("test.txt", "another test!")
 
 
-@api.route('/removeTask/<taskID>')
+@api.route('/removeTask/<task_id>')
 @jwt_required()
 def remove_task(task_id):
     # Get the current user, check to make sure the supplied taskID belongs to them
     # TODO: Need to make sure <taskID> is safe
+    # TODO: task should be UUID4, throw error message for invalid task type
     print("beginning removeTask")
     user_data = current_user
     current_task = TaskReminder.query.get(task_id)
@@ -68,7 +69,8 @@ def remove_task(task_id):
             return jsonify({'Message': "remove_fail", 'Error': str(e)})
 
 
-# TODO: Need input validation. Waiting for Bootstrap to be setup for full functionality.
+# TODO: Need input validation.
+# Waiting for Bootstrap to be setup for full functionality.
 @api.route('/editTask/<task_id>', methods=['PUT'])
 @jwt_required()
 def edit_task(task_id):

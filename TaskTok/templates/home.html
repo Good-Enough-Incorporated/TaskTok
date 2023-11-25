@@ -70,14 +70,31 @@
     position: relative;
     padding-top: 30px;
     position: relative;
+    
     margin-left: 200px;
 }
 .table-wrapper {
-
-  
+    padding: 25px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    background-color: #17171c;
+    transition: 0.3s;
+    border-radius: 5px;
     position: relative; /* New positioning context for the button */
 }
 
+.table-wrapper:hover{
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.tasktable-title-lbl{
+    display: block;
+    padding-bottom: 10px;
+    position: absolute;
+    left: 50%;
+    top: -30px;
+    font-size: 16px;
+    transform: translate(-50%, -50%);
+}
 .task-add-btn {
     background-color: #E0A900;
     border: none;
@@ -114,8 +131,7 @@
 table {
     margin-left: auto;
     margin-right: auto;
-    border: 3px solid #0F0F12;
-    background-color: #17171C;
+
     border-collapse: collapse;
     
     /* ... other styles ... */
@@ -277,6 +293,52 @@ border-bottom: 0px solid #444444;
     box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
     }
 
+.archived-tasks-container {
+  display: flex;
+  overflow-x: auto;
+  margin-left: 200px; /* Same as the width of the sidenav */
+  margin-top: 30px;
+  scroll-behavior: smooth;
+  white-space: nowrap; /* Ensures cards are in a single line */
+}
+
+.archived-task-card {
+  display: inline-block;
+  background-color: #2a2a2e; /* Dark theme card */
+  color: white;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  min-width: 200px; /* Minimum width for each card */
+  /* Other styling as needed */
+}
+
+/* scroll bar */
+/* This styles the scrollbar track */
+::-webkit-scrollbar-track {
+    background: #2a2a2e; /* Dark track background */
+}
+
+/* This styles the scrollbar handle */
+::-webkit-scrollbar-thumb {
+    background: #444; /* Dark thumb color */
+    border-radius: 10px; /* Optional: round corners for the scrollbar handle */
+}
+
+/* This styles the scrollbar itself (the entire component) */
+::-webkit-scrollbar {
+    width: 8px; /* Width of the vertical scrollbar */
+    height: 8px; /* Height of the horizontal scrollbar */
+}
+
+/* Use the scrollbar-color property to set the thumb and track color */
+.scrollable-element {
+    scrollbar-color: #444 #2a2a2e;
+    scrollbar-width: thin; /* Can be 'auto', 'thin', or 'none' */
+}
+
+
 
 </style>
 {% endblock %}
@@ -299,6 +361,7 @@ border-bottom: 0px solid #444444;
     </div>
     <div class="table-container">
         <div class="table-wrapper">
+            <label class="tasktable-title-lbl">Active Tasks</label>
             <button class="task-add-btn" id="task-add-btn">New Task</button>
             <table id="taskTable">
                 <thead>
@@ -309,7 +372,126 @@ border-bottom: 0px solid #444444;
         </div>
 
     </div>
-        
+    <!-- Archived Tasks Section -->
+<div class="archived-tasks-container">
+    <!-- Repeat this block for each archived task -->
+    <div class="archived-task-card">
+      <h3>Task Title</h3>
+      <p>Completed on: Date</p>
+      <p>Summary of the task...</p>
+      <button>View Details</button>
+    </div>
+    <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+      <div class="archived-task-card">
+        <h3>Task Title</h3>
+        <p>Completed on: Date</p>
+        <p>Summary of the task...</p>
+        <button>View Details</button>
+      </div>
+    <!-- More archived task cards -->
+  </div>
+
     </div>
 <!-- The Modal -->
     <div id="editModal" class="modal">

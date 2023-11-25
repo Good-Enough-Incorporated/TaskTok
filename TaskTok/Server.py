@@ -16,6 +16,11 @@ import os
 #  from RemindMeClient import task
 #  from flask_mail import Mail, Message
 #  --------------------------------------------------------------
+# TODO:maybe remove
+# from flask_mail import Mail,Message
+# from .schema import UserSchema
+# from celery import Celery
+# from RemindMeClient import task
 
 
 def create_app():
@@ -35,8 +40,10 @@ def create_app():
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
     app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT')
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # Your Gmail address
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # Your App Password
+    app.config['MAIL_USERNAME'] = os.environ.get(
+        'MAIL_USERNAME')  # Your Gmail address
+    app.config['MAIL_PASSWORD'] = os.environ.get(
+        'MAIL_PASSWORD')  # Your App Password
 
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
     # app.config['JWT_COOKIE_DOMAIN'] = 'tasktok.com'  # Set your domain here

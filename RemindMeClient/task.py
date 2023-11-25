@@ -9,7 +9,7 @@ from flask_mail import Message
 # -------------------------------------------------------
 
 @shared_task(bind=True)
-def send_email(email_to, subject, body):
+def send_email(self, email_to, subject, body):
     msg = Message(subject, recipients=[email_to])
     # msg.body=body
     msg.html = body
@@ -24,4 +24,5 @@ def create_file(file, contents):
 
 @shared_task
 def add(x, y):
+
     return x + y
