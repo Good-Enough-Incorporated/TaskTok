@@ -30,11 +30,15 @@ def add_task():
     # get the current user's information
     user_data = current_user
 
-    task = taskReminder(owner_username=user_data.username, task_dueDate=datetime.datetime.now(),
-                        task_description="Hello, this is the reminder of the example task", task_name="My Task!",
-                        task_message="This is the message")
+    task = taskReminder(
+        owner_username=user_data.username,
+        task_dueDate=datetime.datetime.now(),
+        task_description="Hello, this is the reminder of the example task",
+        task_name="My Task!",
+        task_message="This is the message")
     task.add()
-    return jsonify({"Message": "Added task to the database", "UserData": user_data.username})
+    return jsonify({"Message": "Added task to the database",
+                   "UserData": user_data.username})
 
 
 @api.route('/listTask')
@@ -49,16 +53,19 @@ def list_task():
     # create_file.delay("test.txt", "another test!")
 
 
-@api.route('/removeTask/<taskID>')
+@api.route('/removeTask/<task_id>')
 @jwt_required()
 def remove_task(task_id):
-    # Get the current user, check to make sure the supplied taskID belongs to them
+    # Get the current user, check to make sure the supplied
+    # taskID belongs to them
     # TODO: Need to make sure <taskID> is safe
+    # TODO: task should be UUID4, throw error message for invalid task type
     print("beginning removeTask")
     user_data = current_user
     current_task = taskReminder.query.get(task_id)
     if current_task is not None and user_data.username == current_task.owner_username:
-        print(f"[api/removeTask] {user_data.username} is the owner, removing task {task_id}")
+        print(
+            f"[api/removeTask] {user_data.username} is the owner, removing task {task_id}")
         try:
             current_task.remove()
             print("ending removeTask")
@@ -68,7 +75,8 @@ def remove_task(task_id):
             return jsonify({'Message': "remove_fail", 'Error': str(e)})
 
 
-# TODO: Need input validation. Waiting for Bootstrap to be setup for full functionality.
+# TODO: Need input validation.
+# Waiting for Bootstrap to be setup for full functionality.
 @api.route('/editTask/<task_id>', methods=['PUT'])
 @jwt_required()
 def edit_task(task_id):
@@ -96,13 +104,15 @@ def edit_task(task_id):
     if new_due_date is not None:
         try:
             print(f"DUE DATE = {new_due_date}")
-            task.task_dueDate = datetime.datetime.strptime(new_due_date, f'%Y-%m-%dT%H:%M:%S')
+            task.task_dueDate = datetime.datetime.strptime(
+                new_due_date, f'%Y-%m-%dT%H:%M:%S')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
 
     if new_reminder_off_set is not None:
         try:
-            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
+            task.task_reminderOffSetTime = datetime.datetime.strptime(
+                new_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
 
@@ -120,7 +130,8 @@ def edit_task(task_id):
     except Exception as e:
         # Rollback in case of error.
         db.session.rollback()
-        return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
+        return jsonify(
+            {'Message': 'Failed to update task', 'Error': str(e)}), 500
 
 
 @api.route('/')

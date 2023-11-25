@@ -1,21 +1,12 @@
 from TaskTok.Server import create_app
-from flask import Flask, jsonify, request
-from flask import render_template
-from flask.cli import with_appcontext, FlaskGroup
-from TaskTok.extensions import db, jwtManager, flaskMail
-from TaskTok.models import User, NoNoTokens, taskReminder
-from TaskTok.schema import UserSchema
-from RemindMeClient import task
+from TaskTok.extensions import db
+from TaskTok.models import User, taskReminder
 from TaskTok.functions import verify_celery_worker
 from TaskTok.functions import verify_message_broker_online
-
 from flask_mail import Message
 import click
 import datetime
-import os
 import sys
-
-
 
 app = create_app()
 app.config['HOST'] = '0.0.0.0'
@@ -33,11 +24,11 @@ def cli():
 def checkCeleryStatus():
     try:
         celery_status = verify_celery_worker()
-    except: 
+    except:
         celery_status = None
-        
     status_message = "OK" if celery_status else "NOT OK"
-    box_width = max(len(status_message), 20) + 4  # Adjust the width of the box based on the message length
+    # Adjust the width of the box based on the message length
+    box_width = max(len(status_message), 20) + 4
 
     print("\n" + "╔" + "═" * box_width + "╗")
     print(f"║ CELERY STATUS: {status_message} ".ljust(box_width) + "║")
@@ -50,12 +41,13 @@ def checkMessageBrokerStatus():
     port = 5672
     timeout = 5
     try:
-        message_broker_status = verify_message_broker_online(host, port, timeout)
+        message_broker_status = verify_message_broker_online(host,
+                                                             port,
+                                                             timeout)
     except:
         message_broker_status = None
     status_message = "OK" if message_broker_status else "NOT OK"
     box_width = max(len(status_message), 24) + 4
-    
     print("\n" + "╔" + "═" * box_width + "╗")
     print(f"║ MESSAGE BROKER STATUS: {status_message} ".ljust(box_width) + "║")
     print("╚" + "═" * box_width + "╝\n")
@@ -74,7 +66,11 @@ def makeAdminUser():
 def AddAdminTasks():
     with app.app_context():
         for tasks in range(10):
-            task = taskReminder(owner_username='admin', task_dueDate=datetime.datetime.now(), task_description="Hello, this is the reminder of the example task", task_name="My Task!", task_message="This is the message")
+            task = taskReminder(owner_username='admin',
+                                task_dueDate=datetime.datetime.now(),
+                                task_description="Hello, this is a task",
+                                task_name="My Task!",
+                                task_message="This is the message")
             task.add()
 
 
@@ -83,10 +79,9 @@ def createDB():
     with app.app_context():
         print("\nCreating database and default admin for first run.")
         db.create_all()
-
-
-
 # Use this for testing setupError.html page and other error pages based on DB setup issues.
+
+
 @app.cli.command('dropDB')
 def dropDB():
     with app.app_context():
@@ -97,18 +92,11 @@ def dropDB():
 @app.cli.command('testSendMail')
 def testSendMail():
     with app.app_context():
-        msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
-        msg.body="This email was sent using flask-mail and google's smtp relay"
+        msg = Message("This is a test email",
+                      recipients=['jason.supple.27@gmail.com'])
+        msg.body = "This email was sent using flask-mail and google's smtp relay"
         app.mail.send(msg)
 
-
-
-@app.cli.command('testSendMail')
-def testSendMail():
-    
-    msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
-    msg.body="This email was sent using flask-mail and google's smtp relay"
-    flaskMail.send(msg)
 
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.
@@ -116,12 +104,8 @@ if __name__ == '__main__':
         cli(app)
     # Else, just run Flask.
     else:
-     app.run(host='0.0.0.0', port=443, debug=True, ssl_context=('adhoc'))
-     #change ssl_context to below when testing locally
-     #'adhoc'
-     #or for azure
-     # '/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'
-     
-
-
-
+        app.run(host='0.0.0.0', port=443, debug=True, ssl_context=('adhoc'))
+        # change ssl_context to below when testing locally
+        # 'adhoc'
+        # or for azure
+        # '/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'
