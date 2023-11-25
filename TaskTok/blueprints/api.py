@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from TaskTok.models import User, taskReminder
+from TaskTok.models import User, TaskReminder
 from TaskTok.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 from TaskTok.schema import UserSchema, TaskSchema
@@ -30,7 +30,7 @@ def add_task():
     # get the current user's information
     user_data = current_user
 
-    task = taskReminder(owner_username=user_data.username, task_dueDate=datetime.datetime.now(),
+    task = TaskReminder(owner_username=user_data.username, task_dueDate=datetime.datetime.now(),
                         task_description="Hello, this is the reminder of the example task", task_name="My Task!",
                         task_message="This is the message")
     task.add()
@@ -42,7 +42,7 @@ def add_task():
 def list_task():
     # TODO: Probably need to returned a paged list for a lot of tasks
     user_data = current_user
-    task_list = taskReminder.findTaskByUsername(username=user_data.username)
+    task_list = TaskReminder.find_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
     return jsonify({"TaskList": task_list_string}), 200
 
@@ -56,7 +56,7 @@ def remove_task(task_id):
     # TODO: Need to make sure <taskID> is safe
     print("beginning removeTask")
     user_data = current_user
-    current_task = taskReminder.query.get(task_id)
+    current_task = TaskReminder.query.get(task_id)
     if current_task is not None and user_data.username == current_task.owner_username:
         print(f"[api/removeTask] {user_data.username} is the owner, removing task {task_id}")
         try:
@@ -73,7 +73,7 @@ def remove_task(task_id):
 @jwt_required()
 def edit_task(task_id):
     user_data = current_user
-    task = taskReminder.query.get(task_id)
+    task = TaskReminder.query.get(task_id)
 
     # Check if the task exists and if it belongs to the current user.
     if task is None or task.owner_username != user_data.username:

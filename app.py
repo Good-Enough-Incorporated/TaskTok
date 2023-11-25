@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 from flask import render_template
 from flask.cli import with_appcontext, FlaskGroup
 from TaskTok.extensions import db, jwtManager, flaskMail
-from TaskTok.models import User, NoNoTokens, taskReminder
+from TaskTok.models import User, NoNoTokens, TaskReminder
 from TaskTok.schema import UserSchema
 from RemindMeClient import task
 from TaskTok.functions import verify_celery_worker
@@ -66,7 +66,7 @@ def makeAdminUser():
     with app.app_context():
         print("\nCreating Admin User...\n")
         defaultAcc = User(username="admin", email="admin@tasktok.com")
-        defaultAcc.setPassword('superpassword')
+        defaultAcc.set_password('superpassword')
         defaultAcc.add()
 
 
@@ -74,7 +74,7 @@ def makeAdminUser():
 def AddAdminTasks():
     with app.app_context():
         for tasks in range(10):
-            task = taskReminder(owner_username='admin', task_dueDate=datetime.datetime.now(), task_description="Hello, this is the reminder of the example task", task_name="My Task!", task_message="This is the message")
+            task = TaskReminder(owner_username='admin', task_dueDate=datetime.datetime.now(), task_description="Hello, this is the reminder of the example task", task_name="My Task!", task_message="This is the message")
             task.add()
 
 

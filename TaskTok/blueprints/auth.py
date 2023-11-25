@@ -49,10 +49,10 @@ def verify_email(token):
     if not token_email:
         return "Invalid or expired token received."
 
-    non_verified_user = User.searchEmailAddress(email=token_email)
+    non_verified_user = User.search_email_address(email=token_email)
     if non_verified_user is not None:
-        if non_verified_user.isAccountVerified() is False:
-            non_verified_user.verifyEmailAddress()
+        if non_verified_user.is_account_verified() is False:
+            non_verified_user.verify_email_address()
             try:
                 db.session.commit()
             except Exception as e:
@@ -82,7 +82,7 @@ def register():
         new_user_email = request.form.get('email').lower()
 
         print(f"Username = {new_user_username}")
-        user = User.getUserByUsername(username=new_user_username)
+        user = User.get_user_by_username(username=new_user_username)
         print(user)
         if user is not None:
             # return json if application/json later
@@ -90,7 +90,7 @@ def register():
             error = 'user already exists'
             flash(error, 'error')
             return render_template('register.html', form=form)
-        email = User.searchEmailAddress(email=new_user_email)
+        email = User.search_email_address(email=new_user_email)
 
         if email is not None:
             print('email already exists')
@@ -100,7 +100,7 @@ def register():
 
         new_user = User(username=new_user_username,
                         email=new_user_email)
-        new_user.setPassword(password=new_user_password)
+        new_user.set_password(password=new_user_password)
         new_user.add()
 
         token = generate_email_token(new_user.email)
@@ -153,13 +153,13 @@ def login():
         remember_me = request.form.get('rememberMe')
 
         try:
-            user = User.getUserByUsername(username=form_username)
+            user = User.get_user_by_username(username=form_username)
         except OperationalError as e:
             print(f'Failed to authenticate user: %s', e)
             return "TODO: Make this pretty and give an error code for setup not complete... Please create your " \
                    "database using flask cli: flask createDB | flask makeAdminUser "
 
-        if user and (user.verifyPassword(password=form_password)):
+        if user and (user.verify_password(password=form_password)):
             # Set expiration time based on whether 'remember me' is checked
             expiration_hours = 720 if remember_me == 'on' else 1
             expiration_time = timedelta(hours=expiration_hours)
@@ -190,8 +190,8 @@ def login():
 def login_api_user():
     request_information = request.get_json()
     # attempt to find the user passed by the login endpoint
-    user = User.getUserByUsername(username=request_information.get('username'))
-    if user and (user.verifyPassword(password=request_information.get('password'))):
+    user = User.get_user_by_username(username=request_information.get('username'))
+    if user and (user.verify_password(password=request_information.get('password'))):
         access_token = create_access_token(identity=user)  # was username
         refresh_token = create_refresh_token(identity=user)  # was username
 

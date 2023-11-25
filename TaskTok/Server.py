@@ -82,7 +82,7 @@ def create_app():
                 #but currently assigning identity with userObject
                 #probably need to change this to userObject.id
                 id = get_jwt_identity()
-                userObject = User.getUserById(id=id)
+                userObject = User.get_user_by_id(user_id=id)
                 print(f'Reissuing token for [{userObject.username}]')
                 access_token = create_access_token(identity=userObject)
                
