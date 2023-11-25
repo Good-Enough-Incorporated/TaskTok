@@ -16,7 +16,7 @@ from wtforms.validators import InputRequired
 def validate_email(form, field):
     # Found this regex here:
     # https://emailregex.com/
-    if re.match(r'(^[a-zA-Z\d_.+-]+@[a-zA-Z\d-]+\.[a-zA-Z\d-.]+$)', field.data):
+    if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", field.data):
         return
     raise ValidationError(
         'Email must match the standard format: user@domain.tld')
@@ -44,8 +44,7 @@ def validate_username(form, field):
     # if len(field.data) == 0:
     #    raise ValidationError('Username is required')
 
-    # This could all be handled by regex but this way
-    # is easier to build on later
+    # This could all be handled by regex but this way is easier to build on later
     min_length = 4
     max_length = 20
     if len(field.data) < min_length:
