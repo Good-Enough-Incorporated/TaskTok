@@ -22,7 +22,7 @@ from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
 from TaskTok.forms import NewUserForm, LoginForm, ResetPasswordForm
 from datetime import timedelta
-from TaskTok.utilities import email
+from TaskTok.utilities import email_message
 
 #  ------------ Unused imports: Needs review -----------------
 #  from passlib.hash import sha256_crypt
@@ -119,7 +119,7 @@ def register():
             username=new_user.username)
 
         try:
-            email(
+            email_message(
                 new_user.email,
                 "TaskTok - Verification Required",
                 email_body)
@@ -308,7 +308,7 @@ def forgot_password():
             print(verification_url)
             email_body = render_template('email/resetPasswordEmail.html', token=token, username=user.username, verificationLink=verification_url, form=form) 
             print('sending email')
-            email(
+            email_message(
                 email,
                 "TaskTok - Password Reset",
                 email_body)
