@@ -305,7 +305,7 @@ def forgot_password():
             _external=True,
             token=token)
             print(verification_url)
-            email_body = render_template('resetPassword.html', token=token, username=user.username, verificationLink=verification_url, form=form) 
+            email_body = render_template('email/resetPasswordEmail.html', token=token, username=user.username, verificationLink=verification_url, form=form) 
             print('sending email')
             send_email.delay(
                 email,
