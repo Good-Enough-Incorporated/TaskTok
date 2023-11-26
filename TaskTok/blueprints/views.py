@@ -56,9 +56,18 @@ def home():
     return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
 
 
-@views.route('/profile')
+@views.route('/profile', methods=['GET','POST'])
 def profile():
-    return render_template('profile.html')
+    #current_user.username
+    #search User object using username
+    #User.get_user_by_username(current_user.username)
+    #user_email = User.email
+    #user_username = User.username
+    request.form.get('username')
+    request.form.get('email')
+    #compare if changed
+    #if changed update
+    return render_template('profile.html', username=user_username, email=user_email)
 
 
 def request_current_user(access_token):

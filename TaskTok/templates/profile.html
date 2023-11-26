@@ -97,14 +97,14 @@
 	<div class="container"> 
     <main>
 
-		<form>
+		<form action="{{ url_for('views.profile') }}" method="post">
 			<label>Username: </label> 
-						<!--<input type="text" placeholder="Enter Username" name="username" required>-->
+			<input type="text" placeholder="Enter Username" name="username" id="username" {{user_username}} required>
 						
 			<label>Password: </label> 
-						<!--<input type="password" placeholder="Enter Password" name="password" required>-->
+			<input type="text" placeholder="Enter Email" name="email" id="email" {{user_email}}required>
 						
-				<button  class="submit" type="submit" name="register_button" value="register_button">Commit</button>
+				<button  class="submit" type="submit" name="register_button" value="register_button">Committ</button>
 				<p class="purpose" align="center"> <a href="{{url_for('views.home')}}">Go Back</a></p>
 			
 		</form>
