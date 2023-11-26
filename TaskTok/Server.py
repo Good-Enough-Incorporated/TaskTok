@@ -151,7 +151,7 @@ def create_app():
         return response
 
     @jwtManager.invalid_token_loader
-    def expired_token_callback(error):
+    def invalid_token_callback(error):
         return jsonify({"Message": "Signature validation failed", "Error": "token_invalid"}), 401
 
     @jwtManager.unauthorized_loader

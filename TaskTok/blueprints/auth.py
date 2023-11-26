@@ -20,7 +20,7 @@ from TaskTok.models import NoNoTokens
 from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
-from TaskTok.forms import NewUserForm, LoginForm
+from TaskTok.forms import NewUserForm, LoginForm, ResetPasswordForm
 from datetime import timedelta
 from RemindMeClient.task import send_email
 
@@ -291,4 +291,54 @@ def logout():
 
 @auth.route('/forgotPassword', methods=['GET', 'POST'])
 def forgot_password():
+    form = ResetPasswordForm()
+    error = None
+    if request.method == 'POST':
+        
+        email = request.form.get('email')
+        #check if the email actually exists in our db
+        user = User.search_email_address(email=email)
+        if user is not None:
+            token = generate_email_token(email=email)
+            verification_url = url_for(
+            'auth.reset_password',
+            _external=True,
+            token=token)
+            print(verification_url)
+            email_body = render_template('resetPassword.html', token=token, username=user.username, verificationLink=verification_url, form=form) 
+            print('sending email')
+            send_email.delay(
+                email,
+                "TaskTok - Password Reset",
+                email_body)
+            flash("If an account with this email is found, we'll send a link with instructions on how to reset your password", 'error')
+            return render_template('forgotPassword.html')
+        print("i didn't find this account")
     return render_template('forgotPassword.html')
+
+@auth.route('/resetPassword/<token>', methods=['GET','POST'])
+def reset_password(token):
+    form = ResetPasswordForm()
+    error = None
+    if request.method == 'POST':
+
+        if form.validate_on_submit():
+
+            password = request.form.get('password')
+            password_confirm = request.form.get('password_confirm')
+
+            if password != password_confirm:
+                flash("Passwords do not match", 'error')
+                return render_template("resetPassword.html", token=token, form=form)
+            token_email = verify_email_token(token)
+            user = User.search_email_address(email=token_email)
+            user.set_password(password)
+
+
+    token_email = verify_email_token(token)
+    if not token_email:
+        return "Invalid or expired token received."
+    non_verified_user = User.search_email_address(email=token_email)
+    # we need to provide the token in a hidden text field so the user submits their token 
+    # with their POST 
+    return render_template("resetPassword.html", token=token, form=form)

@@ -16,7 +16,7 @@ from wtforms.validators import InputRequired
 def validate_email(form, field):
     # Found this regex here:
     # https://emailregex.com/
-    if re.match(r"(^[a-zA-Z\d_.+-]+@[a-zA-Z\d-]+\.[a-zA-Z\d-.]+$)", field.data):
+    if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", field.data):
         return
     raise ValidationError(
         'Email must match the standard format: user@domain.tld')
@@ -73,3 +73,10 @@ class LoginForm(FlaskForm):
                            InputRequired(), validate_username])
     password = PasswordField('Password', validators=[
                              InputRequired(), validate_password])
+
+class ResetPasswordForm(FlaskForm):
+        password = PasswordField('Password', validators=[
+                             InputRequired(), validate_password])
+        confirm_password = PasswordField('Confirm_Password', validators=[
+                             InputRequired(), validate_password])
+
