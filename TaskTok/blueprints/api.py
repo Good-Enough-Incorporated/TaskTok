@@ -3,7 +3,7 @@ from TaskTok.models import User, TaskReminder
 from TaskTok.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 from TaskTok.schema import UserSchema, TaskSchema
-from RemindMeClient.task import send_email
+from TaskTok.utilities import email
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
 
@@ -19,7 +19,7 @@ api = Blueprint('api', __name__)
 @api.route('/sendMail')
 @jwt_required()
 def send_mail():
-    send_email.delay('jason.supple.27@gmail.com', "Test Subject", "Test Body")
+    email('jason.supple.27@gmail.com', "Test Subject", "Test Body")
     # create_file.delay('test.txt', "hello world")
     return 'send_email celery task created :)'
 
