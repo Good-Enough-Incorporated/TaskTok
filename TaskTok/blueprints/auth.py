@@ -16,7 +16,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, \
     jwt_required, get_jwt, current_user, \
     get_jwt_identity, set_access_cookies, \
     set_refresh_cookies, unset_jwt_cookies
-from TaskTok.models import NoNoTokens
+from TaskTok.models import NoNoTokens, EmailTokens
 from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
@@ -322,6 +322,7 @@ def reset_password(token):
     error=None
     token_data = verify_email_token(token)
     token_email = token_data.get('email')
+    token_jti = token_data.get('jti')
     if not token_email:
         return "Invalid or expired token received."
     non_verified_user = User.search_email_address(email=token_email)
@@ -340,6 +341,9 @@ def reset_password(token):
             
             user = User.search_email_address(email=token_email)
             user.set_password(password)
+            print('blocking email_token')
+            blocked_email_token = EmailTokens(jti=token_jti)
+            blocked_email_token.add()
             try:
                 db.session.commit()
             except Exception as e:

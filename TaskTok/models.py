@@ -83,6 +83,24 @@ class NoNoTokens(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+class EmailTokens(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    jti = db.Column(db.String(), nullable=False)
+    created_at = db.Column(db.DateTime(), default= lambda: datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f"<Token {self.jti}>"
+
+    # add blocked token to the database
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+
+    # remove blocked token to the database
+    def remove(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 
 class TaskReminder(db.Model):
