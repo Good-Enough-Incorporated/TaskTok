@@ -47,7 +47,8 @@ callback_URL = f"http://192.168.1.26/kc/callback"
 def verify_email(token):
     # check the token, if valid lookup the user via email and verify their
     # account
-    token_email = verify_email_token(token)
+    token_data = verify_email_token(token)
+    token_email = token_data.get('email')
 
     if not token_email:
         return "Invalid or expired token received."
@@ -318,8 +319,9 @@ def forgot_password():
 
 @auth.route('/resetPassword/<token>', methods=['GET','POST'])
 def reset_password(token):
-
-    token_email = verify_email_token(token)
+    error=None
+    token_data = verify_email_token(token)
+    token_email = token_data.get('email')
     if not token_email:
         return "Invalid or expired token received."
     non_verified_user = User.search_email_address(email=token_email)
@@ -335,7 +337,7 @@ def reset_password(token):
             print("Validating on submit")
             password = request.form.get('password')
             password_confirm = request.form.get('password_confirm')
-            token_email = verify_email_token(token)
+            
             user = User.search_email_address(email=token_email)
             user.set_password(password)
             try:
@@ -352,3 +354,14 @@ def reset_password(token):
             flash(error, 'error')
 
     return render_template("resetPassword.html", token=token, form=form, login_url = url_for('auth.login'))
+
+
+def check_used_token(f):
+    @wraps(f)
+    def decorator_function(*args, **kwargs):
+        token = kwargs.get('token', None)
+        # check if the token is a NoNoToken
+        # return to an error page
+
+        return f(*args,**kwargs)
+    return decorator_function

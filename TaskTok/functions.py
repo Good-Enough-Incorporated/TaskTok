@@ -1,5 +1,6 @@
 import subprocess
 import socket
+from uuid import uuid4
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import os
 
@@ -39,14 +40,16 @@ def verify_message_broker_online(host, port, timeout):
 
 def generate_email_token(email):
     timed_serializer = URLSafeTimedSerializer(os.environ.get('EMAIL_VERIFICATION_SECRET'))
-    return timed_serializer.dumps(email, salt=os.environ.get('SECURITY_PASSWORD_SALT'))
+    token_id = str(uuid4())
+    token_data = {"email":email,"jti":token_id}
+    return timed_serializer.dumps(token_data, salt=os.environ.get('SECURITY_PASSWORD_SALT'))
 
 
-def verify_email_token(token, expiration=1800):
+def verify_email_token(token_data, expiration=1800):
     timed_serializer = URLSafeTimedSerializer(os.environ.get('EMAIL_VERIFICATION_SECRET'))
     try:
-        email = timed_serializer.loads(token, salt=os.environ.get('SECURITY_PASSWORD_SALT'), max_age=expiration)
-        return email
+        token_data = timed_serializer.loads(token_data, salt=os.environ.get('SECURITY_PASSWORD_SALT'), max_age=expiration)
+        return token_data
     except SignatureExpired:
         return False
     except BadSignature:
