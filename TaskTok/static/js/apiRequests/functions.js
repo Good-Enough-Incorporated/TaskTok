@@ -1,4 +1,6 @@
 function clearModal(){
+    var editModal = document.getElementById('editModal');
+    editModal.style.display = 'none';
     var modalBody = document.getElementById('modal-body');
     var modalFooter = document.getElementById('modal-footer')
     modalBody.innerHTML = "";
@@ -68,7 +70,8 @@ async function addTask() {
                     addRowToTable(task);
                 });
                 addButtonEventHandlers();
-                showToast(`Task successfully created!}`, 5000)
+                clearModal();
+                showToast(`Task successfully created!`, 5000)
             } else {
                 showToast(data.Error, 5000)
             }
