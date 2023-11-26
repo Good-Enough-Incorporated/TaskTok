@@ -3,7 +3,6 @@ from TaskTok.extensions import db
 from TaskTok.models import User, TaskReminder
 from TaskTok.functions import verify_celery_worker
 from TaskTok.functions import verify_message_broker_online
-from flask_mail import Message
 import click
 import datetime
 import sys
@@ -96,16 +95,6 @@ def drop_db():
     with app.app_context():
         print("\nDropping all database tables!")
         db.drop_all()
-
-
-@app.cli.command('testSendMail')
-def test_send_mail():
-    # TODO: change to extensions.py's mail
-    with app.app_context():
-        msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
-        msg.body = "This email was sent using flask-mail and google's smtp relay"
-        app.mail.send(msg)
-
 
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.
