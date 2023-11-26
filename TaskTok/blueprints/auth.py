@@ -364,8 +364,8 @@ def check_used_token(f):
     @wraps(f)
     def decorator_function(*args, **kwargs):
         token = kwargs.get('token', None)
-        # check if the token is a NoNoToken
-        # return to an error page
+        # check if the token is in EmailTokens
+        # return to an error page since its used (blocked)
 
         return f(*args,**kwargs)
     return decorator_function
