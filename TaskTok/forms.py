@@ -77,6 +77,9 @@ class LoginForm(FlaskForm):
 class ResetPasswordForm(FlaskForm):
         password = PasswordField('Password', validators=[
                              InputRequired(), validate_password])
-        confirm_password = PasswordField('Confirm_Password', validators=[
+        confirm_password = PasswordField('Confirm Password', validators=[
                              InputRequired(), validate_password])
+        def validate_confirm_password(self, field):
+            if field.data != self.password.data:
+                raise ValidationError("Passwords do not match, please try again.")
 

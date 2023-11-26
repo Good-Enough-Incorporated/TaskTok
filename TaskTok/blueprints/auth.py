@@ -318,22 +318,6 @@ def forgot_password():
 
 @auth.route('/resetPassword/<token>', methods=['GET','POST'])
 def reset_password(token):
-    form = ResetPasswordForm()
-    error = None
-    if request.method == 'POST':
-
-        if form.validate_on_submit():
-
-            password = request.form.get('password')
-            password_confirm = request.form.get('password_confirm')
-
-            if password != password_confirm:
-                flash("Passwords do not match", 'error')
-                return render_template("resetPassword.html", token=token, form=form)
-            token_email = verify_email_token(token)
-            user = User.search_email_address(email=token_email)
-            user.set_password(password)
-
 
     token_email = verify_email_token(token)
     if not token_email:
@@ -341,4 +325,30 @@ def reset_password(token):
     non_verified_user = User.search_email_address(email=token_email)
     # we need to provide the token in a hidden text field so the user submits their token 
     # with their POST 
-    return render_template("resetPassword.html", token=token, form=form)
+    form = ResetPasswordForm(request.form)
+    error = None
+    
+    print('At resetPassword route')
+    if request.method == 'POST':
+        print('POST')
+        if form.validate_on_submit():
+            print("Validating on submit")
+            password = request.form.get('password')
+            password_confirm = request.form.get('password_confirm')
+            token_email = verify_email_token(token)
+            user = User.search_email_address(email=token_email)
+            user.set_password(password)
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(e)
+            flash('Your password was successfully reset!')
+        else:
+            if form.password.errors:
+                error = form.password.errors[0]
+            if form.confirm_password.errors:
+                error = form.confirm_password.errors[0]
+            flash(error, 'error')
+
+    return render_template("resetPassword.html", token=token, form=form, login_url = url_for('auth.login'))
