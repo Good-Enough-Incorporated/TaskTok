@@ -100,6 +100,7 @@ def drop_db():
 
 @app.cli.command('testSendMail')
 def test_send_mail():
+    # TODO: change to extensions.py's mail
     with app.app_context():
         msg = Message("This is a test email", recipients=['jason.supple.27@gmail.com'])
         msg.body = "This email was sent using flask-mail and google's smtp relay"
