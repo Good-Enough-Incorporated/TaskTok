@@ -1,109 +1,116 @@
 from flask import Blueprint, jsonify, request
-from TaskTok.models import User, taskReminder
+from TaskTok.models import User, TaskReminder
 from TaskTok.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt, current_user
-import datetime
 from TaskTok.schema import UserSchema, TaskSchema
-from RemindMeClient.task import send_email, create_file
-from RemindMeClient import task as cTask
+from RemindMeClient.task import send_email
+from sqlalchemy.exc import SQLAlchemyError
 import datetime
-import subprocess
-import socket
+
+#  ---------- Unused Imports: Needs review ----------------
+#  import subprocess
+#  import socket
+#  from RemindMeClient import task as cTask
+#  from RemindMeClient.task import create_file
+#  --------------------------------------------------------
 api = Blueprint('api', __name__)
 
 
 @api.route('/sendMail')
 @jwt_required()
-def sendMail():
+def send_mail():
     send_email.delay('jason.supple.27@gmail.com', "Test Subject", "Test Body")
-    #create_file.delay('test.txt', "hello world")
+    # create_file.delay('test.txt', "hello world")
     return 'send_email celery task created :)'
+
 
 @api.route('/addTask')
 @jwt_required()
-def addTask():
-    #get the current user's information
-    userData = current_user
-    
-    task = taskReminder(owner_username=userData.username, task_dueDate=datetime.datetime.now(), task_description="Hello, this is the reminder of the example task", task_name="My Task!", task_message="This is the message")
+def add_task():
+    # get the current user's information
+    user_data = current_user
+
+    task = TaskReminder(owner_username=user_data.username, task_dueDate=datetime.datetime.now(),
+                        task_description="Hello, this is the reminder of the example task", task_name="My Task!",
+                        task_message="This is the message")
     task.add()
-    return jsonify({"Message": "Added task to the database", "UserData": userData.username} )
+    return jsonify({"Message": "Added task to the database", "UserData": user_data.username})
+
 
 @api.route('/listTask')
 @jwt_required()
-def listTask():
-    #TODO: Probably need to returned a paged list for a lot of tasks
-    userData = current_user
-    taskList = taskReminder.findTaskByUsername(username= userData.username)
-    taskList_string = TaskSchema().dump(taskList, many=True)
-    return jsonify({"TaskList": taskList_string}),200
+def list_task():
+    # TODO: Probably need to returned a paged list for a lot of tasks
+    user_data = current_user
+    task_list = TaskReminder.find_task_by_username(username=user_data.username)
+    task_list_string = TaskSchema().dump(task_list, many=True)
+    return jsonify({"TaskList": task_list_string}), 200
 
-    #create_file.delay("test.txt", "another test!")
-    
-    return "Ran test task!"
-@api.route('/removeTask/<taskID>')
+    # create_file.delay("test.txt", "another test!")
+
+
+@api.route('/removeTask/<task_id>')
 @jwt_required()
-def removeTask(taskID):
-    #Get the current user, check to make sure the supplied taskID belongs to them
-    #TODO: Need to make sure <taskID> is safe
+def remove_task(task_id):
+    # Get the current user, check to make sure the supplied taskID belongs to them
+    # TODO: Need to make sure <taskID> is safe
+    # TODO: task should be UUID4, throw error message for invalid task type
     print("beginning removeTask")
-    userData = current_user
-    currentTask = taskReminder.query.get(taskID)
-    if currentTask is not None and userData.username == currentTask.owner_username:
-        print(f"[api/removeTask] {userData.username} is the owner, removing task {taskID}")
+    user_data = current_user
+    current_task = TaskReminder.query.get(task_id)
+    if current_task is not None and user_data.username == current_task.owner_username:
+        print(f"[api/removeTask] {user_data.username} is the owner, removing task {task_id}")
         try:
-            currentTask.remove()
+            current_task.remove()
             print("ending removeTask")
             return jsonify({'Message': "remove_success"})
-        except Exception as e:
-            #TODO:Log the removal error
-            print("ending removeTask")
-            return jsonify({'Message': "remove_fail"})
-        
+        except SQLAlchemyError as e:
+            print(f"Database error occurred: {e}")
+            return jsonify({'Message': "remove_fail", 'Error': str(e)})
 
 
-#TODO: Need input validation. Waiting for Bootstrap to be setup for full functionality. 
-@api.route('/editTask/<taskID>', methods=['PUT'])
+# TODO: Need input validation.
+# Waiting for Bootstrap to be setup for full functionality.
+@api.route('/editTask/<task_id>', methods=['PUT'])
 @jwt_required()
-def editTask(taskID):
-    userData = current_user
-    task = taskReminder.query.get(taskID)
+def edit_task(task_id):
+    user_data = current_user
+    task = TaskReminder.query.get(task_id)
 
     # Check if the task exists and if it belongs to the current user.
-    if task is None or task.owner_username != userData.username:
+    if task is None or task.owner_username != user_data.username:
         return jsonify({'Message': 'Task not found or not authorized'}), 404
 
     # Get updated data from the request.
     data = request.json
     new_name = data.get('task_name')
     new_description = data.get('task_description')
-    new_dueDate = data.get('task_dueDate')
-    new_reminderOffSet = data.get('task_reminderOffSet')
-    new_emailList = data.get('task_emailList')
-    #TODO: Validate these inputs as safe 
+    new_due_date = data.get('task_dueDate')
+    new_reminder_off_set = data.get('task_reminderOffSet')
+    new_email_list = data.get('task_emailList')
+    # TODO: Validate these inputs as safe
 
-    
     # Getting new description.
     if new_description is not None:
         task.task_description = new_description
-    
+
     # Getting new due date.
-    if new_dueDate is not None:
+    if new_due_date is not None:
         try:
-            print(f"DUE DATE = {new_dueDate}")
-            task.task_dueDate = datetime.datetime.strptime(new_dueDate, f'%Y-%m-%dT%H:%M:%S')
+            print(f"DUE DATE = {new_due_date}")
+            task.task_dueDate = datetime.datetime.strptime(new_due_date, f'%Y-%m-%dT%H:%M:%S')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
-        
-    if new_reminderOffSet is not None:
+
+    if new_reminder_off_set is not None:
         try:
-            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminderOffSet, f'%Y-%m-%dT%H:%M:%S')
+            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
-    
-    if new_emailList is not None:
-        task.task_emailList = new_emailList
-    
+
+    if new_email_list is not None:
+        task.task_emailList = new_email_list
+
     # Getting new name for task.
     if new_name is not None:
         task.task_name = new_name
@@ -113,37 +120,33 @@ def editTask(taskID):
         db.session.commit()
         return jsonify({'Message': 'Task updated successfully'}), 200
     except Exception as e:
-        # Rollback incase of error.
+        # Rollback in case of error.
         db.session.rollback()
         return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
 
 
-
 @api.route('/')
 def get_tasks():
-    
     return "something"
 
-#Return users, /api/get_users?page=1&per_page=5 as an example
-@api.route('/get_users',methods=['GET'])
+
+# Return users, /api/get_users?page=1&per_page=5 as an example
+@api.route('/get_users', methods=['GET'])
 @jwt_required()
 def get_users():
-    jwtInfo = get_jwt()
-    if jwtInfo.get('is_admin') == True:
-       
+    jwt_info = get_jwt()
+    if jwt_info.get('is_admin'):
+
         page = request.args.get('page', default=1, type=int)
         per_page = request.args.get('per_page', default=3, type=int)
-    
+
         users = User.query.paginate(
             page=page,
-            per_page = per_page
+            per_page=per_page
         )
-        jsonUsers = UserSchema().dump(users,many=True)
+        json_users = UserSchema().dump(users, many=True)
         return jsonify({
-            "users": jsonUsers
-        }),200
+            "users": json_users
+        }), 200
     else:
-        return jsonify({"message": "User unauthorized"}),401
-
-
-
+        return jsonify({"message": "User unauthorized"}), 401
