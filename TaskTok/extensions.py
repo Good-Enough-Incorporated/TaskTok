@@ -11,6 +11,6 @@ celery_worker = Celery(__name__)
 
 def update_celery(app):
     global celery_worker
-    celery_worker.conf.update(app.conf)
+    celery_worker=app
     # Additional specific configurations can go here
     return celery_worker
