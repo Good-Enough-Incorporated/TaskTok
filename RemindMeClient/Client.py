@@ -4,7 +4,7 @@ from TaskTok.extensions import celery_worker
 # create our Flask app, so we can get the app.config properties.
 # app = create_app()
 
-celery = celery_worker
+celery = celery_worker.extensions['celery']
 #app = create_app()
 #celery_worker = app.celery_app
 
