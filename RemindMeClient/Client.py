@@ -9,8 +9,8 @@ import os
 #app = create_app()
 #celery_worker = app.celery_app
 load_dotenv()
-celery.conf.broker_url = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
-celery.conf.result_backend = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
+#celery.conf.broker_url = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
+#celery.conf.result_backend = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
 #app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
 
 #celery = celery_app.extensions['celery']
