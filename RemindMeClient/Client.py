@@ -1,9 +1,14 @@
-from TaskTok import app
+#from TaskTok import create_app
+from TaskTok.extensions import celery_worker 
 
 # create our Flask app, so we can get the app.config properties.
 # app = create_app()
-with app.app_context():
-    celery = app.extensions["celery"]
+
+celery = celery_worker
+#app = create_app()
+#celery_worker = app.celery_app
+
+#celery = celery_app.extensions['celery']
 
 # When we call our worker
 # celery -A RemindMeClient.Client.celery object
