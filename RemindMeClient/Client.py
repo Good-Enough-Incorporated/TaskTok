@@ -1,5 +1,5 @@
 #from TaskTok import create_app
-from TaskTok.extensions import celery_worker as celery
+from TaskTok.extensions import celery_worker
 from dotenv import load_dotenv
 import os
 # create our Flask app, so we can get the app.config properties.
