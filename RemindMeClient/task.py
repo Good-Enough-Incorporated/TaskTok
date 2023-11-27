@@ -4,6 +4,9 @@ from celery import shared_task
 from flask_mail import Message
 
 
+@celery_worker.on_after_configure.connect
+def setup_beat_tasks(sender, **kwargs):
+    sender.add_periodic_task(10.0, check_tasks_ready.s(), name="Analyze tasks")
 
 @shared_task(bind=True)
 def send_email(self, email_to, subject, body):
