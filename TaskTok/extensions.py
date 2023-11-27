@@ -10,7 +10,8 @@ flaskMail = Mail()
 celery_worker = Celery(__name__)
 
 def update_celery(app):
+    print('updating celery conf')
     global celery_worker
-    celery_worker.conf = app
+    celery_worker.conf.update(app.config)
     # Additional specific configurations can go here
     return celery_worker
