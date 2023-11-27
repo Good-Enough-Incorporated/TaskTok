@@ -60,7 +60,7 @@ def create_app():
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
     #app.celery_app = celery_init_app(app)
-    celery_worker = celery_init_app(app)
+    celery_worker.conf.update(app.config)
     flaskMail.init_app(app)
 
     # Register blueprints:
