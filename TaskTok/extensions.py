@@ -9,4 +9,8 @@ db = SQLAlchemy()
 jwtManager = JWTManager()
 flaskMail = Mail()
 load_dotenv()
-celery_worker = Celery(__name__, broker=os.environ.get('broker_url'),backend=os.environ.get('result_backend'))
+celery_worker = None
+
+def update_celery(app):
+    global celery_worker
+    celery_worker = app
