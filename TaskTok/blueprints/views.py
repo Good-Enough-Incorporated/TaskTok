@@ -43,13 +43,12 @@ def main_page():
 
 
 @views.route('/home')
-
 @jwt_required()
 def home():
     # check for JWT in cookie
     side_nav_menu_items = [
         {'title': 'Home', 'url': url_for('views.home')},
-        {'title': 'Profile', 'url': url_for('views.userProfile')},
+        {'title': 'Settings', 'url': url_for('views.user_settings')},
         {'title': 'Admin', 'url': url_for('views.home')},
         {'title': 'Sign Out', 'url': url_for('auth.logout')},
     ]
@@ -59,22 +58,20 @@ def home():
     return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
 
 
-@views.route('/userProfile', methods=['GET', "POST"])
+@views.route('/user-settings', methods=['GET', "POST"])
 @jwt_required()
-def userProfile():
-    #current_user.username
-    #search User object using username
-    #User.get_user_by_username(current_user.username)
-    #user_email = User.email
-    #user_username = User.username
+def user_settings():
+    # current_user.username
+    # search User object using username
+    # User.get_user_by_username(current_user.username)
+    # user_email = User.email
+    # user_username = User.username
     access_token_cookie = request.cookies.get('access_token_cookie')
     user_csrf_token = get_csrf_token(access_token_cookie)
     if request.method == 'POST':
         print("POST")
-        return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token)
+        return render_template('settings.html', username='test', email='test@gmail.com', csrf_token=user_csrf_token)
     else:
         print("GET")
-    #compare if changed
-    #if changed update
-    return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token)
-
+    # compare if changed
+    return render_template('settings.html', username='test', email='test@gmail.com', csrf_token=user_csrf_token)
