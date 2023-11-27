@@ -7,7 +7,7 @@ routes for /, /order, /info, etc
 
 from flask import Blueprint
 from flask import render_template, url_for, request, redirect
-from flask_jwt_extended import jwt_required, current_user
+from flask_jwt_extended import jwt_required, current_user, get_csrf_token
 from TaskTok.forms import LoginForm
 
 #  ----------- Unused imports: Needs review --------------
@@ -21,7 +21,7 @@ CURRENT_CAR_IMAGE = None
 
 
 # our root route (home)
-@views.route('/', methods=['GET', 'POST'])
+@views.route('/', methods=['GET'])
 # need optional=True so we can check current_user to see if they're already authenticated.
 @jwt_required(optional=True)
 def main_page():
@@ -30,23 +30,26 @@ def main_page():
     otherwise, make them login first.
     """
     # HEADERS = request.environ.get("SSL_CLIENT_CERT")
+    print('im here')
     if current_user:
         print('User already authenticated')
-
+        print('REDIRECTING TO views.home')
         return redirect(url_for('views.home'))
 
     login_form = LoginForm()
     print('User is not authenticated')
+    print('rendering template loginPage')
     return render_template('loginPage.html', form=login_form)
 
 
 @views.route('/home')
+
 @jwt_required()
 def home():
     # check for JWT in cookie
     side_nav_menu_items = [
         {'title': 'Home', 'url': url_for('views.home')},
-        {'title': 'Profile', 'url': url_for('views.profile')},
+        {'title': 'Profile', 'url': url_for('views.userProfile')},
         {'title': 'Admin', 'url': url_for('views.home')},
         {'title': 'Sign Out', 'url': url_for('auth.logout')},
     ]
@@ -56,20 +59,22 @@ def home():
     return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
 
 
-@views.route('/profile', methods=['GET','POST'])
-def profile():
+@views.route('/userProfile', methods=['GET', "POST"])
+@jwt_required()
+def userProfile():
     #current_user.username
     #search User object using username
     #User.get_user_by_username(current_user.username)
     #user_email = User.email
     #user_username = User.username
-    request.form.get('username')
-    request.form.get('email')
+    access_token_cookie = request.cookies.get('access_token_cookie')
+    user_csrf_token = get_csrf_token(access_token_cookie)
+    if request.method == 'POST':
+        print("POST")
+        return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token)
+    else:
+        print("GET")
     #compare if changed
     #if changed update
-    return render_template('profile.html', username=user_username, email=user_email)
+    return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token)
 
-
-def request_current_user(access_token):
-    api_endpoint = url_for("auth.get_current_user")
-    return "test"

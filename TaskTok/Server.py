@@ -32,6 +32,7 @@ def create_app():
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_TOKEN_LOCATION'] = os.environ.get('JWT_TOKEN_LOCATION')
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+    app.config['JWT_CSRF_CHECK_FORM'] = True
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
         hours=hours)  # change hours to .001 to test session expires error
@@ -132,6 +133,9 @@ def create_app():
 
     @jwtManager.expired_token_loader
     def expired_token_callback(jwt_header, jwt_data):
+        print('EXPIRED_TOKEN_CALLBACK')
+        # TODO: Add flash message to show this error on the login page
+        # This would be triggered if CSRF token isn't on page
         accept_header = request.headers.get('Accept', '')
         response = make_response()
         if 'application/json' in accept_header:
@@ -156,6 +160,8 @@ def create_app():
 
     @jwtManager.unauthorized_loader
     def unauthorized_token_callback(error):
+        print(f"UNAUTHORIZED_TOKEN_CALLBACK - {error}")
+        # TODO: Add flash message to show this error on the login page
         accept_header = request.headers.get('Accept', '')
         response = make_response()
         if 'application/json' in accept_header:

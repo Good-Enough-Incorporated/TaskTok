@@ -97,14 +97,16 @@
 	<div class="container"> 
     <main>
 
-		<form action="{{ url_for('views.profile') }}" method="post">
+		<form action="{{ url_for('views.userProfile') }}" method="post">
+			
 			<label>Username: </label> 
-			<input type="text" placeholder="Enter Username" name="username" id="username" {{user_username}} required>
+			<input type="text" placeholder="Enter Username" name="username" id="username" value="{{username}}" required>
 						
-			<label>Password: </label> 
-			<input type="text" placeholder="Enter Email" name="email" id="email" {{user_email}}required>
+			<label>E-Mail: </label> 
+			<input type="text" placeholder="Enter Email" name="email" id="email" value="{{email}}" required>
+			<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 						
-				<button  class="submit" type="submit" name="register_button" value="register_button">Committ</button>
+				<button  class="submit" type="submit" name="register_button" value="register_button">Commit</button>
 				<p class="purpose" align="center"> <a href="{{url_for('views.home')}}">Go Back</a></p>
 			
 		</form>
