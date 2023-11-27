@@ -62,6 +62,7 @@ async function addTask() {
             });
 
             //Get our async api call
+            clearModal();
             const data = await response.json();
             console.log(data)
             if(data.Message == "add_success") {
@@ -70,7 +71,7 @@ async function addTask() {
                     addRowToTable(task);
                 });
                 addButtonEventHandlers();
-                clearModal();
+                
                 showToast(`Task successfully created!`, 5000)
             } else {
                 showToast(data.Error, 5000)
@@ -263,41 +264,55 @@ async function listTask() {
 
   function addButtonEventHandlers(){
     document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
-        button.addEventListener('click', function(event) {
-            const dataID = this.closest('tr').getAttribute('data-id');
-            if (this.classList.contains('task-edit-btn')) {
-                console.log('attempting to edit taskID=', dataID);
-                //editTask(dataID);
-                getTableInformation(dataID);
-                var editModal = document.getElementById('editModal');
-                var close = document.getElementsByClassName("close")[0];
-                editModal.style.display = 'block';
-
-                close.onclick = function() {
-                    editModal.style.display = "none";
-                    clearModal();
-                  }
+        if(!button.getAttribute('data-click-handler') == true) { 
+            
+        
+            button.addEventListener('click', function(event) {
+                const dataID = this.closest('tr').getAttribute('data-id');
                 
-                //window.onclick = function(event) {
-                //    if(event.target == editModal) {
-                //        editModal.style.display = 'none';
-                //        clearModal();
-                //    }
-                //}
-            } else if (this.classList.contains('task-delete-btn')) {
-                console.log('attempting to remove taskID=', dataID);
-                removeTask(dataID);
-            }
-        });
-    });
+                if (this.classList.contains('task-edit-btn')) {
+                    console.log('attempting to edit taskID=', dataID);
+                    //editTask(dataID);
+                    getTableInformation(dataID);
+                    var editModal = document.getElementById('editModal');
+                    var close = document.getElementsByClassName("close")[0];
+                    editModal.style.display = 'block';
 
-    $(document).ready(function() {
-        $("#task-add-btn").click(function() {
-            // Your event handling code goes here
-            alert("Button clicked!");
-            addTaskModal();
-        });
+                    close.onclick = function() {
+                        editModal.style.display = "none";
+                        clearModal();
+                    }
+                    
+                    //window.onclick = function(event) {
+                    //    if(event.target == editModal) {
+                    //        editModal.style.display = 'none';
+                    //        clearModal();
+                    //    }
+                    //}
+                } else if (this.classList.contains('task-delete-btn')) {
+                    console.log('attempting to remove taskID=', dataID);
+                    removeTask(dataID);
+                }
+            });
+        };
+        button.setAttribute('data-click-handler', true);
     });
+    //only apply the click event handler once
+    var has_click_handler = $('#task-add-btn').attr('data-click-handler')
+    if (!has_click_handler){
+        $('#task-add-btn').on('click', function(){
+            addTaskModal();
+        }).attr('data-click-handler', true);
+    } else {
+        console.log('task-add-btn already has click handler')
+    }
+
+
+    
+
+
+    
+
 }
 
  //TODO: will not need if using jQuery
