@@ -6,6 +6,7 @@ from flask_mail import Message
 
 @celery_worker.on_after_configure.connect
 def setup_beat_tasks(sender, **kwargs):
+    print('************************** SETTING UP PERIODIC TASKS **************************************')
     sender.add_periodic_task(10.0, check_tasks_ready.s(), name="Analyze tasks")
 
 @shared_task(bind=True)
