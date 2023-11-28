@@ -1,7 +1,7 @@
 
 from flask import Flask, jsonify, request, render_template, make_response, flash
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
-from .extensions import db, jwtManager, flaskMail
+from .extensions import db, jwtManager, flaskMail, update_celery
 from .models import User, NoNoTokens
 from RemindMeClient.celeryManager import celery_init_app
 from datetime import timedelta, timezone, datetime
@@ -36,8 +36,8 @@ def create_app():
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
         hours=hours)  # change hours to .001 to test session expires error
-    # app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
-    # app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
+    app.config["broker_url"] = os.environ.get('broker_url') #celery doesn't like the CELERY_ prefix.
+    app.config['result_backend'] = os.environ.get('result_backend') #celery doesn't like the CELERY_ prefix.
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
     app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT')
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
@@ -59,7 +59,8 @@ def create_app():
 
     db.init_app(app)  # Initialize the db extension with app
     jwtManager.init_app(app)
-    app.celery_app = celery_init_app(app)
+    #app.celery_app = celery_init_app(app)
+    update_celery(celery_init_app(app))
     flaskMail.init_app(app)
 
     # Register blueprints:

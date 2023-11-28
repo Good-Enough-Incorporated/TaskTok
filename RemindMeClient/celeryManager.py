@@ -13,7 +13,7 @@ if not getattr(kombu.utils.cached_property, 'lock', None):
     kombu.utils.cached_property.lock.__set_name__(kombu.utils.cached_property, 'lock')
 
 
-# def celery_init_app(app):
+#def celery_init_app(app):
 #    celery = Celery(
 #        app.import_name,
 #        broker=app.config['broker_url']

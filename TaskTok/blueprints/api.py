@@ -3,7 +3,7 @@ from TaskTok.models import User, TaskReminder
 from TaskTok.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 from TaskTok.schema import UserSchema, TaskSchema
-from TaskTok.utilities import email_message
+from TaskTok.utilities import email_message, check_emails_overdue
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
 
@@ -22,6 +22,12 @@ def send_mail():
     email_message('jason.supple.27@gmail.com', "Test Subject", "Test Body")
     # create_file.delay('test.txt', "hello world")
     return 'send_email celery task created :)'
+
+@api.route('/testRoute')
+def testRoute():
+    # test route, will not be kept
+    check_emails_overdue()
+    return "testing check_emails_overdue()"
 
 
 @api.route('/addTask', methods=['PUT'])
