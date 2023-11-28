@@ -3,7 +3,7 @@ from TaskTok.models import User, TaskReminder
 from TaskTok.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 from TaskTok.schema import UserSchema, TaskSchema
-from RemindMeClient.task import send_email
+from TaskTok.utilities import email_message
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
 
@@ -19,22 +19,44 @@ api = Blueprint('api', __name__)
 @api.route('/sendMail')
 @jwt_required()
 def send_mail():
-    send_email.delay('jason.supple.27@gmail.com', "Test Subject", "Test Body")
+    email_message('jason.supple.27@gmail.com', "Test Subject", "Test Body")
     # create_file.delay('test.txt', "hello world")
     return 'send_email celery task created :)'
 
 
-@api.route('/addTask')
+@api.route('/addTask', methods=['PUT'])
 @jwt_required()
 def add_task():
     # get the current user's information
     user_data = current_user
+    # TODO: Need to validate as safe
+    data = request.json
 
-    task = TaskReminder(owner_username=user_data.username, task_dueDate=datetime.datetime.now(),
-                        task_description="Hello, this is the reminder of the example task", task_name="My Task!",
-                        task_message="This is the message")
+    task_name = data.get('task_name')
+    task_description = data.get('task_description')
+    task_due_date = data.get('task_dueDate')
+    task_reminder_off_set = data.get('task_reminderOffSetTime')
+    task_email_list = data.get('task_emailList')
+    task_email_message = data.get('task_email_message')
+    print(task_reminder_off_set)
+    print(task_due_date)
+    try:
+    
+        task_due_date = datetime.datetime.strptime(task_due_date, f'%Y-%m-%dT%H:%M:%S')
+        task_reminder_off_set = datetime.datetime.strptime(task_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
+    except ValueError:
+        return jsonify({'Message': 'add_failed', 'Error': "Invalid DateTime format received."}), 400
+        
+    if task_reminder_off_set > task_due_date:
+        return jsonify({'Message': 'add_failed', 'Error': 'Reminder Offset must be before the due date.'}), 400
+
+    task = TaskReminder(owner_username=user_data.username, task_dueDate=task_due_date,
+                        task_description=task_description, task_reminderOffSetTime=task_reminder_off_set,
+                        task_message=task_email_message, task_emailList = task_email_list, task_name=task_name)
     task.add()
-    return jsonify({"Message": "Added task to the database", "UserData": user_data.username})
+    task_array = [task]
+    task_string = TaskSchema().dump(task_array, many=True)
+    return jsonify({"Message": "add_success", "TaskList": task_string, 'Error': 'None'}), 200
 
 
 @api.route('/listTask')

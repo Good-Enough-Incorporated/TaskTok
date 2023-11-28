@@ -1,4 +1,6 @@
 function clearModal(){
+    var editModal = document.getElementById('editModal');
+    editModal.style.display = 'none';
     var modalBody = document.getElementById('modal-body');
     var modalFooter = document.getElementById('modal-footer')
     modalBody.innerHTML = "";
@@ -24,17 +26,56 @@ function getCookie(name) {
   
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
+    const taskInput1 = document.getElementById('taskInput1').value;
+    const taskInput2 = document.getElementById('taskInput2').value;
+    const taskInput3 = document.getElementById('taskInput3').value;
+    const taskInput4 = document.getElementById('taskInput4').value;
+    const taskInput5 = document.getElementById('taskInput5').value;
+    const taskInput6 = document.getElementById('taskInput6').value;
+
+    //terrible way to check, but it'll do for now.
+    if(taskInput1.length == 0 || taskInput2.length == 0 || taskInput3.length == 0 || taskInput4.length == 0 || taskInput5.length == 0 || taskInput6.length == 0){
+        console.log("NULL");
+        showToast("Please fill out all iput boxes before submitting", 5000)
+        return;
+    }
+  
+
     try {
         const response = await fetch('/api/addTask', {
-            method: "GET",
+            method: "PUT",
             headers: {
-                'X-CSRF-TOKEN': csrfAccessToken,
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfAccessToken
             },
+            body: JSON.stringify({ 
+                
+                task_name: taskInput1,
+                task_description: taskInput2,
+                task_dueDate: taskInput3,
+                task_reminderOffSetTime: taskInput4,
+                task_emailList: taskInput5,
+                task_email_message: taskInput6
+
+            
+            })
             });
 
             //Get our async api call
+            clearModal();
             const data = await response.json();
             console.log(data)
+            if(data.Message == "add_success") {
+                console.log('whats data.TaskList');
+                data.TaskList.forEach(task => {
+                    addRowToTable(task);
+                });
+                addButtonEventHandlers();
+                
+                showToast(`Task successfully created!`, 5000)
+            } else {
+                showToast(data.Error, 5000)
+            }
         } catch (error) {
             console.error("Error:", error)
         }
@@ -57,7 +98,6 @@ async function editTask(taskID) {
     console.log(taskInput4);
     console.log(taskInput5);
 
-  
         
     try {
         const response = await fetch(`/api/editTask/${taskID}`, {
@@ -187,9 +227,10 @@ async function listTask() {
             data.TaskList.forEach(task => {
                 addRowToTable(task);
             });
+            addButtonEventHandlers();
         
         //add event handlers for edit/delete buttons
-        addButtonEventHandlers();
+        //addButtonEventHandlers();
         const addTableButton = document.getElementById('task-add-btn');
         addTableButton.style.visibility = 'visible';
 
@@ -223,33 +264,55 @@ async function listTask() {
 
   function addButtonEventHandlers(){
     document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
-        button.addEventListener('click', function(event) {
-            const dataID = this.closest('tr').getAttribute('data-id');
-            if (this.classList.contains('task-edit-btn')) {
-                console.log('attempting to edit taskID=', dataID);
-                //editTask(dataID);
-                getTableInformation(dataID);
-                var editModal = document.getElementById('editModal');
-                var close = document.getElementsByClassName("close")[0];
-                editModal.style.display = 'block';
-
-                close.onclick = function() {
-                    editModal.style.display = "none";
-                    clearModal();
-                  }
+        if(!button.getAttribute('data-click-handler') == true) { 
+            
+        
+            button.addEventListener('click', function(event) {
+                const dataID = this.closest('tr').getAttribute('data-id');
                 
-                //window.onclick = function(event) {
-                //    if(event.target == editModal) {
-                //        editModal.style.display = 'none';
-                //        clearModal();
-                //    }
-                //}
-            } else if (this.classList.contains('task-delete-btn')) {
-                console.log('attempting to remove taskID=', dataID);
-                removeTask(dataID);
-            }
-        });
+                if (this.classList.contains('task-edit-btn')) {
+                    console.log('attempting to edit taskID=', dataID);
+                    //editTask(dataID);
+                    getTableInformation(dataID);
+                    var editModal = document.getElementById('editModal');
+                    var close = document.getElementsByClassName("close")[0];
+                    editModal.style.display = 'block';
+
+                    close.onclick = function() {
+                        editModal.style.display = "none";
+                        clearModal();
+                    }
+                    
+                    //window.onclick = function(event) {
+                    //    if(event.target == editModal) {
+                    //        editModal.style.display = 'none';
+                    //        clearModal();
+                    //    }
+                    //}
+                } else if (this.classList.contains('task-delete-btn')) {
+                    console.log('attempting to remove taskID=', dataID);
+                    removeTask(dataID);
+                }
+            });
+        };
+        button.setAttribute('data-click-handler', true);
     });
+    //only apply the click event handler once
+    var has_click_handler = $('#task-add-btn').attr('data-click-handler')
+    if (!has_click_handler){
+        $('#task-add-btn').on('click', function(){
+            addTaskModal();
+        }).attr('data-click-handler', true);
+    } else {
+        console.log('task-add-btn already has click handler')
+    }
+
+
+    
+
+
+    
+
 }
 
  //TODO: will not need if using jQuery
@@ -338,6 +401,61 @@ async function listTask() {
             editTask(taskId);
 
         }
+  }
+
+  function addTaskModal(){
+    var modal = document.getElementById('modal-body');
+    var modalFooter = document.getElementById('modal-footer');
+    const fields = ['Task Name', 'Task Description', 'Task Due Date', 'Task Due (Offset)', 'E-Mail List', 'E-mail Message'];
+    var elementNumber = 1;
+    fields.forEach(field => {
+        //Create the element
+        label = document.createElement('label');
+        console.log(field)
+        label.id = `taskLabel${elementNumber}`;
+        label.innerHTML = field;
+        label.name = `taskLabel${elementNumber}`;
+
+        input = document.createElement('input');
+        input.id = `taskInput${elementNumber}`;
+        input.name = `taskInput${elementNumber}`;
+        input.type = 'text'
+        input.className = 'modal-fields';
+        modal.appendChild(label);
+        modal.appendChild(input);
+           
+        elementNumber++;
+
+
+    });
+    
+        console.log('setting to datetime-local')
+        dateTimeInput = document.getElementById('taskInput3')
+        dateTimeInput.type = 'datetime-local'
+        dateTimeInput.setAttribute('step', 1)
+        dateTimeInput = document.getElementById('taskInput4')
+        dateTimeInput.type = 'datetime-local'
+        dateTimeInput.setAttribute('step', 1)
+    
+    
+    addButton = document.createElement('button');
+    addButton.textContent = "Add Task";
+    addButton.className = 'task-update-btn';
+    modalFooter.appendChild(addButton);
+    addButton.onclick = function(){
+        console.log("Clicked add button");
+        addTask();
+    }
+
+
+    var editModal = document.getElementById('editModal');
+    var close = document.getElementsByClassName("close")[0];
+    editModal.style.display = 'block';
+
+    close.onclick = function() {
+        editModal.style.display = "none";
+        clearModal();
+      }
   }
   function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast-container");
