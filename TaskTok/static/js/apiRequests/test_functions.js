@@ -1,8 +1,22 @@
-function clearModal(){
+// Global variable for the Bootstrap 5 modal instance
+let confirmationModal = null;
+let currentTaskID = null;
+
+document.addEventListener('DOMContentLoaded', function(){
+    // Initialize the Bootstrap 5 modal
+    confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
+
+    // Other initialization code
+    listTask();
+    enableVerticalScroll();
+    addButtonEventHandlers();
+});
+
+function clearModal() {
     var editModal = document.getElementById('editModal');
     editModal.style.display = 'none';
     var modalBody = document.getElementById('modal-body');
-    var modalFooter = document.getElementById('modal-footer')
+    var modalFooter = document.getElementById('modal-footer');
     modalBody.innerHTML = "";
     modalFooter.innerHTML = "";
 }
@@ -15,15 +29,16 @@ function getCookie(name) {
             const cookie = cookies[i].trim();
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                console.log(cookieValue);
                 break;
             }
         }
     }
     return cookieValue;
-  }
-  
-  
+}
+
+// Rest of your addTask, editTask, deleteTask, listTask, etc. functions
+// ...
+
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
     const taskInput1 = document.getElementById('taskInput1').value;
@@ -34,12 +49,12 @@ async function addTask() {
     const taskInput6 = document.getElementById('taskInput6').value;
 
     //terrible way to check, but it'll do for now.
-    if(taskInput1.length == 0 || taskInput2.length == 0 || taskInput3.length == 0 || taskInput4.length == 0 || taskInput5.length == 0 || taskInput6.length == 0){
+    if(taskInput1.length === 0 || taskInput2.length === 0 || taskInput3.length === 0 || taskInput4.length === 0 || taskInput5.length === 0 || taskInput6.length === 0){
         console.log("NULL");
         showToast("Please fill out all iput boxes before submitting", 5000)
         return;
     }
-  
+
 
     try {
         const response = await fetch('/api/addTask', {
@@ -48,8 +63,8 @@ async function addTask() {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfAccessToken
             },
-            body: JSON.stringify({ 
-                
+            body: JSON.stringify({
+
                 task_name: taskInput1,
                 task_description: taskInput2,
                 task_dueDate: taskInput3,
@@ -57,7 +72,7 @@ async function addTask() {
                 task_emailList: taskInput5,
                 task_email_message: taskInput6
 
-            
+
             })
             });
 
@@ -65,13 +80,13 @@ async function addTask() {
             clearModal();
             const data = await response.json();
             console.log(data)
-            if(data.Message == "add_success") {
+            if(data.Message === "add_success") {
                 console.log('whats data.TaskList');
                 data.TaskList.forEach(task => {
                     addRowToTable(task);
                 });
                 addButtonEventHandlers();
-                
+
                 showToast(`Task successfully created!`, 5000)
             } else {
                 showToast(data.Error, 5000)
@@ -85,7 +100,7 @@ async function addTask() {
 async function editTask(taskID) {
     const csrfAccessToken = getCookie('csrf_access_token');
     //Grab the values from the text fields
-    //ensure we're validating this as safe on our endpoint as it 
+    //ensure we're validating this as safe on our endpoint as it
     //make no sense on the client side
     const taskInput1 = document.getElementById('taskInput1').value;
     const taskInput2 = document.getElementById('taskInput2').value;
@@ -98,7 +113,7 @@ async function editTask(taskID) {
     console.log(taskInput4);
     console.log(taskInput5);
 
-        
+
     try {
         const response = await fetch(`/api/editTask/${taskID}`, {
                 method: "PUT",
@@ -106,25 +121,25 @@ async function editTask(taskID) {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfAccessToken
                 },
-                body: JSON.stringify({ 
-                    
+                body: JSON.stringify({
+
                     task_name: taskInput1,
                     task_description: taskInput2,
                     task_dueDate: taskInput3,
                     task_reminderOffSetTime: taskInput4,
                     task_emailList: taskInput5,
 
-                
+
                 })
             });
-        
+
         const data = await response.json();
         console.log(data);
-        
-        if (data.Message == 'Task updated successfully') {
+
+        if (data.Message === 'Task updated successfully') {
             showToast("Task was successfully updated.", 5000);
             console.log('Task was updated in the database');
-                
+
             // Update the corresponding task in the HTML table with the new description.
             const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
             if (taskRow) {
@@ -153,36 +168,14 @@ async function editTask(taskID) {
                 showToast("Task failed to be updated.", 5000);
                 console.log('Something went wrong when updating the task');
             }
-        
+
         } catch (error) {
             showToast('Oops, an error occurred. Please try again.', 5000)
             console.error("Error:", error);
         }
     }
 
- // Global variable to store the current task ID.
-let currentTaskID = null;
-
-async function removeTask(taskID) {
-    // Store the task ID globally
-    currentTaskID = taskID;
-
-    // Show the delete confirmation modal.
-    $('#confirmationModal').modal('show');
-}
-
-// Fix: Bind the deleteTask function to the confirmation button in the modal
-document.getElementById('confirmDelete').addEventListener('click', function() {
-    // Call the function to delete the task
-    if (currentTaskID !== null) {
-        deleteTask(currentTaskID); // Change to deleteTask
-    }
-    // Hide the modal
-    $('#confirmationModal').modal('hide');
-});
-
-
-async function deleteTask(taskID) {
+    async function deleteTask(taskID) {
 
      console.log("Delete task called for task ID:", taskID);
 
@@ -202,7 +195,7 @@ async function deleteTask(taskID) {
         console.log("[removeTask]: waiting for response")
         const data = await response.json();
         console.log("[removeTask]: response received!")
-        if (data.Message == 'remove_success'){
+        if (data.Message === 'remove_success'){
             showToast("Task was successfully removed.", 5000);
             console.log('Task was deleted from the database')
             const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
@@ -214,15 +207,15 @@ async function deleteTask(taskID) {
               });
 
             //removeRowFromTable(taskID);
-                
-           
-            
+
+
+
         } else {
             showToast("Task failed to be removed :(", 5);
             console.log('Something went wrong when deleting the task')
         }
         //console.log(data);
-        
+
 
     } catch (error) {
         showToast('Oops, looks like your session expired :( Please refresh the page.', 10000)
@@ -245,15 +238,15 @@ async function listTask() {
 
             //Get our async api call
             const data = await response.json();
-            
+
             console.log(typeof(data));
-            
+
             createTableHeader()
             data.TaskList.forEach(task => {
                 addRowToTable(task);
             });
             addButtonEventHandlers();
-        
+
         //add event handlers for edit/delete buttons
         //addButtonEventHandlers();
         const addTableButton = document.getElementById('task-add-btn');
@@ -262,33 +255,45 @@ async function listTask() {
         } catch (error) {
             console.error("Error:", error)
         }
-}   
+}
+    function createTableHeader(){
+    var table = document.getElementById('taskTable');
+    var thead = table.getElementsByTagName('thead')[0];
 
-        
-  
-  function createTableHeader(){
-    var table = document.getElementById('taskTable').getElementsByTagName('thead')[0];
-    var newRow = table.insertRow(-1)//add to the bottom
-    
-    function createHeaderCell(text){
-        var cell = document.createElement('th');
-        cell.innerHTML = text;
-        newRow.appendChild(cell)
+    // Check if header already exists
+    if (thead.rows.length === 0) {
+        var newRow = thead.insertRow(-1); // Add to the bottom
+
+        function createHeaderCell(text) {
+            var cell = document.createElement('th');
+            cell.innerHTML = text;
+            newRow.appendChild(cell);
+        }
+
+        createHeaderCell("Owner");
+        createHeaderCell("Task Name");
+        createHeaderCell("Task Description");
+        createHeaderCell("Task Due Date");
+        createHeaderCell("Task Due (Offset)");
+        createHeaderCell("E-mail List");
+        createHeaderCell("Actions");
     }
+}
 
-    createHeaderCell("Owner");
-    createHeaderCell("Task Name");
-    createHeaderCell("Task Description");
-    createHeaderCell("Task Due Date");
-    createHeaderCell("Task Due (Offset)");
-    createHeaderCell("E-mail List");
-    createHeaderCell("Actions");
+function removeTask(taskID) {
+    currentTaskID = taskID;
+    confirmationModal.show();
+}
 
+document.getElementById('confirmDelete').addEventListener('click', function() {
+    if (currentTaskID !== null) {
+        deleteTask(currentTaskID);
+    }
+    confirmationModal.hide();
+});
 
-  }
-
-  function addButtonEventHandlers(){
-    document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
+function addButtonEventHandlers(){
+  document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
         if (!button.getAttribute('data-click-handler')) {
             button.addEventListener('click', function(event) {
                 const dataID = this.closest('tr').getAttribute('data-id');
@@ -314,8 +319,9 @@ async function listTask() {
     });
 }
 
-
- //TODO: will not need if using jQuery
+// Additional functions
+// ...
+//TODO: will not need if using jQuery
   function removeRowFromTable(taskID){
     const row = document.querySelector(`tr[data-id="${taskID}"]`);
     if(row){
@@ -323,7 +329,7 @@ async function listTask() {
     }
   }
   function addRowToTable(task){
-    
+
     var table = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     var newRow = table.insertRow(-1); //last row
     newRow.setAttribute('data-id', task.id)
@@ -342,7 +348,7 @@ async function listTask() {
     cell6.innerHTML = task.task_emailList
     //cell7.innerHTML = '<td><input type="submit" value="Edit"></td><td><input type="submit" value="Delete"></td>'
     cell7.innerHTML = '<button class="task-edit-btn">Edit</button><button class="task-delete-btn">Delete</button>'
-    
+
   }
 
   function getTableInformation(taskId){
@@ -367,7 +373,7 @@ async function listTask() {
         inputBox = document.createElement('input');
 
         inputBox.type = 'text';
-        
+
         inputBox.type = 'text';
         inputBox.value = cellValues[i].innerHTML;
         inputBox.id = `taskInput${i}`;
@@ -375,15 +381,15 @@ async function listTask() {
         inputBox.className = 'modal-fields';
         modal.appendChild(label);
         modal.appendChild(inputBox);
-        if(inputBox.id == 'taskInput3'){
+        if(inputBox.id === 'taskInput3'){
             dateTimeInput = document.getElementById('taskInput3')
             dateTimeInput.type = 'datetime-local'
             unparsedDate = cellValues[i].innerHTML.toString()
             console.log(unparsedDate.indexOf('.'));
-            if(unparsedDate.indexOf('.') == -1){
+            if(unparsedDate.indexOf('.') === -1){
                 //already in the format we want.
                 formattedDate = unparsedDate
-                
+
             } else {
                 //parse to allow the datetime-local to load the correct date.
                 formattedDate = unparsedDate.substring(0, unparsedDate.indexOf('.'))
@@ -423,12 +429,12 @@ async function listTask() {
         input.className = 'modal-fields';
         modal.appendChild(label);
         modal.appendChild(input);
-           
+
         elementNumber++;
 
 
     });
-    
+
         console.log('setting to datetime-local')
         dateTimeInput = document.getElementById('taskInput3')
         dateTimeInput.type = 'datetime-local'
@@ -436,8 +442,8 @@ async function listTask() {
         dateTimeInput = document.getElementById('taskInput4')
         dateTimeInput.type = 'datetime-local'
         dateTimeInput.setAttribute('step', 1)
-    
-    
+
+
     addButton = document.createElement('button');
     addButton.textContent = "Add Task";
     addButton.className = 'task-update-btn';
@@ -468,7 +474,7 @@ async function listTask() {
         toast.classList.remove("show");
     }, duration);
 }
-  
+
   document.addEventListener('DOMContentLoaded', function(){
   //Use the DOMContentLoaded to make sure the DOM is fully loaded before trying to load our script.
 
@@ -479,20 +485,18 @@ async function listTask() {
   listTask();
   console.log('hello')
   enableVerticalScroll();
-  
-  });
-  
-  function enableVerticalScroll(){
-    const scrollContainer = document.querySelector('.archived-tasks-container');
 
-    // Check if the container exists
+  });
+
+
+function enableVerticalScroll() {
+    const scrollContainer = document.querySelector('.archived-tasks-container');
     if (scrollContainer) {
         scrollContainer.addEventListener('wheel', (event) => {
-            // Prevent the default vertical scroll
             event.preventDefault();
-
-            // Scroll horizontally instead
             scrollContainer.scrollLeft += event.deltaY;
         });
     }
-  }
+}
+
+// Ensure all other functionalities are correctly updated for Bootstrap 5 if needed
