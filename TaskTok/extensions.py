@@ -11,6 +11,8 @@ flaskMail = Mail()
 load_dotenv()
 celery_worker = None
 
+
 def update_celery(app):
     global celery_worker
     celery_worker = app
+    celery_worker.autodiscover_tasks(['RemindMeClient'])
