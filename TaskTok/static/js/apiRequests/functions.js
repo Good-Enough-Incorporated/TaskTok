@@ -162,6 +162,14 @@ async function editTask(taskID) {
   
 
 async function removeTask(taskID) {
+    // Confirmation dialog pop-up
+    const userConfirmed = confirm('Are you sure you want to delete this task?');
+    if(!userConfirmed) {
+        // Exits the function if the user decides to cancel the action.
+        return;
+    }
+
+
     //we need a csrfAccessToken to make our API call
     console.log("[removeTask]: beginning client api request")
     const csrfAccessToken = getCookie('csrf_access_token');
