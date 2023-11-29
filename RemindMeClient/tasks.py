@@ -33,5 +33,5 @@ def check_tasks_ready():
     print('this will use celery beat to check tasks')
     current_time = datetime.now()
     task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= current_time).all()
-    logger.info('There are %s tasks ready for email alerts!', task_list.count)
+    logger.info('There are %s tasks ready for email alerts!', task_list.count())
     #send_email.delay('jason.supple.27@gmail.com', "Periodic Email Test", 'Testing periodic tasks')
