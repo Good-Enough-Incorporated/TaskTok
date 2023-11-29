@@ -116,7 +116,7 @@ class TaskReminder(db.Model):
     def generate_uuid():
         return str(uuid4())
 
-    __tablename__ = "taskreminders"
+    __tablename__ = "taskreminder"
     id = db.Column(db.String(), primary_key=True, default=lambda: str(uuid4()))
     owner_username = db.Column(db.String(120), nullable=False)
     task_emailList = db.Column(db.JSON, nullable=True)
