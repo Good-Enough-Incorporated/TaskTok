@@ -1,12 +1,12 @@
-// Global variable for the Bootstrap 5 modal instance
+// Global variable for the Bootstrap 5 modal instance.
 let confirmationModal = null;
 let currentTaskID = null;
 
-document.addEventListener('DOMContentLoaded', function(){
-    // Initialize the Bootstrap 5 modal
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize the Bootstrap 5 modal.
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
 
-    // Other initialization code
+    // Other initialization code.
     listTask();
     enableVerticalScroll();
     addButtonEventHandlers();
@@ -36,8 +36,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Rest of your addTask, editTask, deleteTask, listTask, etc. functions
-// ...
 
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
@@ -49,7 +47,8 @@ async function addTask() {
     const taskInput6 = document.getElementById('taskInput6').value;
 
     //terrible way to check, but it'll do for now.
-    if(taskInput1.length === 0 || taskInput2.length === 0 || taskInput3.length === 0 || taskInput4.length === 0 || taskInput5.length === 0 || taskInput6.length === 0){
+    if (taskInput1.length === 0 || taskInput2.length === 0 || taskInput3.length === 0 || taskInput4.length === 0
+        || taskInput5.length === 0 || taskInput6.length === 0) {
         console.log("NULL");
         showToast("Please fill out all iput boxes before submitting", 5000)
         return;
@@ -74,27 +73,28 @@ async function addTask() {
 
 
             })
+        });
+
+        // Get our async api call.
+        clearModal();
+        const data = await response.json();
+        console.log(data)
+        if (data.Message === "add_success") {
+            console.log('whats data.TaskList');
+            data.TaskList.forEach(task => {
+                addRowToTable(task);
             });
+            addButtonEventHandlers();
 
-            //Get our async api call
-            clearModal();
-            const data = await response.json();
-            console.log(data)
-            if(data.Message === "add_success") {
-                console.log('whats data.TaskList');
-                data.TaskList.forEach(task => {
-                    addRowToTable(task);
-                });
-                addButtonEventHandlers();
-
-                showToast(`Task successfully created!`, 5000)
-            } else {
-                showToast(data.Error, 5000)
-            }
-        } catch (error) {
-            console.error("Error:", error)
+            showToast(`Task successfully created!`, 5000)
+        } else {
+            showToast(data.Error, 5000)
         }
+    } catch (error) {
+        console.error("Error:", error)
     }
+}
+
 
 async function showEditModal(taskID) {
     // Fetching task data from API.
@@ -112,61 +112,75 @@ async function showEditModal(taskID) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const taskData = await response.json();
 
-        // Populate the edit modal fields
-        document.getElementById('editTaskName').value = taskData.task_name;
-        document.getElementById('editTaskDescription').value = taskData.task_description;
-        document.getElementById('editTaskDueDate').value = taskData.task_dueDate;
-        document.getElementById('editTaskReminderOffset').value = taskData.task_reminderOffSetTime;
-        document.getElementById('editTaskEmailList').value = taskData.task_emailList;
+        const taskData = await response.json();
+        // Access the 'Task' property from the taskData object.
+        const task = taskData.Task;
+
+        // Now populate the edit modal fields with the task details
+        document.getElementById('editTaskName').value = task.task_name;
+        document.getElementById('editTaskDescription').value = task.task_description;
+        document.getElementById('editTaskDueDate').value = task.task_dueDate;
+        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime;
+        document.getElementById('editTaskEmailList').value = task.task_emailList;
+
+
+        // Set current editing taskID  as a data attribute on the edit modal.
+        document.getElementById('editModal').setAttribute('data-current-editing-task-id', taskID);
 
         // Show the modal
         let editModal = new bootstrap.Modal(document.getElementById('editModal'));
         editModal.show();
 
         // Attach event handler to the "Save" button in the edit modal
-        document.getElementById('saveEdit').addEventListener('click', function() {
+        document.getElementById('saveEdit').addEventListener('click', function () {
             editTask(taskID); // Call editTask with the specific task ID
         });
     } catch (error) {
         console.error('Error fetching task data:', error);
         // Handle errors, e.g., display an error message
     }
+
+
 }
 
 
-
-
-
 async function editTask(taskID) {
-    // Fetch values from the modal's input fields
-    const taskName = document.getElementById('editTaskName').value; // Ensure this ID matches your modal's input field
-    const taskDescription = document.getElementById('editTaskDescription').value; // Same as above
-    const taskDueDate = document.getElementById('editTaskDueDate').value; // Add more fields as per your modal form
-    const taskReminderOffset = document.getElementById('editTaskReminderOffset').value;
+    // Fetch values from the modal's input fields.
+    const taskName = document.getElementById('editTaskName').value;
+    const taskDescription = document.getElementById('editTaskDescription').value;
+    let taskDueDate = document.getElementById('editTaskDueDate').value;
+    let taskReminderOffset = document.getElementById('editTaskReminderOffset').value;
     const taskEmailList = document.getElementById('editTaskEmailList').value;
+
+    // Format the date and time for the Flask backend.
+    taskDueDate = taskDueDate ? formatDateTimeForBackend(taskDueDate) : getDefaultDateTime();
+    taskReminderOffset = taskReminderOffset ? formatDateTimeForBackend(taskReminderOffset) : getDefaultDateTime();
+
+    // Debugging: Log the formatted dates
+    console.log("Formatted Due Date:", taskDueDate);
+    console.log("Formatted Reminder Offset:", taskReminderOffset);
 
     const csrfAccessToken = getCookie('csrf_access_token');
 
     try {
         const response = await fetch(`/api/editTask/${taskID}`, {
-                method: "PUT",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfAccessToken
-                },
-                body: JSON.stringify({
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfAccessToken
+            },
+            body: JSON.stringify({
 
-                    task_name: taskName,
-                    task_description: taskDescription,
-                    task_dueDate: taskDueDate,
-                    task_reminderOffSetTime: taskReminderOffset,
-                    task_emailList: taskEmailList,
+                task_name: taskName,
+                task_description: taskDescription,
+                task_dueDate: taskDueDate,
+                task_reminderOffSetTime: taskReminderOffset,
+                task_emailList: taskEmailList,
 
 
-                })
-            });
+            })
+        });
 
         const data = await response.json();
         console.log(data);
@@ -183,48 +197,62 @@ async function editTask(taskID) {
                 const dueDateCell = taskRow.querySelector("td:nth-child(4)")
                 const offSetCell = taskRow.querySelector("td:nth-child(5)")
                 const emailListCell = taskRow.querySelector("td:nth-child(6)")
-                    if (nameCell) {
-                        nameCell.textContent = taskName;
-                    }
-                    if (descriptionCell) {
-                        descriptionCell.textContent = taskDescription;
-                    }
-                    if (dueDateCell) {
-                        dueDateCell.textContent = taskDueDate;
-                    }
-                    if (offSetCell) {
-                        offSetCell.textContent = taskReminderOffset;
-                    }
-                    if (emailListCell) {
-                        emailListCell.textContent = taskEmailList;
-                    }
+                if (nameCell) {
+                    nameCell.textContent = taskName;
                 }
-                 // Close the modal
-                let editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                editModal.hide();
-            } else {
-                showToast("Task failed to be updated.", 5000);
-                console.log('Something went wrong when updating the task');
+                if (descriptionCell) {
+                    descriptionCell.textContent = taskDescription;
+                }
+                if (dueDateCell) {
+                    dueDateCell.textContent = taskDueDate;
+                }
+                if (offSetCell) {
+                    offSetCell.textContent = taskReminderOffset;
+                }
+                if (emailListCell) {
+                    emailListCell.textContent = taskEmailList;
+                }
             }
-
-        } catch (error) {
-            showToast('Oops, an error occurred. Please try again.', 5000)
-            console.error("Error:", error);
+            // Close the modal
+            let editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            editModal.hide();
+        } else {
+            showToast("Task failed to be updated.", 5000);
+            console.log('Something went wrong when updating the task');
         }
+
+    } catch (error) {
+        showToast('Oops, an error occurred. Please try again.', 5000)
+        console.error("Error:", error);
     }
+}
 
-    async function deleteTask(taskID) {
+// #TODO: Need to either change the date format or figure out how to handle blank/string fields in offset/date input fields
+// Helper function to format date and time for Flask back-end.
+function formatDateTimeForBackend(dateTime) {
+    if (!dateTime) return '';
+    const date = new Date(dateTime);
+    // keep this setting to keep current flask setup happy.
+    return date.toISOString().slice(0, 19).replace('T', ' ');
+}
 
-     console.log("Delete task called for task ID:", taskID);
+function getDefaultDateTime() {
+    const now = new Date();
+    return now.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+async function deleteTask(taskID) {
+
+    console.log("Delete task called for task ID:", taskID);
 
 
     //we need a csrfAccessToken to make our API call
     console.log("[removeTask]: beginning client api request")
     const csrfAccessToken = getCookie('csrf_access_token');
     console.log("[removeTask]: obtained csrf token")
-    try{
+    try {
         console.log("[removeTask]: calling /api/removeTask/ call")
-        const response =  await fetch(`api/removeTask/${taskID}`, {
+        const response = await fetch(`api/removeTask/${taskID}`, {
             method: "GET",
             headers: {
                 'X-CSRF-TOKEN': csrfAccessToken
@@ -233,19 +261,18 @@ async function editTask(taskID) {
         console.log("[removeTask]: waiting for response")
         const data = await response.json();
         console.log("[removeTask]: response received!")
-        if (data.Message === 'remove_success'){
+        if (data.Message === 'remove_success') {
             showToast("Task was successfully removed.", 5000);
             console.log('Task was deleted from the database')
             const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
             const $taskRow = $(taskRow)
 
             $taskRow.addClass('fadeOutSlideRight');
-            $taskRow.on('animationend', function() {
+            $taskRow.on('animationend', function () {
                 $taskRow.remove(); // This will remove the row from the DOM after the animation
-              });
+            });
 
             //removeRowFromTable(taskID);
-
 
 
         } else {
@@ -259,6 +286,7 @@ async function editTask(taskID) {
         showToast('Oops, looks like your session expired :( Please refresh the page.', 10000)
         console.error("Error:", error);
     }
+
 }
 
 
@@ -272,29 +300,30 @@ async function listTask() {
             headers: {
                 'X-CSRF-TOKEN': csrfAccessToken,
             },
-            });
+        });
 
-            //Get our async api call
-            const data = await response.json();
+        //Get our async api call
+        const data = await response.json();
 
-            console.log(typeof(data));
+        console.log(typeof (data));
 
-            createTableHeader()
-            data.TaskList.forEach(task => {
-                addRowToTable(task);
-            });
-            addButtonEventHandlers();
+        createTableHeader()
+        data.TaskList.forEach(task => {
+            addRowToTable(task);
+        });
+        addButtonEventHandlers();
 
         //add event handlers for edit/delete buttons
         //addButtonEventHandlers();
         const addTableButton = document.getElementById('task-add-btn');
         addTableButton.style.visibility = 'visible';
 
-        } catch (error) {
-            console.error("Error:", error)
-        }
+    } catch (error) {
+        console.error("Error:", error)
+    }
 }
-    function createTableHeader(){
+
+function createTableHeader() {
     var table = document.getElementById('taskTable');
     var thead = table.getElementsByTagName('thead')[0];
 
@@ -323,7 +352,7 @@ function removeTask(taskID) {
     confirmationModal.show();
 }
 
-document.getElementById('confirmDelete').addEventListener('click', function() {
+document.getElementById('confirmDelete').addEventListener('click', function () {
     if (currentTaskID !== null) {
         deleteTask(currentTaskID);
     }
@@ -333,7 +362,7 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
 function addButtonEventHandlers() {
     document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
         if (!button.getAttribute('data-click-handler')) {
-            button.addEventListener('click', function(event) {
+            button.addEventListener('click', function (event) {
                 const dataID = this.closest('tr').getAttribute('data-id');
                 if (this.classList.contains('task-edit-btn')) {
                     console.log('attempting to edit taskID=', dataID);
@@ -350,16 +379,15 @@ function addButtonEventHandlers() {
 
 
 
-// Additional functions
-// ...
 //TODO: will not need if using jQuery
-  function removeRowFromTable(taskID){
+function removeRowFromTable(taskID) {
     const row = document.querySelector(`tr[data-id="${taskID}"]`);
-    if(row){
+    if (row) {
         row.remove();
     }
-  }
-  function addRowToTable(task){
+}
+
+function addRowToTable(task) {
 
     var table = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     var newRow = table.insertRow(-1); //last row
@@ -380,22 +408,22 @@ function addButtonEventHandlers() {
     //cell7.innerHTML = '<td><input type="submit" value="Edit"></td><td><input type="submit" value="Delete"></td>'
     cell7.innerHTML = '<button class="task-edit-btn">Edit</button><button class="task-delete-btn">Delete</button>'
 
-  }
+}
 
-  function getTableInformation(taskId){
+function getTableInformation(taskId) {
     var table = document.getElementById('taskTable');
     var modal = document.getElementById('modal-body');
     var modalFooter = document.getElementById('modal-footer');
     var headerValues = table.getElementsByTagName('th');
     //need to query the row by using the data-id
     //otherwise we'll get a list of all values which isn't very helpful.
-    var row   = table.querySelector(`tr[data-id="${taskId}"]`)
+    var row = table.querySelector(`tr[data-id="${taskId}"]`)
     var cellValues = row.getElementsByTagName('td');
     //do not include this in our list
     const skipHeaders = ['actions', 'owner'];
-    for(var i=0; i < headerValues.length; i++){
+    for (var i = 0; i < headerValues.length; i++) {
         //create the label
-        if (skipHeaders.includes(headerValues[i].innerHTML.toLowerCase())){
+        if (skipHeaders.includes(headerValues[i].innerHTML.toLowerCase())) {
             continue; //do not create these elements
         }
         label = document.createElement('label');
@@ -408,16 +436,16 @@ function addButtonEventHandlers() {
         inputBox.type = 'text';
         inputBox.value = cellValues[i].innerHTML;
         inputBox.id = `taskInput${i}`;
-        inputBox.name =  headerValues[i].innerHTML;
+        inputBox.name = headerValues[i].innerHTML;
         inputBox.className = 'modal-fields';
         modal.appendChild(label);
         modal.appendChild(inputBox);
-        if(inputBox.id === 'taskInput3'){
+        if (inputBox.id === 'taskInput3') {
             dateTimeInput = document.getElementById('taskInput3')
             dateTimeInput.type = 'datetime-local'
             unparsedDate = cellValues[i].innerHTML.toString()
             console.log(unparsedDate.indexOf('.'));
-            if(unparsedDate.indexOf('.') === -1){
+            if (unparsedDate.indexOf('.') === -1) {
                 //already in the format we want.
                 formattedDate = unparsedDate
 
@@ -429,18 +457,19 @@ function addButtonEventHandlers() {
         }
 
     }
-        updateButton = document.createElement('button');
-        updateButton.textContent = "Update Task";
-        updateButton.className = 'task-update-btn';
-        modalFooter.appendChild(updateButton);
-        updateButton.onclick = function(){
-            console.log("Updating task")
-            editTask(taskId);
+    updateButton = document.createElement('button');
+    updateButton.textContent = "Update Task";
+    updateButton.className = 'task-update-btn';
+    modalFooter.appendChild(updateButton);
+    updateButton.onclick = function () {
+        console.log("Updating task")
+        editTask(taskId);
 
-        }
-  }
+    }
+}
 
-  function addTaskModal(){
+
+function addTaskModal() {
     var modal = document.getElementById('modal-body');
     var modalFooter = document.getElementById('modal-footer');
     const fields = ['Task Name', 'Task Description', 'Task Due Date', 'Task Due (Offset)', 'E-Mail List', 'E-mail Message'];
@@ -466,20 +495,20 @@ function addButtonEventHandlers() {
 
     });
 
-        console.log('setting to datetime-local')
-        dateTimeInput = document.getElementById('taskInput3')
-        dateTimeInput.type = 'datetime-local'
-        dateTimeInput.setAttribute('step', 1)
-        dateTimeInput = document.getElementById('taskInput4')
-        dateTimeInput.type = 'datetime-local'
-        dateTimeInput.setAttribute('step', 1)
+    console.log('setting to datetime-local')
+    dateTimeInput = document.getElementById('taskInput3')
+    dateTimeInput.type = 'datetime-local'
+    dateTimeInput.setAttribute('step', 1)
+    dateTimeInput = document.getElementById('taskInput4')
+    dateTimeInput.type = 'datetime-local'
+    dateTimeInput.setAttribute('step', 1)
 
 
     addButton = document.createElement('button');
     addButton.textContent = "Add Task";
     addButton.className = 'task-update-btn';
     modalFooter.appendChild(addButton);
-    addButton.onclick = function(){
+    addButton.onclick = function () {
         console.log("Clicked add button");
         addTask();
     }
@@ -489,12 +518,13 @@ function addButtonEventHandlers() {
     var close = document.getElementsByClassName("close")[0];
     editModal.style.display = 'block';
 
-    close.onclick = function() {
+    close.onclick = function () {
         editModal.style.display = "none";
         clearModal();
-      }
-  }
-  function showToast(message, duration = 3000) {
+    }
+}
+
+function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast-container");
     const toastContent = document.getElementById("toast-user-content");
     toastContent.textContent = message;
@@ -506,18 +536,18 @@ function addButtonEventHandlers() {
     }, duration);
 }
 
-  document.addEventListener('DOMContentLoaded', function(){
-  //Use the DOMContentLoaded to make sure the DOM is fully loaded before trying to load our script.
+document.addEventListener('DOMContentLoaded', function () {
+    //Use the DOMContentLoaded to make sure the DOM is fully loaded before trying to load our script.
 
-  //Add button event handlers for edit/delete actions.
-  //Uses the data-id field to determine which task was selected
+    //Add button event handlers for edit/delete actions.
+    //Uses the data-id field to determine which task was selected
 
-  console.log("testing api calls from js");
-  listTask();
-  console.log('hello')
-  enableVerticalScroll();
+    console.log("testing api calls from js");
+    listTask();
+    console.log('hello')
+    enableVerticalScroll();
 
-  });
+});
 
 
 function enableVerticalScroll() {
@@ -530,4 +560,17 @@ function enableVerticalScroll() {
     }
 }
 
-// Ensure all other functionalities are correctly updated for Bootstrap 5 if needed
+// DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialization code...
+
+    // Attach event listener to the "Save" button in the edit modal
+    document.getElementById('saveEdit').addEventListener('click', function () {
+        const currentEditingTaskId = document.getElementById('editModal').getAttribute('data-current-editing-task-id');
+        if (currentEditingTaskId) {
+            editTask(currentEditingTaskId);
+        }
+    });
+
+});
+

@@ -2,6 +2,9 @@
 {% block title %}TaskTok{% endblock %}
     
 {% block style %}
+    <!-- Flatpicker for date and time input CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <style>
         body {
             font-family: Calibri, Helvetica, sans-serif;
@@ -324,7 +327,6 @@ border-bottom: 0px solid #444444;
                     <label for="editTaskDescription" class="form-label">Description</label>
                     <input type="text" id="editTaskDescription" class="form-control" placeholder="Description">
                 </div>
-                <!-- Add more inputs as needed -->
                  <div class="mb-3">
                     <label for="editTaskDueDate" class="form-label">Due Date</label>
                     <input type="text" id="editTaskDueDate" class="form-control" placeholder="Due Date">
@@ -500,6 +502,23 @@ border-bottom: 0px solid #444444;
         </div>
     
     </div>
+    <!-- Home.html Scripts Section -->
     <script src="{{ url_for('static', filename='js/apiRequests/test_functions.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- flatpickr used for date/time selection in date/offset input fields -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    flatpickr("#editTaskDueDate", {
+        enableTime: true,
+        dateFormat: "Y-m-dTH:i:S", // Matches '%Y-%m-%dT%H:%M:%S' from flask-backend
+    });
+
+    flatpickr("#editTaskReminderOffset", {
+        enableTime: true,
+        dateFormat: "Y-m-dTH:i:S", // Matches '%Y-%m-%dT%H:%M:%S' from flask-backend
+        });
+    });
+    </script>
+
 </body>
 {% endblock %}
