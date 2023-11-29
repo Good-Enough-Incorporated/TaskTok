@@ -4,7 +4,7 @@ from celery.utils.log import get_task_logger
 from flask_mail import Message
 from datetime import datetime
 from TaskTok.extensions import flaskMail, celery_worker
-from TaskTok.models import TaskReminder
+from TaskTok.models import TaskReminder as task
 from TaskTok.extensions import db
 logger = get_task_logger(__name__)
 @celery_worker.on_after_configure.connect
@@ -32,6 +32,6 @@ def send_email(self, email_to, subject, body):
 def check_tasks_ready():
     print('this will use celery beat to check tasks')
     current_time = datetime.now()
-    task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= current_time).all().all()
+    task_list = task.query.filter(task.task_dueDate >= current_time).all().all()
     logger.info('There are %s tasks ready for email alerts!', task_list.count)
     #send_email.delay('jason.supple.27@gmail.com', "Periodic Email Test", 'Testing periodic tasks')
