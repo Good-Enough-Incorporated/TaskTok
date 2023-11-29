@@ -153,9 +153,20 @@ def edit_task(task_id):
         return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
 
 
-@api.route('/')
-def get_tasks():
-    return "something"
+@api.route('/getTask/<task_id>', methods=['GET'])
+@jwt_required()
+def get_task(task_id):
+    # Logic to fetch a single task by its ID
+    task = TaskReminder.query.get(task_id)
+
+    if task is None:
+        return jsonify({'Message': 'Task not found'}), 404
+
+    if task.owner_username != current_user.username:
+        return jsonify({'Message': 'Unauthorized'}), 401
+
+    task_data = TaskSchema().dump(task)
+    return jsonify({"Task": task_data}), 200
 
 
 # Return users, /api/get_users?page=1&per_page=5 as an example

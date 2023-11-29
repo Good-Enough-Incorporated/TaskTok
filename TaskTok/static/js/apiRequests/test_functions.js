@@ -96,23 +96,58 @@ async function addTask() {
         }
     }
 
+async function showEditModal(taskID) {
+    // Fetching task data from API.
+    try {
+        const csrfAccessToken = getCookie('csrf_access_token');
+        const response = await fetch(`/api/getTask/${taskID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfAccessToken
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const taskData = await response.json();
+
+        // Populate the edit modal fields
+        document.getElementById('editTaskName').value = taskData.task_name;
+        document.getElementById('editTaskDescription').value = taskData.task_description;
+        document.getElementById('editTaskDueDate').value = taskData.task_dueDate;
+        document.getElementById('editTaskReminderOffset').value = taskData.task_reminderOffSetTime;
+        document.getElementById('editTaskEmailList').value = taskData.task_emailList;
+
+        // Show the modal
+        let editModal = new bootstrap.Modal(document.getElementById('editModal'));
+        editModal.show();
+
+        // Attach event handler to the "Save" button in the edit modal
+        document.getElementById('saveEdit').addEventListener('click', function() {
+            editTask(taskID); // Call editTask with the specific task ID
+        });
+    } catch (error) {
+        console.error('Error fetching task data:', error);
+        // Handle errors, e.g., display an error message
+    }
+}
+
+
+
+
 
 async function editTask(taskID) {
-    const csrfAccessToken = getCookie('csrf_access_token');
-    //Grab the values from the text fields
-    //ensure we're validating this as safe on our endpoint as it
-    //make no sense on the client side
-    const taskInput1 = document.getElementById('taskInput1').value;
-    const taskInput2 = document.getElementById('taskInput2').value;
-    const taskInput3 = document.getElementById('taskInput3').value;
-    const taskInput4 = document.getElementById('taskInput4').value;
-    const taskInput5 = document.getElementById('taskInput5').value;
-    console.log(taskInput1);
-    console.log(taskInput2);
-    console.log(taskInput3);
-    console.log(taskInput4);
-    console.log(taskInput5);
+    // Fetch values from the modal's input fields
+    const taskName = document.getElementById('editTaskName').value; // Ensure this ID matches your modal's input field
+    const taskDescription = document.getElementById('editTaskDescription').value; // Same as above
+    const taskDueDate = document.getElementById('editTaskDueDate').value; // Add more fields as per your modal form
+    const taskReminderOffset = document.getElementById('editTaskReminderOffset').value;
+    const taskEmailList = document.getElementById('editTaskEmailList').value;
 
+    const csrfAccessToken = getCookie('csrf_access_token');
 
     try {
         const response = await fetch(`/api/editTask/${taskID}`, {
@@ -123,11 +158,11 @@ async function editTask(taskID) {
                 },
                 body: JSON.stringify({
 
-                    task_name: taskInput1,
-                    task_description: taskInput2,
-                    task_dueDate: taskInput3,
-                    task_reminderOffSetTime: taskInput4,
-                    task_emailList: taskInput5,
+                    task_name: taskName,
+                    task_description: taskDescription,
+                    task_dueDate: taskDueDate,
+                    task_reminderOffSetTime: taskReminderOffset,
+                    task_emailList: taskEmailList,
 
 
                 })
@@ -149,21 +184,24 @@ async function editTask(taskID) {
                 const offSetCell = taskRow.querySelector("td:nth-child(5)")
                 const emailListCell = taskRow.querySelector("td:nth-child(6)")
                     if (nameCell) {
-                        nameCell.textContent = taskInput1;
+                        nameCell.textContent = taskName;
                     }
                     if (descriptionCell) {
-                        descriptionCell.textContent = taskInput2;
+                        descriptionCell.textContent = taskDescription;
                     }
                     if (dueDateCell) {
-                        dueDateCell.textContent = taskInput3;
+                        dueDateCell.textContent = taskDueDate;
                     }
                     if (offSetCell) {
-                        offSetCell.textContent = taskInput4;
+                        offSetCell.textContent = taskReminderOffset;
                     }
                     if (emailListCell) {
-                        emailListCell.textContent = taskInput5;
+                        emailListCell.textContent = taskEmailList;
                     }
                 }
+                 // Close the modal
+                let editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                editModal.hide();
             } else {
                 showToast("Task failed to be updated.", 5000);
                 console.log('Something went wrong when updating the task');
@@ -292,32 +330,25 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
     confirmationModal.hide();
 });
 
-function addButtonEventHandlers(){
-  document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
+function addButtonEventHandlers() {
+    document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
         if (!button.getAttribute('data-click-handler')) {
             button.addEventListener('click', function(event) {
                 const dataID = this.closest('tr').getAttribute('data-id');
-
                 if (this.classList.contains('task-edit-btn')) {
                     console.log('attempting to edit taskID=', dataID);
-                    getTableInformation(dataID);
-                    var editModal = document.getElementById('editModal');
-                    var close = document.getElementsByClassName("close")[0];
-                    editModal.style.display = 'block';
-
-                    close.onclick = function() {
-                        editModal.style.display = "none";
-                        clearModal();
-                    }
+                    showEditModal(dataID); // Call the new function here
                 } else if (this.classList.contains('task-delete-btn')) {
                     console.log('attempting to remove taskID=', dataID);
-                    removeTask(dataID); // Change made here to call removeTask
+                    removeTask(dataID);
                 }
             });
             button.setAttribute('data-click-handler', true);
         }
     });
 }
+
+
 
 // Additional functions
 // ...

@@ -287,7 +287,7 @@ border-bottom: 0px solid #444444;
 
     </div>
 
-<!-- Bootstrap Confirmation Modal -->
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -305,6 +305,47 @@ border-bottom: 0px solid #444444;
         </div>
     </div>
 </div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form inputs for editing task -->
+                <div class="mb-3">
+                    <label for="editTaskName" class="form-label">Task Name</label>
+                    <input type="text" id="editTaskName" class="form-control" placeholder="Task Name">
+                </div>
+                <div class="mb-3">
+                    <label for="editTaskDescription" class="form-label">Description</label>
+                    <input type="text" id="editTaskDescription" class="form-control" placeholder="Description">
+                </div>
+                <!-- Add more inputs as needed -->
+                 <div class="mb-3">
+                    <label for="editTaskDueDate" class="form-label">Due Date</label>
+                    <input type="text" id="editTaskDueDate" class="form-control" placeholder="Due Date">
+                </div>
+                 <div class="mb-3">
+                    <label for="editTaskReminderOffset" class="form-label">Off-Set</label>
+                    <input type="text" id="editTaskReminderOffset" class="form-control" placeholder="Off-Set">
+                </div>
+                 <div class="mb-3">
+                    <label for="editTaskEmailList" class="form-label">Email-List</label>
+                    <input type="text" id="editTaskEmailList" class="form-control" placeholder="Email-List">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEdit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
     <!-- Archived Tasks Section -->
