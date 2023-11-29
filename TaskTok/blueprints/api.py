@@ -23,6 +23,7 @@ def send_mail():
     # create_file.delay('test.txt', "hello world")
     return 'send_email celery task created :)'
 
+
 @api.route('/testRoute')
 def testRoute():
     # test route, will not be kept
@@ -47,18 +48,18 @@ def add_task():
     print(task_reminder_off_set)
     print(task_due_date)
     try:
-    
+
         task_due_date = datetime.datetime.strptime(task_due_date, f'%Y-%m-%dT%H:%M:%S')
         task_reminder_off_set = datetime.datetime.strptime(task_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
     except ValueError:
         return jsonify({'Message': 'add_failed', 'Error': "Invalid DateTime format received."}), 400
-        
+
     if task_reminder_off_set > task_due_date:
         return jsonify({'Message': 'add_failed', 'Error': 'Reminder Offset must be before the due date.'}), 400
 
     task = TaskReminder(owner_username=user_data.username, task_dueDate=task_due_date,
                         task_description=task_description, task_reminderOffSetTime=task_reminder_off_set,
-                        task_message=task_email_message, task_emailList = task_email_list, task_name=task_name)
+                        task_message=task_email_message, task_emailList=task_email_list, task_name=task_name)
     task.add()
     task_array = [task]
     task_string = TaskSchema().dump(task_array, many=True)
@@ -127,6 +128,7 @@ def edit_task(task_id):
         try:
             print(f"DUE DATE = {new_due_date}")
             task.task_dueDate = datetime.datetime.strptime(new_due_date, f'%Y-%m-%dT%H:%M:%S')
+
         except ValueError:
             return jsonify({'Message': 'Invalid date format'}), 400
 
@@ -153,9 +155,20 @@ def edit_task(task_id):
         return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
 
 
-@api.route('/')
-def get_tasks():
-    return "something"
+@api.route('/getTask/<task_id>', methods=['GET'])
+@jwt_required()
+def get_task(task_id):
+    # Logic to fetch a single task by its ID
+    task = TaskReminder.query.get(task_id)
+
+    if task is None:
+        return jsonify({'Message': 'Task not found'}), 404
+
+    if task.owner_username != current_user.username:
+        return jsonify({'Message': 'Unauthorized'}), 401
+
+    task_data = TaskSchema().dump(task)
+    return jsonify({"Task": task_data}), 200
 
 
 # Return users, /api/get_users?page=1&per_page=5 as an example
