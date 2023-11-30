@@ -108,7 +108,8 @@ def remove_task(task_id):
 def edit_task(task_id):
     user_data = current_user
     task = TaskReminder.query.get(task_id)
-
+    error = []
+    status_code = None
     # Check if the task exists and if it belongs to the current user.
     if task is None or task.owner_username != user_data.username:
         return jsonify({'Message': 'Task not found or not authorized'}), 404
@@ -118,46 +119,59 @@ def edit_task(task_id):
     new_name = data.get('task_name')
     new_description = data.get('task_description')
     new_due_date = data.get('task_dueDate')
-    new_reminder_off_set = data.get('task_reminderOffSet')
+    new_reminder_off_set = data.get('task_reminderOffSetTime')
     new_email_list = data.get('task_emailList')
     # TODO: Validate these inputs as safe
-
+    print(f'OFFSET = {data}')
     # Getting new description.
     if new_description is not None:
         task.task_description = new_description
 
     # Getting new due date.
     if new_due_date is not None:
-        formatted_date = format_date(new_due_date)
+        due_formatted_date = format_date(new_due_date)
         if format_date is not None:
-            task.task_dueDate = formatted_date
+            task.task_dueDate = due_formatted_date
         else:
-            return jsonify({'Message': 'Invalid date format'}), 400
+            error.append("Due date received an invalid date format")
+            
 
     if new_reminder_off_set is not None:
-        formatted_date = format_date(new_reminder_off_set)
+        offset_formatted_date = format_date(new_reminder_off_set)
         if format_date is not None:
-            print(new_reminder_off_set)
-            task.task_reminderOffSetTime = new_reminder_off_set
+            if due_formatted_date < offset_formatted_date:
+                error.append("Offset must not be after your due date!")
+            else:
+                print(f'UPDATING OFFSET {new_reminder_off_set}')
+                old_reminder_offset_time = task.task_reminderOffSetTime
+                task.task_reminderOffSetTime = offset_formatted_date
         else:
-            return jsonify({'Message': 'Invalid date format'}), 400
-
+            error.append("Offset time date received an invalid date format")
+    else:
+        print('new_reminder_off_set was None')
+            
+    
 
     if new_email_list is not None:
         task.task_emailList = new_email_list
+
 
     # Getting new name for task.
     if new_name is not None:
         task.task_name = new_name
 
+    if error:
+        status_code = 400
+    else:
+        status_code = 200
     # Commit the changes to the database
     try:
         db.session.commit()
-        return jsonify({'Message': 'Task updated successfully'}), 200
-    except Exception as e:
+        return jsonify({'Message': 'Task updated successfully', "Error": error}), status_code
+    except Exception:
         # Rollback in case of error.
         db.session.rollback()
-        return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
+        return jsonify({'Message': 'Failed to update task', 'Error': error}), status_code
 
 
 @api.route('/getTask/<task_id>', methods=['GET'])
