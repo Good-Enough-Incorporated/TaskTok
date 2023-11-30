@@ -263,7 +263,7 @@ async function deleteTask(taskID) {
         console.log("[removeTask]: response received!")
         if (data.Message === 'remove_success') {
             showToast("Task was successfully removed.", 5000);
-            console.log('Task was deleted from the database')
+            console.log(`Task was deleted from the database ${data.task_id}`)
             const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
             const $taskRow = $(taskRow)
 
@@ -277,7 +277,7 @@ async function deleteTask(taskID) {
 
         } else {
             showToast("Task failed to be removed :(", 5);
-            console.log('Something went wrong when deleting the task')
+            console.log(`Something went wrong when deleting the task ${data.Error}`)
         }
         //console.log(data);
 
@@ -309,6 +309,7 @@ async function listTask() {
 
         createTableHeader()
         data.TaskList.forEach(task => {
+            console.log(task + ' being added to table')
             addRowToTable(task);
         });
         addButtonEventHandlers();
@@ -535,19 +536,6 @@ function showToast(message, duration = 3000) {
         toast.classList.remove("show");
     }, duration);
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    //Use the DOMContentLoaded to make sure the DOM is fully loaded before trying to load our script.
-
-    //Add button event handlers for edit/delete actions.
-    //Uses the data-id field to determine which task was selected
-
-    console.log("testing api calls from js");
-    listTask();
-    console.log('hello')
-    enableVerticalScroll();
-
-});
 
 
 function enableVerticalScroll() {

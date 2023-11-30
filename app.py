@@ -73,11 +73,14 @@ def make_admin_user():
 @app.cli.command('createAdminTasks')
 def add_admin_tasks():
     with app.app_context():
+        count = 1
+        
         for tasks in range(10):
             user_task = TaskReminder(owner_username='admin', task_dueDate=datetime.datetime.now(),
-                                     task_description="Hello, this is the reminder of the example task",
-                                     task_name="My Task!", task_message="This is the message")
+                                     task_description=f"Task {count} description",
+                                     task_name=f"Task {count}", task_message="BlahBlahBlah")
             user_task.add()
+            count+=1
 
 
 @app.cli.command('createDB')

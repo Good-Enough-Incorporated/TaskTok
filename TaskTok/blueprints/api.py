@@ -92,10 +92,13 @@ def remove_task(task_id):
         try:
             current_task.remove()
             print("ending removeTask")
-            return jsonify({'Message': "remove_success"})
+            return jsonify({'Message': "remove_success", "task_id": task_id})
         except SQLAlchemyError as e:
             print(f"Database error occurred: {e}")
-            return jsonify({'Message': "remove_fail", 'Error': str(e)})
+            return jsonify({'Message': "remove_fail", 'Error': str(e), "task_id": task_id})
+    else:
+        return jsonify({'Message': "remove_fail", 'Error': f'Task [{task_id}] was not found, or permission denied'})
+
 
 
 # TODO: Need input validation.
