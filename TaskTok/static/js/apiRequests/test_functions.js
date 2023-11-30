@@ -22,6 +22,7 @@ function clearModal() {
 }
 
 function getCookie(name) {
+    
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
@@ -36,6 +37,17 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function format_backend_datetime(dateString){
+    const date = new Date(dateString);
+
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth() returns 0-11
+    let year = date.getFullYear();
+    let hours = date.getHours().toString().padStart(2, '0');
+    let minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
+}
 
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
@@ -131,6 +143,16 @@ async function showEditModal(taskID) {
         // Show the modal
         let editModal = new bootstrap.Modal(document.getElementById('editModal'));
         editModal.show();
+        flatpickr("#editTaskReminderOffset", {
+            enableTime: true,
+            allowInput: true,
+            dateFormat: "m/d/Y H:i"
+          });
+          flatpickr("#editTaskDueDate", {
+            enableTime: true,
+            allowInput: true,
+            dateFormat: "m/d/Y H:i"
+          });
 
         // Attach event handler to the "Save" button in the edit modal
         document.getElementById('saveEdit').addEventListener('click', function () {
@@ -154,8 +176,8 @@ async function editTask(taskID) {
     const taskEmailList = document.getElementById('editTaskEmailList').value;
 
     // Format the date and time for the Flask backend.
-    taskDueDate = taskDueDate ? formatDateTimeForBackend(taskDueDate) : getDefaultDateTime();
-    taskReminderOffset = taskReminderOffset ? formatDateTimeForBackend(taskReminderOffset) : getDefaultDateTime();
+    //taskDueDate = taskDueDate ? formatDateTimeForBackend(taskDueDate) : getDefaultDateTime();
+    //taskReminderOffset = taskReminderOffset ? formatDateTimeForBackend(taskReminderOffset) : getDefaultDateTime();
 
     // Debugging: Log the formatted dates
     console.log("Formatted Due Date:", taskDueDate);
@@ -403,12 +425,13 @@ function addRowToTable(task) {
     cell1.innerHTML = task.owner_username;
     cell2.innerHTML = task.task_name;
     cell3.innerHTML = task.task_description;
-    cell4.innerHTML = task.task_dueDate;
-    cell5.innerHTML = task.task_reminderOffSetTime;
+    cell4.innerHTML = format_backend_datetime(task.task_dueDate);
+    //cell5.innerHTML = task.task_reminderOffSetTime;
+    cell5.innerHTML = task.task_reminderOffSetTime ? format_backend_datetime(task.task_reminderOffSetTime) : '';
     cell6.innerHTML = task.task_emailList
     //cell7.innerHTML = '<td><input type="submit" value="Edit"></td><td><input type="submit" value="Delete"></td>'
     cell7.innerHTML = '<button class="task-edit-btn">Edit</button><button class="task-delete-btn">Delete</button>'
-
+    console.log(format_backend_datetime)
 }
 
 function getTableInformation(taskId) {
@@ -464,7 +487,7 @@ function getTableInformation(taskId) {
     modalFooter.appendChild(updateButton);
     updateButton.onclick = function () {
         console.log("Updating task")
-        editTask(taskId);
+        //editTask(taskId);
 
     }
 }
@@ -556,7 +579,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('saveEdit').addEventListener('click', function () {
         const currentEditingTaskId = document.getElementById('editModal').getAttribute('data-current-editing-task-id');
         if (currentEditingTaskId) {
-            editTask(currentEditingTaskId);
+            //this is ran twice, we can probably delete this or the other event listener
+            //editTask(currentEditingTaskId);
         }
     });
 

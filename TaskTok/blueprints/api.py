@@ -6,7 +6,7 @@ from TaskTok.schema import UserSchema, TaskSchema
 from TaskTok.utilities import email_message, check_emails_overdue
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
-
+import re
 #  ---------- Unused Imports: Needs review ----------------
 #  import subprocess
 #  import socket
@@ -128,18 +128,20 @@ def edit_task(task_id):
 
     # Getting new due date.
     if new_due_date is not None:
-        try:
-            print(f"DUE DATE = {new_due_date}")
-            task.task_dueDate = datetime.datetime.strptime(new_due_date, f'%Y-%m-%dT%H:%M:%S')
-
-        except ValueError:
+        formatted_date = format_date(new_due_date)
+        if format_date is not None:
+            task.task_dueDate = formatted_date
+        else:
             return jsonify({'Message': 'Invalid date format'}), 400
 
     if new_reminder_off_set is not None:
-        try:
-            task.task_reminderOffSetTime = datetime.datetime.strptime(new_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
-        except ValueError:
+        formatted_date = format_date(new_reminder_off_set)
+        if format_date is not None:
+            print(new_reminder_off_set)
+            task.task_reminderOffSetTime = new_reminder_off_set
+        else:
             return jsonify({'Message': 'Invalid date format'}), 400
+
 
     if new_email_list is not None:
         task.task_emailList = new_email_list
@@ -194,3 +196,14 @@ def get_users():
         }), 200
     else:
         return jsonify({"message": "User unauthorized"}), 401
+
+def format_date(string_date):
+    pattern = r"^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/(20\d{2})\s([01]?[0-9]|2[0-3]):([0-5][0-9])$"
+    match = re.match(pattern, string_date)
+    try:
+        if match:
+            return datetime.datetime.strptime(string_date, f'%m/%d/%Y %H:%M')
+        else:
+            return datetime.datetime.strptime(string_date, f'%Y-%m-%dT%H:%M:%S')
+    except Exception as e:
+        print(f'Failed to parse date {e}')
