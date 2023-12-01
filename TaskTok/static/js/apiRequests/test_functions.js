@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Other initialization code.
     listTask();
     enableVerticalScroll();
-    addButtonEventHandlers();
+    
 });
 
 function clearModal() {
@@ -187,9 +187,10 @@ async function addTask() {
             data.TaskList.forEach(task => {
                 addRowToTable(task);
             });
-            addButtonEventHandlers();
-
+ 
             showToast(`Task successfully created!`, 5000)
+            console.log('adding button event handlers')
+        
         } else {
             showToast(data.Error, 5000)
         }
@@ -219,14 +220,15 @@ async function showEditModal(taskID) {
         const taskData = await response.json();
         // Access the 'Task' property from the taskData object.
         const task = taskData.Task;
-
+        console.log(task.task_dueDate)
+        console.log(task.task_reminderOffSetTime)
+       
         // Now populate the edit modal fields with the task details
         document.getElementById('editTaskName').value = task.task_name;
         document.getElementById('editTaskDescription').value = task.task_description;
-        document.getElementById('editTaskDueDate').value = task.task_dueDate;
-        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime;
+        document.getElementById('editTaskDueDate').value = format_backend_datetime(task.task_dueDate);
+        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime ? format_backend_datetime(task.task_reminderOffSetTime) : ""
         document.getElementById('editTaskEmailList').value = task.task_emailList;
-
 
         // Set current editing taskID  as a data attribute on the edit modal.
         document.getElementById('editModal').setAttribute('data-current-editing-task-id', taskID);
@@ -425,10 +427,9 @@ async function listTask() {
             console.log(task + ' being added to table')
             addRowToTable(task);
         });
-        addButtonEventHandlers();
+        
 
-        //add event handlers for edit/delete buttons
-        //addButtonEventHandlers();
+
         const addTableButton = document.getElementById('task-add-btn');
         addTableButton.style.visibility = 'visible';
 
@@ -472,25 +473,6 @@ document.getElementById('confirmDelete').addEventListener('click', function () {
     }
     confirmationModal.hide();
 });
-
-function addButtonEventHandlers() {
-    document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
-        if (!button.getAttribute('data-click-handler')) {
-            button.addEventListener('click', function (event) {
-                const dataID = this.closest('tr').getAttribute('data-id');
-                if (this.classList.contains('task-edit-btn')) {
-                    console.log('attempting to edit taskID=', dataID);
-                    showEditModal(dataID); // Call the new function here
-                } else if (this.classList.contains('task-delete-btn')) {
-                    console.log('attempting to remove taskID=', dataID);
-                    removeTask(dataID);
-                }
-            });
-            button.setAttribute('data-click-handler', true);
-        }
-    });
-}
-
 
 
 //TODO: will not need if using jQuery
@@ -661,6 +643,19 @@ function enableVerticalScroll() {
         });
     }
 }
+
+document.getElementById('taskTable').addEventListener('click', function(event) {
+    if (event.target.matches('button.task-edit-btn')) { //event handler for Edit button
+        const dataID = event.target.closest('tr').getAttribute('data-id');
+        console.log('Opening showEditModal on taskID=', dataID);
+        showEditModal(dataID); // Call the new function here
+    }
+    if (event.target.matches('button.task-delete-btn')){
+        const dataID = event.target.closest('tr').getAttribute('data-id');
+        console.log('attempting to remove taskID=', dataID);
+        removeTask(dataID);
+    }
+});
 
 // DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function () {
