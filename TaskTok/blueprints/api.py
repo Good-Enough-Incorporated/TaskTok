@@ -31,39 +31,54 @@ def testRoute():
     return "testing check_emails_overdue()"
 
 
-@api.route('/addTask', methods=['PUT'])
+@api.route('/addTask', methods=['POST'])
 @jwt_required()
 def add_task():
     # get the current user's information
     user_data = current_user
-    # TODO: Need to validate as safe
-    data = request.json
 
+    # Validate and get data from request
+    data = request.json
     task_name = data.get('task_name')
     task_description = data.get('task_description')
     task_due_date = data.get('task_dueDate')
     task_reminder_off_set = data.get('task_reminderOffSetTime')
     task_email_list = data.get('task_emailList')
     task_email_message = data.get('task_email_message')
-    print(task_reminder_off_set)
-    print(task_due_date)
-    try:
 
+    # Basic validation
+    if not all([task_name, task_description, task_due_date, task_reminder_off_set]):
+        return jsonify({'Message': 'add_failed', 'Error': 'Missing required fields.'}), 400
+
+    try:
         task_due_date = datetime.datetime.strptime(task_due_date, f'%Y-%m-%dT%H:%M:%S')
         task_reminder_off_set = datetime.datetime.strptime(task_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
+
+        if task_reminder_off_set > task_due_date:
+            return jsonify({'Message': 'add_failed', 'Error': 'Reminder Offset must be before the due date.'}), 400
+
+        task = TaskReminder(
+            owner_username=user_data.username,
+            task_dueDate=task_due_date,
+            task_description=task_description,
+            task_reminderOffSetTime=task_reminder_off_set,
+            task_message=task_email_message,
+            task_emailList=task_email_list,
+            task_name=task_name
+        )
+        db.session.add(task)
+        db.session.commit()
+
+        task_array = [task]
+        task_string = TaskSchema().dump(task_array, many=True)
+
+        return jsonify({"Message": "add_success", "TaskList": task_string}), 200
+
     except ValueError:
         return jsonify({'Message': 'add_failed', 'Error': "Invalid DateTime format received."}), 400
-
-    if task_reminder_off_set > task_due_date:
-        return jsonify({'Message': 'add_failed', 'Error': 'Reminder Offset must be before the due date.'}), 400
-
-    task = TaskReminder(owner_username=user_data.username, task_dueDate=task_due_date,
-                        task_description=task_description, task_reminderOffSetTime=task_reminder_off_set,
-                        task_message=task_email_message, task_emailList=task_email_list, task_name=task_name)
-    task.add()
-    task_array = [task]
-    task_string = TaskSchema().dump(task_array, many=True)
-    return jsonify({"Message": "add_success", "TaskList": task_string, 'Error': 'None'}), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'Message': 'add_failed', 'Error': str(e)}), 500
 
 
 @api.route('/listTask')

@@ -279,7 +279,10 @@ border-bottom: 0px solid #444444;
     <div class="table-container">
         <div class="table-wrapper">
             <label class="tasktable-title-lbl">Active Tasks</label>
-            <button class="task-add-btn" id="task-add-btn">New Task</button>
+            <!-- Add button attached to bootstrap modal -->
+            <button class="btn btn-primary task-add-btn" id="task-add-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#taskAddModal">New Task</button>
             <table id="taskTable">
                 <thead>
                 </thead>
@@ -289,6 +292,53 @@ border-bottom: 0px solid #444444;
         </div>
 
     </div>
+
+
+<!-- Task Add Modal -->
+<div class="modal fade" id="taskAddModal" tabindex="-1" aria-labelledby="taskAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskAddModalLabel">Add New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Task Add Form -->
+                <form id="addTaskForm">
+                    <div class="mb-3">
+                        <label for="taskName" class="form-label">Task Name</label>
+                        <input type="text" class="form-control" id="taskName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDueDate" class="form-label">Due Date</label>
+                        <input type="text" id="taskDueDate" class="form-control" placeholder="Due Date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskReminderOffset" class="form-label">Off-Set</label>
+                        <input type="text" id="taskReminderOffset" class="form-control" placeholder="Off-Set">
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskEmailList" class="form-label">Email-List</label>
+                        <input type="text" id="taskEmailList" class="form-control" placeholder="Email-List">
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskEmailMessage" class="form-label">Email Message</label>
+                        <textarea class="form-control" id="taskEmailMessage" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="addTaskForm">Add Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -308,6 +358,7 @@ border-bottom: 0px solid #444444;
         </div>
     </div>
 </div>
+
 
 <!-- Edit Task Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -505,20 +556,37 @@ border-bottom: 0px solid #444444;
     <!-- Home.html Scripts Section -->
     <script src="{{ url_for('static', filename='js/apiRequests/test_functions.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- flatpickr used for date/time selection in date/offset input fields -->
+
+    <!-- flatpickr used for date/time selection in date/offset input fields for add/edit forms -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     flatpickr("#editTaskDueDate", {
         enableTime: true,
-        dateFormat: "Y-m-dTH:i:S", // Matches '%Y-%m-%dT%H:%M:%S' from flask-backend
+        allowInput: true,
+        dateFormat: "m/d/Y H:i"
     });
 
     flatpickr("#editTaskReminderOffset", {
         enableTime: true,
-        dateFormat: "Y-m-dTH:i:S", // Matches '%Y-%m-%dT%H:%M:%S' from flask-backend
+        allowInput: true,
+        dateFormat: "m/d/y H:i" // if you change this... good luck.
+    });
+
+    $('#taskAddModal').on('shown.bs.modal', function () {
+        flatpickr("#taskDueDate", {
+            enableTime: true,
+            allowInput: true,
+            dateFormat: "m/d/y H:i"
+        });
+
+        flatpickr("#taskReminderOffset", {
+            enableTime: true,
+            allowInput: true,
+            dateFormat: "m/d/y H:i"
         });
     });
-    </script>
+});
+</script>
 
 </body>
 {% endblock %}
