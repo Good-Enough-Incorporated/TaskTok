@@ -661,7 +661,19 @@ function enableVerticalScroll() {
 // DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function () {
     // Initialization code...
+    $('#taskAddModal').on('shown.bs.modal', function () {
+        flatpickr("#taskDueDate", {
+            enableTime: true,
+            allowInput: true,
+            dateFormat: "m/d/Y H:i"
+        });
 
+        flatpickr("#taskReminderOffset", {
+            enableTime: true,
+            allowInput: true,
+            dateFormat: "m/d/Y H:i"
+        });
+    });
     // Attach event listener to the "Save" button in the edit modal
     document.getElementById('saveEdit').addEventListener('click', function () {
         const currentEditingTaskId = document.getElementById('editModal').getAttribute('data-current-editing-task-id');
