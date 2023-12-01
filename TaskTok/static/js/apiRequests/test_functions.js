@@ -78,8 +78,8 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     }
 
     // Format dates back to required string format for the Flask API.
-    taskDueDate = taskDueDate.toISOString().slice(0, 19);
-    taskReminderOffset = taskReminderOffset.toISOString().slice(0, 19);
+    //taskDueDate = taskDueDate.toISOString().slice(0, 19);
+    //taskReminderOffset = taskReminderOffset.toISOString().slice(0, 19);
 
     const csrfAccessToken = getCookie('csrf_access_token');
 
@@ -106,6 +106,11 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
             showToast(`Task successfully created!`, 5000);
 
             // format_backend_datetime' here to format the date for display
+            console.log(data.TaskList[0].task_dueDate)
+            console.log(data.TaskList[0].task_reminderOffSetTime)
+            console.log(format_backend_datetime(data.TaskList[0].task_dueDate))
+            console.log(format_backend_datetime(data.TaskList[0].task_reminderOffSetTime))
+            
             data.TaskList[0].task_dueDate = format_backend_datetime(data.TaskList[0].task_dueDate);
             data.TaskList[0].task_reminderOffSetTime = format_backend_datetime(data.TaskList[0].task_reminderOffSetTime);
             addRowToTable(data.TaskList[0]); // Add the new task to the table

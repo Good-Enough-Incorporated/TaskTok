@@ -65,7 +65,7 @@ def check_message_broker_status():
 def make_admin_user():
     with app.app_context():
         print("\nCreating Admin User...\n")
-        default_acc = User(username="admin", email="admin@tasktok.com")
+        default_acc = User(username="admin", email="jason.supple.27@gmail.com")
         default_acc.set_password('superpassword')
         default_acc.add()
 
