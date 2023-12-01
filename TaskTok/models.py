@@ -143,6 +143,14 @@ class TaskReminder(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def update_email_sent(self, update):
+        self.email_sent = update
+        db.session.commit()
+
+    def task_email_date(self, date):
+        self.email_date = date
+        db.session.commit()
+
     @classmethod
     def find_task_by_username(cls, username):
         print(f'looking for {username} tasks')

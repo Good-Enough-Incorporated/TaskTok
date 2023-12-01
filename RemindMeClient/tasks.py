@@ -45,7 +45,7 @@ def check_tasks_ready():
     print('this will use celery beat to check tasks')
     current_time = datetime.now()
     #task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=30)))).all()
-    task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=0)))).all()
+    task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=0))), TaskReminder.email_sent == False).all()
     logger.info('There are %s tasks ready for email alerts!', len(task_list))
     for task in task_list:
         # we need to construct the email for each task, and queue up our emails
@@ -54,4 +54,6 @@ def check_tasks_ready():
         user = User.query.filter_by(username=task.owner_username)
         subject = f'TaskTok - Reminder for {task.task_name}'
         send_task_reminder.delay(user.email, subject, email_message)
+        #TODO: send_task_reminder should update the .email_sent as we can check if it succeeded or failed
+        task.update_email_sent(True)
     #send_email.delay('jason.supple.27@gmail.com', "Periodic Email Test", 'Testing periodic tasks')
