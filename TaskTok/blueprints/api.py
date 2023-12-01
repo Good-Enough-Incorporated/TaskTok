@@ -49,18 +49,27 @@ def add_task():
     if not all([task_name, task_description, task_due_date, task_reminder_off_set]):
         return jsonify({'Message': 'add_failed', 'Error': 'Missing required fields.'}), 400
 
+    print(task_due_date)
+    print(task_reminder_off_set)
+
+    formatted_due_date = format_date(task_due_date)
+    formatted_reminder_off_set = format_date(task_reminder_off_set)
+
+    
+    print(formatted_due_date)
+    print(formatted_reminder_off_set)
     try:
-        task_due_date = datetime.datetime.strptime(task_due_date, f'%Y-%m-%dT%H:%M:%S')
-        task_reminder_off_set = datetime.datetime.strptime(task_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
+        #task_due_date = datetime.datetime.strptime(task_due_date, f'%Y-%m-%dT%H:%M:%S')
+        #task_reminder_off_set = datetime.datetime.strptime(task_reminder_off_set, f'%Y-%m-%dT%H:%M:%S')
 
         if task_reminder_off_set > task_due_date:
             return jsonify({'Message': 'add_failed', 'Error': 'Reminder Offset must be before the due date.'}), 400
 
         task = TaskReminder(
             owner_username=user_data.username,
-            task_dueDate=task_due_date,
+            task_dueDate=formatted_due_date,
             task_description=task_description,
-            task_reminderOffSetTime=task_reminder_off_set,
+            task_reminderOffSetTime=formatted_reminder_off_set,
             task_message=task_email_message,
             task_emailList=task_email_list,
             task_name=task_name

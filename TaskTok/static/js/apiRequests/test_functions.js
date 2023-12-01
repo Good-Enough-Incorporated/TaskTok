@@ -80,6 +80,10 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     // Format dates back to required string format for the Flask API.
     //taskDueDate = taskDueDate.toISOString().slice(0, 19);
     //taskReminderOffset = taskReminderOffset.toISOString().slice(0, 19);
+    console.log(taskDueDate);
+    console.log(taskReminderOffset);
+    console.log(format_backend_datetime(taskDueDate));
+    console.log(format_backend_datetime(taskReminderOffset));
 
     const csrfAccessToken = getCookie('csrf_access_token');
 
@@ -93,8 +97,8 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
             body: JSON.stringify({
                 task_name: taskName,
                 task_description: taskDescription,
-                task_dueDate: taskDueDate,
-                task_reminderOffSetTime: taskReminderOffset,
+                task_dueDate: format_backend_datetime(taskDueDate),
+                task_reminderOffSetTime: format_backend_datetime(taskReminderOffset),
                 task_emailList: taskEmailList,
                 task_email_message: taskEmailMessage
             })
