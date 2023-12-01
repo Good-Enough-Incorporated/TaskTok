@@ -50,7 +50,7 @@ def check_tasks_ready():
     for task in task_list:
         # we need to construct the email for each task, and queue up our emails
         logger.info(f'Working on {task.id}')
-        email_message = render_template('email/taskEmailTemplate', username = task.owner_username, task_name=task.task_name, due_date=task.dueDate, duedate_offset=task.reminderOffSetTime, message=task.task_message)
+        email_message = render_template('email/taskEmailTemplate', username = task.owner_username, task_name=task.task_name, due_date=task.task_dueDate, duedate_offset=task.task_reminderOffSetTime, message=task.task_message)
         user = User.query.filter_by(username=task.owner_username)
         subject = f'TaskTok - Reminder for {task.task_name}'
         send_task_reminder.delay(user.email, subject, email_message)
