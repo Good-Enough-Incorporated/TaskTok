@@ -49,6 +49,88 @@ function format_backend_datetime(dateString){
     return `${month}/${day}/${year} ${hours}:${minutes}`;
 }
 
+// Add Event Listener to the Add Task Form.
+document.getElementById('addTaskForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Fetch form data
+    const taskName = document.getElementById('taskName').value;
+    const taskDescription = document.getElementById('taskDescription').value;
+    let taskDueDate = document.getElementById('taskDueDate').value;
+    let taskReminderOffset = document.getElementById('taskReminderOffset').value;
+    const taskEmailList = document.getElementById('taskEmailList').value;
+    const taskEmailMessage = document.getElementById('taskEmailMessage').value;
+
+    // Basic validation for now...
+    if (!taskName || !taskDescription || !taskDueDate || !taskReminderOffset || !taskEmailList || !taskEmailMessage) {
+        showToast("Please fill out all input boxes before submitting", 5000);
+        return;
+    }
+
+    // Convert dates to JavaScript Date objects for comparison.
+    taskDueDate = new Date(taskDueDate);
+    taskReminderOffset = new Date(taskReminderOffset);
+
+    // Check if reminder offset is before the due date.
+    if (taskReminderOffset > taskDueDate) {
+        showToast("Reminder Offset must be before the due date.", 5000);
+        return;
+    }
+
+    // Format dates back to required string format for the Flask API.
+    taskDueDate = taskDueDate.toISOString().slice(0, 19);
+    taskReminderOffset = taskReminderOffset.toISOString().slice(0, 19);
+
+    const csrfAccessToken = getCookie('csrf_access_token');
+
+    try {
+        const response = await fetch('/api/addTask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfAccessToken
+            },
+            body: JSON.stringify({
+                task_name: taskName,
+                task_description: taskDescription,
+                task_dueDate: taskDueDate,
+                task_reminderOffSetTime: taskReminderOffset,
+                task_emailList: taskEmailList,
+                task_email_message: taskEmailMessage
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.Message === "add_success") {
+            showToast(`Task successfully created!`, 5000);
+
+            // format_backend_datetime' here to format the date for display
+            data.TaskList[0].task_dueDate = format_backend_datetime(data.TaskList[0].task_dueDate);
+            data.TaskList[0].task_reminderOffSetTime = format_backend_datetime(data.TaskList[0].task_reminderOffSetTime);
+            addRowToTable(data.TaskList[0]); // Add the new task to the table
+        } else {
+            showToast(data.Error, 5000);
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        showToast('An error occurred while adding the task', 5000);
+    }
+
+    // Reset form fields and close bootstrap modal.
+    document.getElementById('taskName').value = '';
+    document.getElementById('taskDescription').value = '';
+    document.getElementById('taskDueDate').value = '';
+    document.getElementById('taskReminderOffset').value = '';
+    document.getElementById('taskEmailList').value = '';
+    document.getElementById('taskEmailMessage').value = '';
+    bootstrap.Modal.getInstance(document.getElementById('taskAddModal')).hide();
+});
+
+
+
+
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
     const taskInput1 = document.getElementById('taskInput1').value;
@@ -410,11 +492,12 @@ function removeRowFromTable(taskID) {
     }
 }
 
+// Function to add a new row to the task table
 function addRowToTable(task) {
-
     var table = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
-    var newRow = table.insertRow(-1); //last row
-    newRow.setAttribute('data-id', task.id)
+    var newRow = table.insertRow(-1); // insert into last row.
+    newRow.setAttribute('data-id', task.id);
+
     var cell1 = newRow.insertCell(0);
     var cell2 = newRow.insertCell(1);
     var cell3 = newRow.insertCell(2);
@@ -422,17 +505,16 @@ function addRowToTable(task) {
     var cell5 = newRow.insertCell(4);
     var cell6 = newRow.insertCell(5);
     var cell7 = newRow.insertCell(6);
+
     cell1.innerHTML = task.owner_username;
     cell2.innerHTML = task.task_name;
     cell3.innerHTML = task.task_description;
     cell4.innerHTML = format_backend_datetime(task.task_dueDate);
-    //cell5.innerHTML = task.task_reminderOffSetTime;
     cell5.innerHTML = task.task_reminderOffSetTime ? format_backend_datetime(task.task_reminderOffSetTime) : '';
-    cell6.innerHTML = task.task_emailList
-    //cell7.innerHTML = '<td><input type="submit" value="Edit"></td><td><input type="submit" value="Delete"></td>'
-    cell7.innerHTML = '<button class="task-edit-btn">Edit</button><button class="task-delete-btn">Delete</button>'
-    console.log(format_backend_datetime)
+    cell6.innerHTML = task.task_emailList;
+    cell7.innerHTML = '<button class="task-edit-btn">Edit</button><button class="task-delete-btn">Delete</button>';
 }
+
 
 function getTableInformation(taskId) {
     var table = document.getElementById('taskTable');
