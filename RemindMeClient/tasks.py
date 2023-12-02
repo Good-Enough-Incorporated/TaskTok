@@ -37,7 +37,7 @@ def send_task_reminder(self, email_to, subject, message, task_id):
     msg.html = message
     try:
         flaskMail.send(msg)
-        logger.info("send_email was successful!")
+        logger.info("send_task_reminder was successful! for %s", task_id)
         current_task = TaskReminder.query(task_id)
         # update the task_email_sent only if a successful email
         # our periodic task will continue to attempt to send this out
