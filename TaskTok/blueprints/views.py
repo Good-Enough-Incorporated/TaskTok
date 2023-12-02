@@ -49,14 +49,30 @@ def home():
     # check for JWT in cookie
     side_nav_menu_items = [
         {'title': 'Home', 'url': url_for('views.home')},
-        {'title': 'Profile', 'url': url_for('views.userProfile')},
         {'title': 'Admin', 'url': url_for('views.home')},
+        {'title': 'Settings', 'url': url_for('views.userProfile')},
         {'title': 'Sign Out', 'url': url_for('auth.logout')},
     ]
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
 
     return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
+
+@views.route('/profile')
+#Sidenav menu in Settings page that allows user to return home/logout
+@jwt_required()
+def profile():
+    # check for JWT in cookie
+    side_nav_menu_items = [
+        {'title': 'Home', 'url': url_for('views.home')},
+        {'title': 'Admin', 'url': url_for('views.home')},
+        {'title': 'Settings', 'url': url_for('views.userProfile')},
+        {'title': 'Sign Out', 'url': url_for('auth.logout')},
+    ]
+    cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
+    # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
+
+    return render_template('profile.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
 
 
 @views.route('/userProfile', methods=['GET', "POST"])
