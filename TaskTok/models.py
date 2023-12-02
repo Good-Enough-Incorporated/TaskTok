@@ -145,8 +145,8 @@ class TaskReminder(db.Model):
 
     def update_email_sent(self, update):
         print("Setting task to email_sent: True")
-        self.email_sent = True
-        db.session.commit()
+        self.email_sent = update
+        
 
     def task_email_date(self, date):
         self.email_date = date
