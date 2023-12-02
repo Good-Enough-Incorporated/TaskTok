@@ -46,7 +46,7 @@ def check_tasks_ready():
     current_time = datetime.now()
     logger.info(f'[Current Time]: {current_time}')
     #task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=30)))).all()
-    task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=0))), TaskReminder.task_email_sent is False).all()
+    task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time), TaskReminder.task_email_sent is False).all()
     logger.info('There are %s tasks ready for email alerts!', len(task_list))
     for task in task_list:
         # we need to construct the email for each task, and queue up our emails
