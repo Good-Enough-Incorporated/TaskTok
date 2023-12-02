@@ -47,7 +47,9 @@ def check_tasks_ready():
     logger.info(f'[Current Time]: {current_time}')
     #task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=30)))).all()
     task_list_all = TaskReminder.query.all()
-    task_list = TaskReminder.query.filter(TaskReminder.task_dueDate <= (current_time-timedelta(days=0)), TaskReminder.task_email_sent is False).all()
+    task_list = TaskReminder.query.filter(
+        TaskReminder.task_dueDate <= (current_time-timedelta(days=0)),
+        TaskReminder.task_email_sent == False).all()
     logger.info('There are %s tasks in total', len(task_list_all)  )
     logger.info('There are %s tasks ready for email alerts!', len(task_list))
     for task in task_list:
