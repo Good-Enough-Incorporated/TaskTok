@@ -26,41 +26,57 @@ def send_email(self, email_to, subject, body):
     try:
         flaskMail.send(msg)
         logger.info("send_email was successful!")
+        
     except Exception as e:
         logger.info("send_email failed! error: %s", e)
 
 @shared_task(bind=True)
-def send_task_reminder(self, email_to, subject, message):
+def send_task_reminder(self, email_to, subject, message, task_id):
     logger.info("Starting send_task_reminder task")
     msg = Message(subject, recipients=[email_to])
     msg.html = message
     try:
         flaskMail.send(msg)
         logger.info("send_email was successful!")
+        current_task = TaskReminder.query(task_id)
+        # update the task_email_sent only if a successful email
+        # our periodic task will continue to attempt to send this out
+        # (smtp down, or other network issues)
+        current_task.update_email_sent(True)
+
     except Exception as e:
         logger.info("send_email failed! error: %s", e)
 
 @celery_worker.task
 def check_tasks_ready():
-    print('this will use celery beat to check tasks')
+    
     current_time = datetime.now()
     logger.info(f'[Current Time]: {current_time}')
-    #task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=30)))).all()
+    
     task_list_all = TaskReminder.query.all()
     task_list = TaskReminder.query.filter(
         TaskReminder.task_dueDate <= (current_time-timedelta(days=0)),
-        TaskReminder.task_email_sent == False).all()
+        TaskReminder.task_email_sent == False).all() #SQLAlchemy must use ==, not is False
+    
     logger.info('There are %s tasks in total', len(task_list_all)  )
     logger.info('There are %s tasks ready for email alerts!', len(task_list))
     for task in task_list:
         # we need to construct the email for each task, and queue up our emails
-        logger.info(f'Working on {task.id}')
-        email_message = render_template('email/taskEmailTemplate.html', username = task.owner_username, task_name=task.task_name, due_date=task.task_dueDate, duedate_offset=task.task_reminderOffSetTime, message=task.task_message)
+        logger.info('Working on %s', task.id)
+        # construct the customized email to the recipient
+        # TODO: add their email list to recipients
+        email_message = render_template(
+            'email/taskEmailTemplate.html',
+            username = task.owner_username,
+            task_name=task.task_name,
+            due_date=task.task_dueDate,
+            duedate_offset=task.task_reminderOffSetTime,
+            message=task.task_message)
+        
         user = User.query.filter_by(username=task.owner_username).first()
         subject = f'TaskTok - Reminder for {task.task_name}'
-        send_task_reminder.delay(user.email, subject, email_message)
-        #TODO: send_task_reminder should update the .email_sent as we can check if it succeeded or failed
-        logger.info (f'Setting task_email_sent to True for task[{task}]')
-        task.update_email_sent(True)
+        send_task_reminder.delay(user.email, subject, email_message, task.id)
+        
+    
     
     #send_email.delay('jason.supple.27@gmail.com', "Periodic Email Test", 'Testing periodic tasks')
