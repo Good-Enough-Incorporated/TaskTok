@@ -1,3 +1,4 @@
+import { showToast, clearModal, getCookie, format_backend_datetime, enableVerticalScroll } from '../utilities.js';
 // Global variable for the Bootstrap 5 modal instance.
 let confirmationModal = null;
 let currentTaskID = null;
@@ -12,42 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
 });
 
-function clearModal() {
-    var editModal = document.getElementById('editModal');
-    editModal.style.display = 'none';
-    var modalBody = document.getElementById('modal-body');
-    var modalFooter = document.getElementById('modal-footer');
-    modalBody.innerHTML = "";
-    modalFooter.innerHTML = "";
-}
 
-function getCookie(name) {
-    
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
 
-function format_backend_datetime(dateString){
-    const date = new Date(dateString);
-
-    let day = date.getDate().toString().padStart(2, '0');
-    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth() returns 0-11
-    let year = date.getFullYear();
-    let hours = date.getHours().toString().padStart(2, '0');
-    let minutes = date.getMinutes().toString().padStart(2, '0');
-
-    return `${month}/${day}/${year} ${hours}:${minutes}`;
-}
 
 // Add Event Listener to the Add Task Form.
 document.getElementById('addTaskForm').addEventListener('submit', async function(event) {
@@ -342,19 +309,9 @@ async function editTask(taskID) {
     }
 }
 
-// #TODO: Need to either change the date format or figure out how to handle blank/string fields in offset/date input fields
-// Helper function to format date and time for Flask back-end.
-function formatDateTimeForBackend(dateTime) {
-    if (!dateTime) return '';
-    const date = new Date(dateTime);
-    // keep this setting to keep current flask setup happy.
-    return date.toISOString().slice(0, 19).replace('T', ' ');
-}
 
-function getDefaultDateTime() {
-    const now = new Date();
-    return now.toISOString().slice(0, 19).replace('T', ' ');
-}
+
+
 
 async function deleteTask(taskID) {
 
@@ -507,142 +464,11 @@ function addRowToTable(task) {
 }
 
 
-function getTableInformation(taskId) {
-    var table = document.getElementById('taskTable');
-    var modal = document.getElementById('modal-body');
-    var modalFooter = document.getElementById('modal-footer');
-    var headerValues = table.getElementsByTagName('th');
-    //need to query the row by using the data-id
-    //otherwise we'll get a list of all values which isn't very helpful.
-    var row = table.querySelector(`tr[data-id="${taskId}"]`)
-    var cellValues = row.getElementsByTagName('td');
-    //do not include this in our list
-    const skipHeaders = ['actions', 'owner'];
-    for (var i = 0; i < headerValues.length; i++) {
-        //create the label
-        if (skipHeaders.includes(headerValues[i].innerHTML.toLowerCase())) {
-            continue; //do not create these elements
-        }
-        label = document.createElement('label');
-        label.innerHTML = headerValues[i].innerHTML;
-        label.htmlFor = `taskLabel${i}`;
-        inputBox = document.createElement('input');
-
-        inputBox.type = 'text';
-
-        inputBox.type = 'text';
-        inputBox.value = cellValues[i].innerHTML;
-        inputBox.id = `taskInput${i}`;
-        inputBox.name = headerValues[i].innerHTML;
-        inputBox.className = 'modal-fields';
-        modal.appendChild(label);
-        modal.appendChild(inputBox);
-        if (inputBox.id === 'taskInput3') {
-            dateTimeInput = document.getElementById('taskInput3')
-            dateTimeInput.type = 'datetime-local'
-            unparsedDate = cellValues[i].innerHTML.toString()
-            console.log(unparsedDate.indexOf('.'));
-            if (unparsedDate.indexOf('.') === -1) {
-                //already in the format we want.
-                formattedDate = unparsedDate
-
-            } else {
-                //parse to allow the datetime-local to load the correct date.
-                formattedDate = unparsedDate.substring(0, unparsedDate.indexOf('.'))
-            }
-            dateTimeInput.value = formattedDate
-        }
-
-    }
-    updateButton = document.createElement('button');
-    updateButton.textContent = "Update Task";
-    updateButton.className = 'task-update-btn';
-    modalFooter.appendChild(updateButton);
-    updateButton.onclick = function () {
-        console.log("Updating task")
-        //editTask(taskId);
-
-    }
-}
 
 
-function addTaskModal() {
-    var modal = document.getElementById('modal-body');
-    var modalFooter = document.getElementById('modal-footer');
-    const fields = ['Task Name', 'Task Description', 'Task Due Date', 'Task Due (Offset)', 'E-Mail List', 'E-mail Message'];
-    var elementNumber = 1;
-    fields.forEach(field => {
-        //Create the element
-        label = document.createElement('label');
-        console.log(field)
-        label.id = `taskLabel${elementNumber}`;
-        label.innerHTML = field;
-        label.name = `taskLabel${elementNumber}`;
-
-        input = document.createElement('input');
-        input.id = `taskInput${elementNumber}`;
-        input.name = `taskInput${elementNumber}`;
-        input.type = 'text'
-        input.className = 'modal-fields';
-        modal.appendChild(label);
-        modal.appendChild(input);
-
-        elementNumber++;
 
 
-    });
 
-    console.log('setting to datetime-local')
-    dateTimeInput = document.getElementById('taskInput3')
-    dateTimeInput.type = 'datetime-local'
-    dateTimeInput.setAttribute('step', 1)
-    dateTimeInput = document.getElementById('taskInput4')
-    dateTimeInput.type = 'datetime-local'
-    dateTimeInput.setAttribute('step', 1)
-
-
-    addButton = document.createElement('button');
-    addButton.textContent = "Add Task";
-    addButton.className = 'task-update-btn';
-    modalFooter.appendChild(addButton);
-    addButton.onclick = function () {
-        console.log("Clicked add button");
-        addTask();
-    }
-
-
-    var editModal = document.getElementById('editModal');
-    var close = document.getElementsByClassName("close")[0];
-    editModal.style.display = 'block';
-
-    close.onclick = function () {
-        editModal.style.display = "none";
-        clearModal();
-    }
-}
-
-function showToast(message, duration = 3000) {
-    const toast = document.getElementById("toast-container");
-    const toastContent = document.getElementById("toast-user-content");
-    toastContent.textContent = message;
-    toast.classList.add("show");
-
-    // Hide the toast after 'duration' milliseconds
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
-}
-
-
-function enableVerticalScroll() {
-    const scrollContainer = document.querySelector('.archived-tasks-container');
-    if (scrollContainer) {
-        scrollContainer.addEventListener('wheel', (event) => {
-            event.preventDefault();
-            scrollContainer.scrollLeft += event.deltaY;
-        });
-    }
-}
 
 document.getElementById('taskTable').addEventListener('click', function(event) {
     if (event.target.matches('button.task-edit-btn')) { //event handler for Edit button
