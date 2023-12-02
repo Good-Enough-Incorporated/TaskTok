@@ -14,7 +14,7 @@ def setup_beat_tasks(sender, **kwargs):
         This will configure our celery worker to periodically 
         check for overdue or soon to be due tasks
     """
-    sender.add_periodic_task(60.0, check_tasks_ready.s(), name="Analyze tasks")
+    sender.add_periodic_task(15.0, check_tasks_ready.s(), name="Analyze tasks")
 
 @shared_task(bind=True)
 def send_email(self, email_to, subject, body):
@@ -44,6 +44,7 @@ def send_task_reminder(self, email_to, subject, message):
 def check_tasks_ready():
     print('this will use celery beat to check tasks')
     current_time = datetime.now()
+    logger.info(f'[Current Time]: {current_time}')
     #task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=30)))).all()
     task_list = TaskReminder.query.filter(TaskReminder.task_dueDate >= (current_time-(timedelta(days=0))), TaskReminder.task_email_sent is False).all()
     logger.info('There are %s tasks ready for email alerts!', len(task_list))
