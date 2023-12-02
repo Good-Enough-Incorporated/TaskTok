@@ -62,6 +62,5 @@ def check_tasks_ready():
         #TODO: send_task_reminder should update the .email_sent as we can check if it succeeded or failed
         logger.info (f'Setting task_email_sent to True for task[{task}]')
         task.update_email_sent(True)
-        logger.info("commiting db session")
-        db.session.commit()
+    
     #send_email.delay('jason.supple.27@gmail.com', "Periodic Email Test", 'Testing periodic tasks')
