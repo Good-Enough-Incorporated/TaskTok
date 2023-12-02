@@ -51,7 +51,7 @@ def send_task_reminder(self, email_to, subject, message, task_id):
 def check_tasks_ready():
     
     current_time = datetime.now()
-    logger.info(f'[Current Time]: {current_time}')
+    logger.info('[Current Time]: %s', current_time)
     
     task_list_all = TaskReminder.query.all()
     task_list = TaskReminder.query.filter(
