@@ -27,7 +27,7 @@ def create_app():
     app = Flask(__name__)
     load_dotenv()
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-    app.config['SQLALCHEMY_ECHO'] = os.environ.get('SQLALCHEMY_ECHO')
+    #app.config['SQLALCHEMY_ECHO'] = os.environ.get('SQLALCHEMY_ECHO')
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
     app.config['JWT_TOKEN_LOCATION'] = os.environ.get('JWT_TOKEN_LOCATION')

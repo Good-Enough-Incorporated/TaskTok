@@ -125,6 +125,10 @@ class TaskReminder(db.Model):
     task_description = db.Column(db.String(255), nullable=False)
     task_name = db.Column(db.String(255), nullable=False)
     task_message = db.Column(db.String(255), nullable=False)
+    task_completed = db.Column(db.Boolean(), default=False, unique=False)
+    task_completed_date = db.Column(db.DateTime, nullable=True)
+    task_email_sent = db.Column(db.Boolean(), default=False, unique=False)
+    task_email_date = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self) -> str:
         return f"<taskReminder {self.task_description}>"
@@ -137,6 +141,16 @@ class TaskReminder(db.Model):
     # remove blocked token to the database
     def remove(self):
         db.session.delete(self)
+        db.session.commit()
+
+    def update_email_sent(self, update):
+        print("Setting task to email_sent: True")
+        self.task_email_sent = update
+        db.session.commit()
+        
+
+    def task_email_date(self, date):
+        self.email_date = date
         db.session.commit()
 
     @classmethod

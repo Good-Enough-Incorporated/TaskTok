@@ -1,28 +1,6 @@
-function clearModal(){
-    var editModal = document.getElementById('editModal');
-    editModal.style.display = 'none';
-    var modalBody = document.getElementById('modal-body');
-    var modalFooter = document.getElementById('modal-footer')
-    modalBody.innerHTML = "";
-    modalFooter.innerHTML = "";
-}
+import { showToast, clearModal, getCookie } from './utilities.js';
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                console.log(cookieValue);
-                break;
-            }
-        }
-    }
-    return cookieValue;
-  }
-  
+
   
 async function addTask() {
     const csrfAccessToken = getCookie('csrf_access_token');
@@ -159,9 +137,34 @@ async function editTask(taskID) {
             console.error("Error:", error);
         }
     }
-  
+
+ // Global variable to store the current task ID.
+let currentTaskID = null;
 
 async function removeTask(taskID) {
+    // Store the task ID globally
+    currentTaskID = taskID;
+
+    // Show the delete confirmation modal.
+    $('#confirmationModal').modal('show');
+}
+
+// Fix: Bind the deleteTask function to the confirmation button in the modal
+document.getElementById('confirmDelete').addEventListener('click', function() {
+    // Call the function to delete the task
+    if (currentTaskID !== null) {
+        deleteTask(currentTaskID); // Change to deleteTask
+    }
+    // Hide the modal
+    $('#confirmationModal').modal('hide');
+});
+
+
+async function deleteTask(taskID) {
+
+     console.log("Delete task called for task ID:", taskID);
+
+
     //we need a csrfAccessToken to make our API call
     console.log("[removeTask]: beginning client api request")
     const csrfAccessToken = getCookie('csrf_access_token');
@@ -264,15 +267,12 @@ async function listTask() {
 
   function addButtonEventHandlers(){
     document.querySelectorAll('.task-edit-btn, .task-delete-btn').forEach(button => {
-        if(!button.getAttribute('data-click-handler') == true) { 
-            
-        
+        if (!button.getAttribute('data-click-handler')) {
             button.addEventListener('click', function(event) {
                 const dataID = this.closest('tr').getAttribute('data-id');
-                
+
                 if (this.classList.contains('task-edit-btn')) {
                     console.log('attempting to edit taskID=', dataID);
-                    //editTask(dataID);
                     getTableInformation(dataID);
                     var editModal = document.getElementById('editModal');
                     var close = document.getElementsByClassName("close")[0];
@@ -282,38 +282,16 @@ async function listTask() {
                         editModal.style.display = "none";
                         clearModal();
                     }
-                    
-                    //window.onclick = function(event) {
-                    //    if(event.target == editModal) {
-                    //        editModal.style.display = 'none';
-                    //        clearModal();
-                    //    }
-                    //}
                 } else if (this.classList.contains('task-delete-btn')) {
                     console.log('attempting to remove taskID=', dataID);
-                    removeTask(dataID);
+                    removeTask(dataID); // Change made here to call removeTask
                 }
             });
-        };
-        button.setAttribute('data-click-handler', true);
+            button.setAttribute('data-click-handler', true);
+        }
     });
-    //only apply the click event handler once
-    var has_click_handler = $('#task-add-btn').attr('data-click-handler')
-    if (!has_click_handler){
-        $('#task-add-btn').on('click', function(){
-            addTaskModal();
-        }).attr('data-click-handler', true);
-    } else {
-        console.log('task-add-btn already has click handler')
-    }
-
-
-    
-
-
-    
-
 }
+
 
  //TODO: will not need if using jQuery
   function removeRowFromTable(taskID){
@@ -457,17 +435,7 @@ async function listTask() {
         clearModal();
       }
   }
-  function showToast(message, duration = 3000) {
-    const toast = document.getElementById("toast-container");
-    const toastContent = document.getElementById("toast-user-content");
-    toastContent.textContent = message;
-    toast.classList.add("show");
 
-    // Hide the toast after 'duration' milliseconds
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
-}
   
   document.addEventListener('DOMContentLoaded', function(){
   //Use the DOMContentLoaded to make sure the DOM is fully loaded before trying to load our script.
