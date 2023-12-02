@@ -109,6 +109,53 @@
         .sidenav a:hover {
             color: #f1f1f1;
         }
+
+        .dropdown {
+            width: 100%;
+        }
+         .dropdown-menu {
+        width: 100%; /* Match the width of the input box */
+        max-height: 200px;
+        overflow-y: auto;
+        
+    }
+
+    .dropdown-menu  {
+        background-color: #17171c;
+        
+    }
+    .timezone-option {
+        color: white;
+    }
+    /* scroll bar */
+    /* This styles the scrollbar track */
+    ::-webkit-scrollbar-track {
+        background: #2a2a2e; /* Dark track background */
+    }
+
+    /* This styles the scrollbar handle */
+    ::-webkit-scrollbar-thumb {
+        background: #444; /* Dark thumb color */
+        border-radius: 10px; /* Optional: round corners for the scrollbar handle */
+    }
+
+    /* This styles the scrollbar itself (the entire component) */
+    ::-webkit-scrollbar {
+        width: 8px; /* Width of the vertical scrollbar */
+        height: 8px; /* Height of the horizontal scrollbar */
+    }
+
+    /* Use the scrollbar-color property to set the thumb and track color */
+    .scrollable-element {
+        scrollbar-color: #444 #2a2a2e;
+        scrollbar-width: auto; /* Can be 'auto', 'thin', or 'none' */
+    }
+
+    ::-webkit-scrollbar-corner {
+        background-color:  #2a2a2e;
+    }
+
+
     </style>
 </head>
 <body>
@@ -124,7 +171,8 @@
     <div class="settings-container">
         <div class="settings-section">
             <h3>Personal Information</h3>
-            <input type="text" placeholder="Username">
+            <input type="text" placeholder="Username" id='username_input' value="{{ username }}">
+            <input type="text" placeholder="Username" id='email_input' value="{{ email }}">
             <input type="password" placeholder="Current Password">
             <input type="password" placeholder="New Password">
             <input type="password" placeholder="Confirm New Password">
@@ -136,7 +184,16 @@
     <div class="settings-container">
         <div class="settings-section">
             <h3>Personalization</h3>
-            <input type="text" placeholder="TimeZone">
+            
+                <input type="text"  id="timezoneInput"  aria-haspopup="true" aria-expanded="false"  placeholder="Select Timezone (US/Eastern)">
+                <div class="dropdown">
+                <div class="dropdown-menu" aria-labelledby="timezoneDropdown">
+                    {% for tz in timezones %}
+                    <a class="dropdown-item timezone-option" href="#">{{tz}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            
             <input type="text" placeholder="DST">
             <button>Save Personalization</button>
         </div>
@@ -158,8 +215,12 @@
     </div>
 
     <div class="footer">
-        <p>&copy; 2023 Task Reminder App</p>
+        <p>&copy; 2023 TaskTok</p>
     </div>
+   
 	
+
+    <script type="module" src="{{ url_for('static', filename='js/settings.js') }}"></script>
+
 </body>
 {% endblock %}

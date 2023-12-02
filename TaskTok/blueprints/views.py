@@ -10,6 +10,7 @@ from flask import render_template, url_for, request, redirect
 from flask_jwt_extended import jwt_required, current_user, get_csrf_token
 from TaskTok.forms import LoginForm
 from TaskTok.extensions import side_nav_menu_items
+from pytz import all_timezones
 #  ----------- Unused imports: Needs review --------------
 #  from TaskTok.Server import create_app
 # from flask import current_app
@@ -57,17 +58,6 @@ def home():
 def admin():
     return 'admin page not built yet'
 
-@views.route('/profile')
-#Sidenav menu in Settings page that allows user to return home/logout
-@jwt_required()
-def profile():
-    # check for JWT in cookie
-
-    cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
-    # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
-
-    return render_template('profile.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
-
 
 @views.route('/userProfile', methods=['GET', "POST"])
 @jwt_required()
@@ -82,5 +72,5 @@ def userProfile():
         print("GET")
     #compare if changed
     #if changed update
-    return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token, sideNavMenuItems=side_nav_menu_items)
+    return render_template('profile.html', username=current_user.username, email=current_user.email, csrf_token= user_csrf_token, sideNavMenuItems=side_nav_menu_items, timezones = all_timezones)
 
