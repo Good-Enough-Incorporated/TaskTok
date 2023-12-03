@@ -47,9 +47,20 @@ def add_task():
     task_reminder_off_set = data.get('task_reminderOffSetTime')
     task_email_list = data.get('task_emailList')
     task_email_message = data.get('task_email_message')
+
     # Basic validation
     if not all([task_name, task_description, task_due_date, task_reminder_off_set]):
         return jsonify({'Message': 'add_failed', 'Error': 'Missing required fields.'}), 400
+
+    #  Checking if task_name is an empty string.
+    if not isinstance(task_name, str) or task_name.strip() == "":
+        return jsonify({'Message': 'add_failed', 'Error': 'Invalid task name.'}), 400
+
+    # VChecking if task_description is an empty string.
+    if not isinstance(task_description, str) or task_description.strip() == "":
+        return jsonify({'Message': 'add_failed', 'Error': 'Invalid task description.'}), 400
+
+    # TODO: Email validation goes here.
 
     print(task_due_date)
     print(task_reminder_off_set)
