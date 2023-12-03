@@ -183,48 +183,56 @@ async function showEditModal(taskID) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-
         const taskData = await response.json();
-        // Access the 'Task' property from the taskData object.
         const task = taskData.Task;
         console.log(task.task_dueDate)
         console.log(task.task_reminderOffSetTime)
-       
-        // Now populate the edit modal fields with the task details
+
+        // Populate the edit modal fields with the task details
         document.getElementById('editTaskName').value = task.task_name;
         document.getElementById('editTaskDescription').value = task.task_description;
         document.getElementById('editTaskDueDate').value = format_backend_datetime(task.task_dueDate);
-        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime ? format_backend_datetime(task.task_reminderOffSetTime) : ""
+        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime ? format_backend_datetime(task.task_reminderOffSetTime) : "";
         document.getElementById('editTaskEmailList').value = task.task_emailList;
 
-        // Set current editing taskID  as a data attribute on the edit modal.
+        // Set current editing taskID as a data attribute on the edit modal.
         document.getElementById('editModal').setAttribute('data-current-editing-task-id', taskID);
 
         // Show the modal
         let editModal = new bootstrap.Modal(document.getElementById('editModal'));
         editModal.show();
+
         flatpickr("#editTaskReminderOffset", {
             enableTime: true,
             allowInput: true,
             dateFormat: "m/d/Y H:i"
-          });
-          flatpickr("#editTaskDueDate", {
+        });
+
+        flatpickr("#editTaskDueDate", {
             enableTime: true,
             allowInput: true,
             dateFormat: "m/d/Y H:i"
-          });
+        });
 
         // Attach event handler to the "Save" button in the edit modal
         document.getElementById('saveEdit').addEventListener('click', function () {
+            // Validate the offset date
+            var offsetDate = document.getElementById("editTaskReminderOffset").value;
+            if (!offsetDate) {
+                // Show the toast for offset date required
+                showToast("Please provide the offset date for the task.");
+                return; // Prevent further execution of editTask
+            }
+
+            // Continue with editTask() call if offset date is provided,
             editTask(taskID); // Call editTask with the specific task ID
         });
     } catch (error) {
         console.error('Error fetching task data:', error);
         // Handle errors, e.g., display an error message
     }
-
-
 }
+
 
 
 async function editTask(taskID) {
@@ -502,6 +510,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach event listener to the "Save" button in the edit modal
     document.getElementById('saveEdit').addEventListener('click', function () {
         const currentEditingTaskId = document.getElementById('editModal').getAttribute('data-current-editing-task-id');
+
+
+
+
         if (currentEditingTaskId) {
             //this is ran twice, we can probably delete this or the other event listener
             //editTask(currentEditingTaskId);
