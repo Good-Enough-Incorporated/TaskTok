@@ -1,10 +1,40 @@
 import { showToast, clearModal, getCookie, format_backend_datetime, enableVerticalScroll } from './utilities.js';
 
 document.addEventListener('DOMContentLoaded', function () {
+    var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
+    var form = document.querySelector('form');
+    var updatePersonalInfoButton = document.getElementById('update_userpassword_btn');
     var timezoneInput = document.getElementById('timezoneInput');
     var timezoneOptions = document.querySelectorAll('.timezone-option');
     var dropdownMenu = document.querySelector('.dropdown-menu');
     var dropDownOpen = false;
+    var isConfirmPressed = false;
+
+
+    //event handler for updating user info
+    form.addEventListener('submit', function(event){
+
+        if(!isConfirmPressed){
+            
+            //prevent the form submission
+            event.preventDefault();
+
+            //add the fields to show the user
+            addInputFieldsToModal();
+
+            //show the confirm modal
+            confirmationModal.show();
+            
+            document.getElementById('confirmUpdate').addEventListener('click', function(event){
+                isConfirmPressed = true
+                //manually force the form submit
+                form.submit();
+            });
+
+        }
+
+
+    });
 
     // Event handler for document click
     document.addEventListener('click', function (event) {
@@ -55,6 +85,85 @@ document.addEventListener('DOMContentLoaded', function () {
             
         }
     });
+
+// Function to add input fields to the modal
+function addInputFieldsToModal() {
+    // Get the element where inputs will be appended
+    var modalInputs = document.querySelector('.modal-body');
+
+    // Clear previous inputs if any
+    modalInputs.innerHTML = '';
+
+    var confirm_message = document.createElement('label');
+    confirm_message.textContent = "You're about to update the following information:"
+    confirm_message.className = 'confirm-label';
+
+    var confirm_message2 = document.createElement('label');
+    confirm_message2.className = 'confirm-label';
+    confirm_message2.textContent = "Are you sure?"
+   
+
+    // Create new input elements
+    var confirm_un_input = document.createElement('input');
+    var confirm_em_input = document.createElement('input');
+    var confirm_fn_input = document.createElement('input');
+    var confirm_ln_input = document.createElement('input');
+
+    var confirm_un_label = document.createElement('label');
+    var confirm_em_label = document.createElement('label');
+    var confirm_fn_label = document.createElement('label');
+    var confirm_ln_label = document.createElement('label');
+
+    
+
+    confirm_un_input.type = 'text';
+    confirm_un_input.className = 'form-control mb-2';
+    confirm_un_input.value = document.getElementById('username').value
+    confirm_un_input.readOnly = true;
+    confirm_un_label.textContent = "Username"
+
+    confirm_em_input.type = 'text';
+    confirm_em_input.className = 'form-control mb-2';
+    confirm_em_input.value = document.getElementById('email').value
+    confirm_em_input.readOnly = true;
+    confirm_em_label.textContent = "E-Mail"
+
+    confirm_fn_input.type = 'text';
+    confirm_fn_input.className = 'form-control mb-2';
+    confirm_fn_input.value = document.getElementById('first_name').value ? document.getElementById('first_name').value : "";
+    confirm_fn_input.readOnly = true;
+    confirm_fn_label.textContent = "First Name"
+
+    confirm_ln_input.type = 'text';
+    confirm_ln_input.className = 'form-control mb-2';
+    confirm_ln_input.value = document.getElementById('last_name').value ? document.getElementById('last_name').value : "";
+    confirm_ln_input.readOnly = true;
+    confirm_ln_label.textContent = "Last Name"
+
+
+
+    // Append inputs to the modal
+    modalInputs.appendChild(confirm_message);
+
+    modalInputs.appendChild(confirm_un_label);
+    modalInputs.appendChild(confirm_un_input);
+
+    modalInputs.appendChild(confirm_em_label);
+    modalInputs.appendChild(confirm_em_input);
+  
+
+  
+    modalInputs.appendChild(confirm_fn_label);
+    modalInputs.appendChild(confirm_fn_input);
+
+    modalInputs.appendChild(confirm_ln_label);
+    modalInputs.appendChild(confirm_ln_input);
+
+
+
+    modalInputs.appendChild(confirm_message2);
+}
+
 
 
 

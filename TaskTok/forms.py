@@ -75,11 +75,16 @@ class LoginForm(FlaskForm):
                              InputRequired(), validate_password])
 
 class ResetPasswordForm(FlaskForm):
-        password = PasswordField('Password', validators=[
+    password = PasswordField('Password', validators=[
                              InputRequired(), validate_password])
-        confirm_password = PasswordField('Confirm Password', validators=[
+    confirm_password = PasswordField('Confirm Password', validators=[
                              InputRequired(), validate_password])
-        def validate_confirm_password(self, field):
-            if field.data != self.password.data:
-                raise ValidationError("Passwords do not match, please try again.")
+    def validate_confirm_password(self, field):
+        if field.data != self.password.data:
+            raise ValidationError("Passwords do not match, please try again.")
 
+class UpdateSettingsForm(FlaskForm):
+    username = StringField('Username',validators=[InputRequired(), validate_username] )
+    email = StringField('E-Mail',validators=[InputRequired(), validate_email] )
+    first_name = StringField('First Name',validators=[InputRequired(), validate_username] )
+    last_name =  StringField('Last Name',validators=[InputRequired(), validate_username] )
