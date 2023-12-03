@@ -106,7 +106,7 @@ box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
     <div class="main">
 		<p class="sign" align="center">Register</p>
 		<form action="{{ url_for('auth.register') }}" method="post">
-		  {{ form.csrf_token }}
+		  {{ form.hidden_tag() }}
 	  <!-- Hanging on to the original here for quick reference. Remove later.
 		  <form class="form1">
 			  <input class="email" type="text" align="center" placeholder="Enter E-Mail" name="email" id="email">	

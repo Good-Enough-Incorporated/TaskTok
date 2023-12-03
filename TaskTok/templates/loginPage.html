@@ -94,10 +94,8 @@
 
 <div class="center-box">
 	<center> <h1> TaskTok </h1> </center>            
-<form>
-</form>  
 	<form action="{{ url_for('auth.login') }}" method="post">
-		{{ form.csrf_token }}
+		{{ form.hidden_tag() }}
 		<div class="container"> 
 		
 			<label>Username: </label> 

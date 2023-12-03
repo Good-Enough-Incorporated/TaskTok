@@ -4,13 +4,15 @@ for all views (except auth related stuff)
 
 routes for /, /order, /info, etc
 """
-
+from pytz import all_timezones
 from flask import Blueprint
 from flask import render_template, url_for, request, redirect
 from flask_jwt_extended import jwt_required, current_user, get_csrf_token
-from TaskTok.forms import LoginForm
-from TaskTok.extensions import side_nav_menu_items
-from pytz import all_timezones
+from TaskTok.forms import LoginForm, UpdateSettingsForm
+from TaskTok.extensions import generate_links
+from flask_wtf.csrf import CSRFProtect
+from TaskTok.extensions import db
+from TaskTok.models import User
 #  ----------- Unused imports: Needs review --------------
 #  from TaskTok.Server import create_app
 # from flask import current_app
@@ -44,11 +46,10 @@ def main_page():
 
 
 @views.route('/home')
-
 @jwt_required()
 def home():
     # check for JWT in cookie
-    
+    side_nav_menu_items = generate_links()
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
 
@@ -59,18 +60,50 @@ def admin():
     return 'admin page not built yet'
 
 
-@views.route('/userProfile', methods=['GET', "POST"])
+@views.route('/userSettings', methods=['GET', "POST"])
 @jwt_required()
-def userProfile():
-
+def userSettings():
+    
+    personal_information = {
+        'username' : current_user.username,
+        'email': current_user.email,
+        'first_name': current_user.first_name,
+        'last_name': current_user.last_name
+    }
+    for key, value in personal_information.items():
+        print(value)
+        if value is None:
+            personal_information[key] = ''
+        
     access_token_cookie = request.cookies.get('access_token_cookie')
-    user_csrf_token = get_csrf_token(access_token_cookie)
+    token = get_csrf_token(access_token_cookie)
+    form = UpdateSettingsForm()
+    error = None
+    side_nav_menu_items = generate_links()
+    
+      
     if request.method == 'POST':
         print("POST")
-        return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token)
+        
+        if form.validate_on_submit():
+            print('validating')
+            submit_type = request.args.get('form_id')
+            #using the form_id, we can check which portions to update
+            if submit_type == 'update_information':
+                username = request.form.get('username')
+                email = request.form.get('email')
+                first_name = request.form.get('first_name')
+                last_name = request.form.get('last_name')
+                user = User.get_user_by_id(user_id=current_user.id)
+                user.first_name = first_name
+                user.last_name = last_name
+                print(user.first_name)
+                db.session.commit()
+                return redirect(url_for('views.userSettings'))
+        
     else:
         print("GET")
     #compare if changed
     #if changed update
-    return render_template('profile.html', username=current_user.username, email=current_user.email, csrf_token= user_csrf_token, sideNavMenuItems=side_nav_menu_items, timezones = all_timezones)
+    return render_template('profile.html', username=personal_information['username'],first_name=personal_information['first_name'],  last_name=personal_information['last_name'], email=personal_information['email'], form=form, csrf_token=token, sideNavMenuItems=side_nav_menu_items, timezones = all_timezones)
 

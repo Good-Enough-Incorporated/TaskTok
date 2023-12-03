@@ -3,13 +3,14 @@ from flask import Flask, jsonify, request, render_template, make_response, flash
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
 from .extensions import db, jwtManager, flaskMail, update_celery
 from .models import User, NoNoTokens
+from flask_migrate import Migrate
 from RemindMeClient.celeryManager import celery_init_app
 from datetime import timedelta, timezone, datetime
 from dotenv import load_dotenv
 from TaskTok.forms import LoginForm
 from TaskTok.extensions import side_nav_menu_items
 import os
-
+from flask_wtf.csrf import CSRFProtect
 
 #  -------------- Unused Imports: Needs Review ------------------
 #  from .schema import UserSchema
@@ -26,10 +27,7 @@ url_generated = False
 
 def create_app():
     app = Flask(__name__)
-    load_dotenv()
-    app.config['SERVER_NAME'] = "localhost"
-    app.config['PREFERRED_URL_SCHEME'] = 'HTTPS'
-    
+    load_dotenv()  
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
     #app.config['SQLALCHEMY_ECHO'] = os.environ.get('SQLALCHEMY_ECHO')
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -37,6 +35,7 @@ def create_app():
     app.config['JWT_TOKEN_LOCATION'] = os.environ.get('JWT_TOKEN_LOCATION')
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     app.config['JWT_CSRF_CHECK_FORM'] = True
+    app.config['WTF_CSRF_FIELD_NAME'] = 'flask_wtf_csrf_token'
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
         hours=hours)  # change hours to .001 to test session expires error
@@ -66,6 +65,7 @@ def create_app():
     #app.celery_app = celery_init_app(app)
     update_celery(celery_init_app(app))
     flaskMail.init_app(app)
+    app.migrate = Migrate(app,db)
 
     # Register blueprints:
     from .blueprints import api as api_blueprint
@@ -75,14 +75,11 @@ def create_app():
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
 
+    csrf = CSRFProtect(app)
+
         #initialize our URLs for our nav items
     
-    global url_generated
-    for item in side_nav_menu_items:
-        url_string = item['url']
-        if url_generated is False:
-            item['url'] = app.url_for(url_string, _external=False)
-    url_generated = True
+
 
     # source: https://flask-jwt-extended.readthedocs.io/en/stable/refreshing_tokens.html
     @app.after_request
