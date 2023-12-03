@@ -9,7 +9,8 @@ from flask import Blueprint
 from flask import render_template, url_for, request, redirect
 from flask_jwt_extended import jwt_required, current_user, get_csrf_token
 from TaskTok.forms import LoginForm
-
+from TaskTok.extensions import side_nav_menu_items
+from pytz import all_timezones
 #  ----------- Unused imports: Needs review --------------
 #  from TaskTok.Server import create_app
 # from flask import current_app
@@ -17,7 +18,7 @@ from TaskTok.forms import LoginForm
 #  import requests
 
 views = Blueprint('views', __name__)
-CURRENT_CAR_IMAGE = None
+
 
 
 # our root route (home)
@@ -47,26 +48,21 @@ def main_page():
 @jwt_required()
 def home():
     # check for JWT in cookie
-    side_nav_menu_items = [
-        {'title': 'Home', 'url': url_for('views.home')},
-        {'title': 'Profile', 'url': url_for('views.userProfile')},
-        {'title': 'Admin', 'url': url_for('views.home')},
-        {'title': 'Sign Out', 'url': url_for('auth.logout')},
-    ]
+    
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
 
     return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
 
+@views.route('/admin')
+def admin():
+    return 'admin page not built yet'
+
 
 @views.route('/userProfile', methods=['GET', "POST"])
 @jwt_required()
 def userProfile():
-    #current_user.username
-    #search User object using username
-    #User.get_user_by_username(current_user.username)
-    #user_email = User.email
-    #user_username = User.username
+
     access_token_cookie = request.cookies.get('access_token_cookie')
     user_csrf_token = get_csrf_token(access_token_cookie)
     if request.method == 'POST':
@@ -76,5 +72,5 @@ def userProfile():
         print("GET")
     #compare if changed
     #if changed update
-    return render_template('profile.html', username='test', email='test@gmail.com', csrf_token= user_csrf_token)
+    return render_template('profile.html', username=current_user.username, email=current_user.email, csrf_token= user_csrf_token, sideNavMenuItems=side_nav_menu_items, timezones = all_timezones)
 

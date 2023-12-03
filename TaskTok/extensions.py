@@ -2,6 +2,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
+from flask import url_for
 from celery import Celery
 from dotenv import load_dotenv
 import os
@@ -11,6 +12,13 @@ flaskMail = Mail()
 load_dotenv()
 celery_worker = None
 
+
+side_nav_menu_items = [
+    {'title': 'Home', 'url': 'views.home'},
+    {'title': 'Admin', 'url': 'views.admin'},
+    {'title': 'Settings', 'url': 'views.userProfile'},
+    {'title': 'Sign Out', 'url': 'auth.logout'},
+]
 
 def update_celery(app):
     global celery_worker

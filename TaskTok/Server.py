@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify, request, render_template, make_response, flash
+from flask import Flask, jsonify, request, render_template, make_response, flash, url_for
 from flask_jwt_extended import set_access_cookies, create_access_token, get_jwt, get_jwt_identity
 from .extensions import db, jwtManager, flaskMail, update_celery
 from .models import User, NoNoTokens
@@ -7,6 +7,7 @@ from RemindMeClient.celeryManager import celery_init_app
 from datetime import timedelta, timezone, datetime
 from dotenv import load_dotenv
 from TaskTok.forms import LoginForm
+from TaskTok.extensions import side_nav_menu_items
 import os
 
 
@@ -21,11 +22,14 @@ import os
 # from .schema import UserSchema
 # from celery import Celery
 # from RemindMeClient import task
-
+url_generated = False
 
 def create_app():
     app = Flask(__name__)
     load_dotenv()
+    app.config['SERVER_NAME'] = "localhost"
+    app.config['PREFERRED_URL_SCHEME'] = 'HTTPS'
+    
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
     #app.config['SQLALCHEMY_ECHO'] = os.environ.get('SQLALCHEMY_ECHO')
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -70,6 +74,15 @@ def create_app():
     app.register_blueprint(api_blueprint.api, url_prefix='/api')
     app.register_blueprint(auth_blueprint.auth, url_prefix='/auth')
     app.register_blueprint(views_blueprint.views, url_prefix='/')
+
+        #initialize our URLs for our nav items
+    
+    global url_generated
+    for item in side_nav_menu_items:
+        url_string = item['url']
+        if url_generated is False:
+            item['url'] = app.url_for(url_string, _external=False)
+    url_generated = True
 
     # source: https://flask-jwt-extended.readthedocs.io/en/stable/refreshing_tokens.html
     @app.after_request
