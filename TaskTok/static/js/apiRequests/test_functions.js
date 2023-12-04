@@ -21,9 +21,15 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     event.preventDefault();
     const form = event.currentTarget;
 
+    // Basic form validation.
+    if (!form.checkValidity()) {
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        showToast("Please fill out all input boxes before submitting", 5000);
+        return;
+    }
 
-
-    // Fetch form data
+    // Fetch form data.
     const taskName = document.getElementById('taskName').value;
     const taskDescription = document.getElementById('taskDescription').value;
     let taskDueDate = document.getElementById('taskDueDate').value;
@@ -31,44 +37,24 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     const taskEmailList = document.getElementById('taskEmailList').value;
     const taskEmailMessage = document.getElementById('taskEmailMessage').value;
 
-    // Basic validation for now...
-    if (!taskName || !taskDescription || !taskDueDate || !taskReminderOffset || !taskEmailList || !taskEmailMessage) {
-        showToast("Please fill out all input boxes before submitting", 5000);
-        return;
-    }
-
-    // If the user enters an invalid email address return error message.
-    if (!form.checkValidity() || !isValidEmailList(taskEmailList)) {
-        event.stopPropagation();
-        form.classList.add('was-validated');
+    // Additional email list validation.
+    if (!isValidEmailList(taskEmailList)) {
         showToast("Please enter valid email addresses.", 5000);
         return;
     }
 
-    // Convert dates to JavaScript Date objects for comparison.
+    // Check if reminder offset is before the due date.
     taskDueDate = new Date(taskDueDate);
     taskReminderOffset = new Date(taskReminderOffset);
-
-    // Check if reminder offset is before the due date.
     if (taskReminderOffset > taskDueDate) {
         showToast("Reminder Offset must be before the due date.", 5000);
         return;
     }
 
-
-    console.log(taskDueDate);
-    console.log(taskReminderOffset);
-    console.log(format_backend_datetime(taskDueDate));
-    console.log(format_backend_datetime(taskReminderOffset));
-
-    const csrfAccessToken = getCookie('csrf_access_token');
-    console.log('token is:')
-    console.log(csrfAccessToken)
-
+    // Proceed with form submission...
     try {
-     
-    
-        const flask_wtf_csrf = document.getElementById('flask_wtf_csrf_token')
+        const csrfAccessToken = getCookie('csrf_access_token');
+        const flask_wtf_csrf = document.getElementById('flask_wtf_csrf_token');
 
         const response = await fetch('/api/addTask', {
             method: 'POST',
@@ -76,7 +62,6 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfAccessToken,
                 'FLASK-WTF-CSRF': flask_wtf_csrf.value
-                
             },
             body: JSON.stringify({
                 task_name: taskName,
@@ -87,31 +72,23 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
                 task_email_message: taskEmailMessage
             })
         });
-        console.log('request made to /addTask');
+
         const data = await response.json();
-
         if (response.ok && data.Message === "add_success") {
+            // Handle successful response
             showToast(`Task successfully created!`, 5000);
-
-            // format_backend_datetime' here to format the date for display
-            console.log(data.TaskList[0].task_dueDate)
-            console.log(data.TaskList[0].task_reminderOffSetTime)
-            console.log(format_backend_datetime(data.TaskList[0].task_dueDate))
-            console.log(format_backend_datetime(data.TaskList[0].task_reminderOffSetTime))
-            
             data.TaskList[0].task_dueDate = format_backend_datetime(data.TaskList[0].task_dueDate);
             data.TaskList[0].task_reminderOffSetTime = format_backend_datetime(data.TaskList[0].task_reminderOffSetTime);
             addRowToTable(data.TaskList[0]); // Add the new task to the table
         } else {
             showToast(data.Error, 5000);
         }
-
     } catch (error) {
         console.error("Error:", error);
         showToast('An error occurred while adding the task', 5000);
     }
 
-    // Reset form fields and close bootstrap modal.
+    // Reset form fields and close the modal
     document.getElementById('taskName').value = '';
     document.getElementById('taskDescription').value = '';
     document.getElementById('taskDueDate').value = '';
@@ -120,6 +97,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     document.getElementById('taskEmailMessage').value = '';
     bootstrap.Modal.getInstance(document.getElementById('taskAddModal')).hide();
 });
+
 
 
 
