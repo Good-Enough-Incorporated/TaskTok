@@ -8,7 +8,6 @@ from sqlalchemy.exc import SQLAlchemyError
 import datetime
 import re
 
-
 #  ---------- Unused Imports: Needs review ----------------
 #  import subprocess
 #  import socket
@@ -138,11 +137,10 @@ def remove_task(task_id):
 @api.route('/editTask/<task_id>', methods=['PUT'])
 @jwt_required()
 def edit_task(task_id):
-
     user_data = current_user
     task = TaskReminder.query.get(task_id)
     error = []
-    status_code = 200  # Default to 200, will be changed to 400 if errors are found
+    status_code = 200  # Default to 200, will be changed to 400 if errors are found.
 
     # Check if the task exists and if it belongs to the current user.
     if task is None or task.owner_username != user_data.username:
@@ -150,59 +148,55 @@ def edit_task(task_id):
 
     # Get updated data from the request.
     data = request.json
+    new_due_date = data.get('task_dueDate')
+    new_reminder_off_set = data.get('task_reminderOffSetTime')
 
-    # Check if each field exists in the request data before updating
-    if 'task_description' in data:
-        new_description = data['task_description']
-        task.task_description = new_description
+    # Validate and format due date.
+    due_formatted_date = None
+    if new_due_date:
+        due_formatted_date = format_date(new_due_date)
+        if due_formatted_date is None:
+            error.append("Due date received an invalid date format")
+    else:
+        error.append("task_dueDate is required")
 
-    if 'task_dueDate' in data:
-        new_due_date = data['task_dueDate']
+    # Validate and format reminder offset time.
+    offset_formatted_date = None
+    if new_reminder_off_set:
+        offset_formatted_date = format_date(new_reminder_off_set)
+        if offset_formatted_date is None:
+            error.append("Offset time date received an invalid date format")
+    else:
+        error.append("task_reminderOffSetTime is required")
+
+    # Check if offset is not after the due date.
+    if due_formatted_date and offset_formatted_date and offset_formatted_date > due_formatted_date:
+        error.append("Offset must not be after your due date!")
+
+    # Update task if no errors.
+    if not error:
         if new_due_date:
-            due_formatted_date = format_date(new_due_date)
-            if due_formatted_date is not None:
-                task.task_dueDate = due_formatted_date
-            else:
-                error.append("Due date received an invalid date format")
-        else:
-            error.append("task_dueDate is required")
-
-    if 'task_reminderOffSetTime' in data:
-        new_reminder_off_set = data['task_reminderOffSetTime']
+            task.task_dueDate = due_formatted_date
         if new_reminder_off_set:
-            offset_formatted_date = format_date(new_reminder_off_set)
-            if offset_formatted_date is not None:
-                if task.task_dueDate < offset_formatted_date:
-                    error.append("Offset must not be after your due date!")
-                else:
-                    task.task_reminderOffSetTime = offset_formatted_date
-            else:
-                error.append("Offset time date received an invalid date format")
-        else:
-            error.append("task_reminderOffSetTime is required")
+            task.task_reminderOffSetTime = offset_formatted_date
+        if 'task_description' in data:
+            task.task_description = data['task_description']
+        if 'task_emailList' in data:
+            task.task_emailList = data['task_emailList']
+        if 'task_name' in data:
+            task.task_name = data['task_name']
 
-    if 'task_emailList' in data:
-        new_email_list = data['task_emailList']
-        task.task_emailList = new_email_list
+        # Commit the changes to the database.
+        try:
+            db.session.commit()
+            return jsonify({'Message': 'Task updated successfully'}), status_code
+        except Exception as e:
+            # Rollback in case of error.
+            db.session.rollback()
+            error.append(str(e))
 
-    if 'task_name' in data:
-        new_name = data['task_name']
-        task.task_name = new_name
-
-    # TODO: Validate the inputs here.
-
-    if error:
-        status_code = 400
-        return jsonify({'Message': 'Failed to update task', 'Error': error}), status_code
-
-    # Commit the changes to the database
-    try:
-        db.session.commit()
-        return jsonify({'Message': 'Task updated successfully'}), status_code
-    except Exception as e:
-        # Rollback in case of error.
-        db.session.rollback()
-        return jsonify({'Message': 'Failed to update task', 'Error': str(e)}), 500
+    # Return errors if any.
+    return jsonify({'Message': 'Failed to update task', 'Error': error}), 400 if error else status_code
 
 
 @api.route('/getTask/<task_id>', methods=['GET'])

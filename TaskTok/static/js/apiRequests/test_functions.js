@@ -253,15 +253,18 @@ async function editTask(taskID) {
     let taskReminderOffset = document.getElementById('editTaskReminderOffset').value;
     const taskEmailList = document.getElementById('editTaskEmailList').value;
 
-    // Format the date and time for the Flask backend.
-    //taskDueDate = taskDueDate ? formatDateTimeForBackend(taskDueDate) : getDefaultDateTime();
-    //taskReminderOffset = taskReminderOffset ? formatDateTimeForBackend(taskReminderOffset) : getDefaultDateTime();
 
-    // Debugging: Log the formatted dates
+    // Debugging: Log the formatted dates.
     console.log("Formatted Due Date:", taskDueDate);
     console.log("Formatted Reminder Offset:", taskReminderOffset);
 
     const csrfAccessToken = getCookie('csrf_access_token');
+
+    // Check if reminder offset is after the due date.
+    if (taskReminderOffset > taskDueDate) {
+        showToast("Reminder Offset must be before the due date.", 5000);
+        return; // Stop the function execution here
+    }
 
     try {
         const flask_wtf_csrf = document.getElementById('flask_wtf_csrf_token')
