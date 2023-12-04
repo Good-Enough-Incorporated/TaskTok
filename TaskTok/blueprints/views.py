@@ -58,7 +58,8 @@ def home():
 
 @views.route('/admin')
 def admin():
-    return 'admin page not built yet'
+    side_nav_menu_items = generate_links()
+    return render_template('admin.html', sideNavMenuItems=side_nav_menu_items)
 
 
 @views.route('/userSettings', methods=['GET', "POST"])
