@@ -53,13 +53,21 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
     console.log(format_backend_datetime(taskReminderOffset));
 
     const csrfAccessToken = getCookie('csrf_access_token');
+    console.log('token is:')
+    console.log(csrfAccessToken)
 
     try {
+     
+    
+        const flask_wtf_csrf = document.getElementById('flask_wtf_csrf_token')
+
         const response = await fetch('/api/addTask', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfAccessToken
+                'X-CSRF-TOKEN': csrfAccessToken,
+                'FLASK-WTF-CSRF': flask_wtf_csrf.value
+                
             },
             body: JSON.stringify({
                 task_name: taskName,
@@ -70,7 +78,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
                 task_email_message: taskEmailMessage
             })
         });
-
+        console.log('request made to /addTask');
         const data = await response.json();
 
         if (response.ok && data.Message === "add_success") {
@@ -126,6 +134,7 @@ async function addTask() {
 
 
     try {
+        console.log('attempting to make api request');
         const response = await fetch('/api/addTask', {
             method: "PUT",
             headers: {
@@ -144,7 +153,7 @@ async function addTask() {
 
             })
         });
-
+        console.log('made request');
         // Get our async api call.
         clearModal();
         const data = await response.json();
@@ -170,6 +179,7 @@ async function addTask() {
 async function showEditModal(taskID) {
     // Fetching task data from API.
     try {
+        
         const csrfAccessToken = getCookie('csrf_access_token');
         const response = await fetch(`/api/getTask/${taskID}`, {
             method: 'GET',
@@ -254,11 +264,13 @@ async function editTask(taskID) {
     const csrfAccessToken = getCookie('csrf_access_token');
 
     try {
+        const flask_wtf_csrf = document.getElementById('flask_wtf_csrf_token')
         const response = await fetch(`/api/editTask/${taskID}`, {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfAccessToken
+                'X-CSRF-TOKEN': csrfAccessToken,
+                'FLASK-WTF-CSRF': flask_wtf_csrf.value
             },
             body: JSON.stringify({
 

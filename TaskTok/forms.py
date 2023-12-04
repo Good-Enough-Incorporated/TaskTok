@@ -84,7 +84,21 @@ class ResetPasswordForm(FlaskForm):
             raise ValidationError("Passwords do not match, please try again.")
 
 class UpdateSettingsForm(FlaskForm):
+
     username = StringField('Username',validators=[InputRequired(), validate_username] )
     email = StringField('E-Mail',validators=[InputRequired(), validate_email] )
     first_name = StringField('First Name',validators=[InputRequired(), validate_username] )
     last_name =  StringField('Last Name',validators=[InputRequired(), validate_username] )
+
+    current_password = PasswordField('Password', validators=[InputRequired(), validate_password])
+    new_password = PasswordField('Confirm Password', validators=[InputRequired(), validate_password])
+    new_password_confirm = PasswordField('Confirm Password', validators=[InputRequired(), validate_password])
+
+    def validate_new_password_confirm(self, field):
+        if field.data != self.new_password.data:
+            raise ValidationError("Passwords do not match, please try again.")
+
+
+class AddTaskForm(FlaskForm):
+    task_name = StringField('Task Name', validators=[InputRequired(), validate_username])
+    

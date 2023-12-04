@@ -8,9 +8,9 @@ from pytz import all_timezones
 from flask import Blueprint
 from flask import render_template, url_for, request, redirect
 from flask_jwt_extended import jwt_required, current_user, get_csrf_token
-from TaskTok.forms import LoginForm, UpdateSettingsForm
+from TaskTok.forms import LoginForm, UpdateSettingsForm, AddTaskForm
 from TaskTok.extensions import generate_links
-from flask_wtf.csrf import CSRFProtect
+
 from TaskTok.extensions import db
 from TaskTok.models import User
 #  ----------- Unused imports: Needs review --------------
@@ -49,11 +49,12 @@ def main_page():
 @jwt_required()
 def home():
     # check for JWT in cookie
+    form = AddTaskForm()
     side_nav_menu_items = generate_links()
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
 
-    return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items)
+    return render_template('home.html', username=current_user.username, sideNavMenuItems=side_nav_menu_items, form=form)
 
 @views.route('/admin')
 def admin():
@@ -90,16 +91,28 @@ def userSettings():
             submit_type = request.args.get('form_id')
             #using the form_id, we can check which portions to update
             if submit_type == 'update_information':
+
                 username = request.form.get('username')
                 email = request.form.get('email')
                 first_name = request.form.get('first_name')
                 last_name = request.form.get('last_name')
+
                 user = User.get_user_by_id(user_id=current_user.id)
+
                 user.first_name = first_name
                 user.last_name = last_name
-                print(user.first_name)
+                
                 db.session.commit()
                 return redirect(url_for('views.userSettings'))
+            if submit_type == 'update_credentials':
+
+                user = User.get_user_by_id(user_id=current_user.id)
+
+                current_password = request.form.get('current_password')
+                new_password = request.form.get('new_password')
+                if user.verify_password(current_password):
+                    #update their password
+                    user.set_password(new_password)
         
     else:
         print("GET")
