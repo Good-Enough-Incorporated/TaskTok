@@ -55,6 +55,8 @@ export function enableVerticalScroll() {
         });
     }
 }
+
+
 // TODO: use a better method of validating more than 1 email addresses?
 export function isValidEmailList(emailList) {
     // Check if the email list is empty
@@ -62,8 +64,19 @@ export function isValidEmailList(emailList) {
         return false;
     }
 
-    const emails = emailList.split(',');
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // only accepts 2 email addresses atm.
-    return emails.every(email => emailRegex.test(email.trim()));
-}
+    // Trim whitespace from each email.
+    const emails = emailList.split(',').map(email => email.trim());
+    // Regular expression for email validation. It's good enough...
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+    // Check each email in the list.
+    for (const email of emails) {
+        // If any email in the list is invalid, return false.
+        if (!emailRegex.test(email)) {
+            return false;
+        }
+    }
+
+    // If all emails are valid, return true.
+    return true;
+}
