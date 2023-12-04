@@ -4,6 +4,7 @@ from TaskTok.models import User, TaskReminder
 from TaskTok.functions import verify_celery_worker
 from TaskTok.functions import verify_message_broker_online
 from flask_migrate import upgrade, migrate
+from TaskTok import app
 import click
 import datetime
 import sys
@@ -18,11 +19,7 @@ import sys
 #  from TaskTok.models import NoNoTokens
 #  ----------------------------------------------------------
 
-app = create_app()
-app.config['HOST'] = '0.0.0.0'
-app.config['PORT'] = 80
-app.config['DEBUG'] = True
-app.config['INITIALIZED'] = False
+
 
 
 @click.group()
@@ -114,13 +111,13 @@ def upgrade_db():
         upgrade()
         print('Database upgraded')
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # If command line args are provided, assume they're for Click.
     if len(sys.argv) > 1:
         cli(app)
     # Else, just run Flask.
     else:
-        app.run(host='0.0.0.0', port=443, debug=True, ssl_context='adhoc')
+        app.run(host='0.0.0.0', port=443, debug=True, use_reloader=True, ssl_context='adhoc')
         # change ssl_context to below when testing locally
         # 'adhoc'
         # or for azure
