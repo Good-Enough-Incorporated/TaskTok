@@ -299,7 +299,7 @@
                 {{credential_form.hidden_tag()}}
                 <!---------- current_password input ---------->
                 <div>
-                    <label for="username">{{ credential_form.current_password.label }}</label><br>
+                    <label for="current_password">{{ credential_form.current_password.label }}</label><br>
                     {{ credential_form.current_password(class='taskTokInput', placeholder="Current Password") }}<br>
                     {% if credential_form.current_password.errors %}
                         <ul class="errors">
@@ -309,11 +309,30 @@
                         </ul>
                     {% endif %}
                 </div>
-
-
-
-                {{credential_form.new_password(class_='taskTokInput', placeholder_='New Password', id_='new_password')}}
-                {{credential_form.new_password_confirm(class_='taskTokInput', placeholder_='Confirm Password', id_='new_password_confirm')}}
+                <!---------- new_password input ---------->
+                <div>
+                    <label for="new_password">{{ credential_form.new_password.label }}</label><br>
+                    {{ credential_form.new_password(class='taskTokInput', placeholder="New Password") }}<br>
+                    {% if credential_form.new_password.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.new_password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <!---------- confirm_password input ---------->
+                <div>
+                    <label for="new_password_confirm">{{ credential_form.new_password_confirm.label }}</label><br>
+                    {{ credential_form.new_password_confirm(class='taskTokInput', placeholder="New Password") }}<br>
+                    {% if credential_form.new_password_confirm.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.new_password_confirm.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
                 <button id="update_userpassword_btn">Update Password</button>
             </form>
             
