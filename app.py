@@ -110,14 +110,14 @@ def upgrade_db():
         upgrade()
         print('Database upgraded')
 
-
-# If command line args are provided, assume they're for Click.
-if len(sys.argv) > 1:
-    cli(app)
-# Else, just run Flask.
-else:
-    app.run(host='0.0.0.0', port=443, debug=True, use_reloader=True, ssl_context='adhoc')
-    # change ssl_context to below when testing locally
-    # 'adhoc'
-    # or for azure
-    # '/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'
+if __name__ == "__main__":
+    # If command line args are provided, assume they're for Click.
+    if len(sys.argv) > 1:
+        cli(app)
+    # Else, just run Flask.
+    else:
+        app.run(host='0.0.0.0', port=443, debug=True, use_reloader=True, ssl_context='adhoc')
+        # change ssl_context to below when testing locally
+        # 'adhoc'
+        # or for azure
+        # '/home/jason/TaskTok/fullchain1.pem','/home/jason/TaskTok/privkey1.pem'
