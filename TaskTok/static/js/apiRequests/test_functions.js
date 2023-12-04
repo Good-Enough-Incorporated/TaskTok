@@ -211,7 +211,8 @@ async function showEditModal(taskID) {
         document.getElementById('editTaskName').value = task.task_name;
         document.getElementById('editTaskDescription').value = task.task_description;
         document.getElementById('editTaskDueDate').value = format_backend_datetime(task.task_dueDate);
-        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime ? format_backend_datetime(task.task_reminderOffSetTime) : "";
+        document.getElementById('editTaskReminderOffset').value = task.task_reminderOffSetTime ?
+            format_backend_datetime(task.task_reminderOffSetTime) : "";
         document.getElementById('editTaskEmailList').value = task.task_emailList;
 
         // Set current editing taskID as a data attribute on the edit modal.
@@ -233,22 +234,24 @@ async function showEditModal(taskID) {
             dateFormat: "m/d/Y H:i"
         });
 
-        // Attach event handler to the "Save" button in the edit modal
+        // Attach event handler to the "Save" button in the edit modal.
         document.getElementById('saveEdit').addEventListener('click', function () {
+
             // Validate the offset date
             var offsetDate = document.getElementById("editTaskReminderOffset").value;
             if (!offsetDate) {
-                // Show the toast for offset date required
+                // Show the toast for offset date required.
                 showToast("Please provide the offset date for the task.");
                 return; // Prevent further execution of editTask
             }
 
+
             // Continue with editTask() call if offset date is provided,
-            editTask(taskID); // Call editTask with the specific task ID
+            editTask(taskID); // Call editTask with the specific task ID.
         });
     } catch (error) {
         console.error('Error fetching task data:', error);
-        // Handle errors, e.g., display an error message
+        // Handle errors, e.g., display an error message.
     }
 }
 
@@ -262,18 +265,20 @@ async function editTask(taskID) {
     let taskReminderOffset = document.getElementById('editTaskReminderOffset').value;
     const taskEmailList = document.getElementById('editTaskEmailList').value;
 
-
-    // Debugging: Log the formatted dates.
-    console.log("Formatted Due Date:", taskDueDate);
-    console.log("Formatted Reminder Offset:", taskReminderOffset);
+    // Validate the email list first.
+    if (!isValidEmailList(taskEmailList)) {
+        showToast("Please enter valid email addresses.", 5000);
+        return;
+    }
 
     const csrfAccessToken = getCookie('csrf_access_token');
 
     // Check if reminder offset is after the due date.
     if (taskReminderOffset > taskDueDate) {
         showToast("Reminder Offset must be before the due date.", 5000);
-        return; // Stop the function execution here
+        return;
     }
+
 
     try {
         const flask_wtf_csrf = document.getElementById('flask_wtf_csrf_token')
@@ -327,7 +332,7 @@ async function editTask(taskID) {
                     emailListCell.textContent = taskEmailList;
                 }
             }
-            // Close the modal
+            // Close the modal.
             let editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
             editModal.hide();
         } else {

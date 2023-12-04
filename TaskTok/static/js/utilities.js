@@ -57,7 +57,13 @@ export function enableVerticalScroll() {
 }
 // TODO: use a better method of validating more than 1 email addresses?
 export function isValidEmailList(emailList) {
-    const emails = emailList.split(',').map(email => email.trim());
-    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/; // accepts two emails atm.
-    return emails.filter(email => emailRegex.test(email));
+    // Check if the email list is empty
+    if (!emailList.trim()) {
+        return false;
+    }
+
+    const emails = emailList.split(',');
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // only accepts 2 email addresses atm.
+    return emails.every(email => emailRegex.test(email.trim()));
 }
+

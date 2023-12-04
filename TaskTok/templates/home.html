@@ -393,9 +393,13 @@ border-bottom: 0px solid #444444;
                     <input type="text" id="editTaskReminderOffset" class="form-control" placeholder="Off-Set">
                 </div>
                  <div class="mb-3">
-                    <label for="editTaskEmailList" class="form-label">Email-List</label>
-                    <input type="text" id="editTaskEmailList" class="form-control" placeholder="Email-List">
+                <label for="editTaskEmailList" class="form-label">Email-List</label>
+                <input type="text" id="editTaskEmailList" class="form-control"
+                       placeholder="example@tasktok.com, example2@tasktok.com" required>
+                <div class="invalid-feedback">
+                    Please enter a valid email addresses.
                 </div>
+            </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
