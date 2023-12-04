@@ -3,6 +3,7 @@ from TaskTok.extensions import db
 from TaskTok.models import User, TaskReminder
 from TaskTok.functions import verify_celery_worker
 from TaskTok.functions import verify_message_broker_online
+from flask_migrate import upgrade, migrate
 import click
 import datetime
 import sys
@@ -98,6 +99,20 @@ def drop_db():
     with app.app_context():
         print("\nDropping all database tables!")
         db.drop_all()
+
+
+@app.cli.command('migrateDB')
+@click.option('-m', '--message', default='Migration', help="Message for your migration script")
+def migrate_db(message):
+    with app.app_context():
+        migrate(message=message)
+        print('Database migration generated')
+
+@app.cli.command('upgradeDB')
+def upgrade_db():
+    with app.app_context():
+        upgrade()
+        print('Database upgraded')
 
 if __name__ == '__main__':
     # If command line args are provided, assume they're for Click.

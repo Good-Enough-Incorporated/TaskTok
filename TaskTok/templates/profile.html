@@ -7,64 +7,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Task Reminder App</title>
     <style>
+
+
         body {
 			font-family: Calibri, Helvetica, sans-serif;
 			color: #FFBF00; 
 			background: #0F0F12 ;
         }
         .header {
-            margin-left: 200px; /* Same as the width of the sidenav */
-            padding: 0px 10px;}
+            display: block;
+            width: 50%;
+            margin-left: calc((100% - 50%)/2 + 175px/2); 
+            padding: 0px 10px;
+            text-align: center;
+            
+        }
         .settings-container {
-            padding: 20px;
-            display: flex;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            width: 30%;
+            margin-left: calc((100% - 30%)/2 + 175px/2); 
+            display: block;
             flex-direction: column;
             align-items: center;
             position: relative;			
 			background: #0F0F12;		
-			margin: auto;			
+						
 		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
 		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
         }
         .settings-section {
-            padding: 20px;
+           
             display: flex;
             flex-direction: column;
-            align-items: center;
             position: relative;
 			padding: 25px; 
 			background: #17171c;
 			min-width: 400px;
-			width: 40%;
+			width: 100%;
 			margin: auto;
 			border-right: 3px inset #ad7231;
 			border-radius: 0px 12px 12px 0px;
 		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
 		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
         }
-        input[type=text], input[type=password] { 
-			width: 100%; 
-			background: #17171c;
-			color: white;  
-			margin: 8px 0;
-			padding: 12px 20px; 
-			display: inline-block; 
-			box-sizing: border-box;     
+        
+        .taskTokInput, .taskTokButton {
+            /* Shared styles for inputs and buttons */
+            background: #17171c;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;     
 			border: 2px solid rgba(51,51,61,0.48);
 			border-radius: 4px;
 			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
 			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
 			}
+        .taskTokInput {
+            color: white;
+        }
+
+        .taskTokReadOnly {
+            background: #17171c;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;     
+			border: 2px solid rgba(51,51,61,0.48);
+			border-radius: 4px;
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+            color: gray;
+        }
+
+        ul.errors {
+            border: 1px solid red; /* Red border around the list */
+            background-color: #ffe6e6; /* Light red background color for visibility */
+            padding: 10px; /* Some padding inside the box */
+            margin: 10px 0; /* Margin to separate the error box from other elements */
+            list-style-type: none; /* Removes the default bullet points */
+        }
+
+        ul.errors li {
+            color: red; /* Red text color for the list items */
+            font-size: 0.9em; /* Adjust the font size as needed */
+        }
+
+
+
         .settings-section h3 {
             margin-top: 0;
         }
-        input, button {
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 95%;
-        }
+
         button {
 			background-color: #ad7231 ; 
 			width: 100%;
@@ -155,29 +190,133 @@
         background-color:  #2a2a2e;
     }
 
+    .confirm-label {
+        color: black;
+        padding: 8px;
+        font-size:  20px;
+    }
+
 
     </style>
 </head>
 <body>
+    <!-- Update Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirm Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               You're about to update the following information, is this correct?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
 	<div class="sidenav">
 		{% for menuItem in sideNavMenuItems %}
 		<a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
 		{% endfor %}
 	  </div>
     <div class="header">
-        <h1>Task Reminder App - Settings</h1>
+        <h1>TaskTok - User Settings</h1>
     </div>
 
     <div class="settings-container">
         <div class="settings-section">
             <h3>Personal Information</h3>
-            <input type="text" placeholder="Username" id='username_input' value="{{ username }}">
-            <input type="text" placeholder="Username" id='email_input' value="{{ email }}">
-            <input type="password" placeholder="Current Password">
-            <input type="password" placeholder="New Password">
-            <input type="password" placeholder="Confirm New Password">
             
-            <button>Update Information</button>
+            <form action="{{ url_for('views.userSettings', form_id='update_information') }}" method="post">
+                
+                
+                
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                {{personal_info_form.hidden_tag()}}
+
+                <!---------- username input ---------->
+                <div>
+                    <label for="username">{{ personal_info_form.username.label }}</label><br>
+                    {{ personal_info_form.username(class='taskTokReadOnly', readonly='readonly') }}<br>
+                    {% if personal_info_form.username.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!---------- email input ---------->
+                <div>
+                    <label for="email">{{ personal_info_form.email.label }}</label><br>
+                    {{ personal_info_form.email(class='taskTokReadOnly', readonly='readonly') }}<br>
+                    {% if personal_info_form.email.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!---------- first_name input ---------->
+                <div>
+                    <label for="first_name">{{ personal_info_form.first_name.label }}</label><br>
+                    {{ personal_info_form.first_name(class='taskTokInput') }}<br>
+                    {% if personal_info_form.first_name.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.first_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <!---------- last_name input ---------->
+                <div>
+                    <label for="last_name">{{ personal_info_form.last_name.label }}</label><br>
+                    {{ personal_info_form.last_name(class='taskTokInput') }}<br>
+                    {% if personal_info_form.last_name.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.last_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+
+            <button id="update_userinfo_btn">Update Info</button>
+            </form>
+            <form action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
+                {{credential_form.hidden_tag()}}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                {{credential_form.hidden_tag()}}
+                <!---------- current_password input ---------->
+                <div>
+                    <label for="username">{{ credential_form.current_password.label }}</label><br>
+                    {{ credential_form.current_password(class='taskTokInput', placeholder="Current Password") }}<br>
+                    {% if credential_form.current_password.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.current_password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+
+
+                {{credential_form.new_password(class_='taskTokInput', placeholder_='New Password', id_='new_password')}}
+                {{credential_form.new_password_confirm(class_='taskTokInput', placeholder_='Confirm Password', id_='new_password_confirm')}}
+                <button id="update_userpassword_btn">Update Password</button>
+            </form>
+            
         </div>
     </div>
 
@@ -185,7 +324,7 @@
         <div class="settings-section">
             <h3>Personalization</h3>
             
-                <input type="text"  id="timezoneInput"  aria-haspopup="true" aria-expanded="false"  placeholder="Select Timezone (US/Eastern)">
+                <input type="text" class='taskTokInput' id="timezoneInput"  aria-haspopup="true" aria-expanded="false"  placeholder="Select Timezone (US/Eastern)">
                 <div class="dropdown">
                 <div class="dropdown-menu" aria-labelledby="timezoneDropdown">
                     {% for tz in timezones %}
@@ -194,7 +333,7 @@
                 </div>
             </div>
             
-            <input type="text" placeholder="DST">
+            <label><input type="checkbox">Daylight Savings (Do you participate in this useless routine?)</label>
             <button>Save Personalization</button>
         </div>
     </div>

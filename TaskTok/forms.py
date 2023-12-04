@@ -59,6 +59,31 @@ def validate_username(form, field):
         return  # String contains valid characters only
     raise ValidationError('Username may only contain letters and numbers')
 
+def validate_first_name(form, field):
+    min_length = 2
+    max_length = 50
+
+    if len(field.data) < min_length:
+        raise ValidationError('First Name must be at least 2 characters.')
+    if len(field.data) > max_length:
+        raise ValidationError('First name must not be more than 50 characters.')
+    # Allowing a broader range of characters, including certain special characters like hyphens and apostrophes
+    if not re.match(r'^[A-Za-zÀ-ÖØ-öø-ÿ-.\' ]*$', field.data):
+        raise ValidationError('First name may only contain letters, hyphens, periods, apostrophes, and spaces')
+    
+def validate_last_name(form, field):
+    min_length = 2
+    max_length = 50
+
+    if len(field.data) < min_length:
+        raise ValidationError('Last Name must be at least 2 characters.')
+    if len(field.data) > max_length:
+        raise ValidationError('Last name must not be more than 50 characters.')
+    # Allowing a broader range of characters, including certain special characters like hyphens and apostrophes
+    if not re.match(r'^[A-Za-zÀ-ÖØ-öø-ÿ-.\' ]*$', field.data):
+        raise ValidationError('Las name may only contain letters, hyphens, periods, apostrophes, and spaces')
+
+
 
 class NewUserForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), validate_email])
@@ -75,11 +100,31 @@ class LoginForm(FlaskForm):
                              InputRequired(), validate_password])
 
 class ResetPasswordForm(FlaskForm):
-        password = PasswordField('Password', validators=[
+    password = PasswordField('Password', validators=[
                              InputRequired(), validate_password])
-        confirm_password = PasswordField('Confirm Password', validators=[
+    confirm_password = PasswordField('Confirm Password', validators=[
                              InputRequired(), validate_password])
-        def validate_confirm_password(self, field):
-            if field.data != self.password.data:
-                raise ValidationError("Passwords do not match, please try again.")
+    def validate_confirm_password(self, field):
+        if field.data != self.password.data:
+            raise ValidationError("Passwords do not match, please try again.")
 
+class UpdatePersonalInfoForm(FlaskForm):
+
+    username = StringField('Username',validators=[InputRequired(), validate_username])
+    email = StringField('E-Mail',validators=[InputRequired(), validate_email])
+    first_name = StringField('First Name',validators=[InputRequired(), validate_first_name])
+    last_name =  StringField('Last Name',validators=[InputRequired(), validate_last_name])
+
+class UpdateCredentialsForm(FlaskForm):
+    current_password = PasswordField('Password', validators=[InputRequired(), validate_password])
+    new_password = PasswordField('Confirm Password', validators=[InputRequired(), validate_password])
+    new_password_confirm = PasswordField('Confirm Password', validators=[InputRequired(), validate_password])
+
+    def validate_new_password_confirm(self, field):
+        if field.data != self.new_password.data:
+            raise ValidationError("Passwords do not match, please try again.")
+
+
+class AddTaskForm(FlaskForm):
+    task_name = StringField('Task Name', validators=[InputRequired(), validate_username])
+    
