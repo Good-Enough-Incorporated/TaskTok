@@ -11,8 +11,6 @@ from TaskTok.forms import LoginForm
 from TaskTok.extensions import side_nav_menu_items
 import os
 from flask_wtf.csrf import CSRFProtect
-import traceback
-
 #  -------------- Unused Imports: Needs Review ------------------
 #  from .schema import UserSchema
 #  from celery import Celery
@@ -28,8 +26,8 @@ url_generated = False
 
 def create_app():
     app = Flask(__name__)
-    print("APP CALLED")
-    traceback.print_stack()
+    #print("APP CALLED")
+    #traceback.print_stack()
     load_dotenv()  
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
     #app.config['SQLALCHEMY_ECHO'] = os.environ.get('SQLALCHEMY_ECHO')

@@ -127,4 +127,7 @@ class UpdateCredentialsForm(FlaskForm):
 
 class AddTaskForm(FlaskForm):
     task_name = StringField('Task Name', validators=[InputRequired(), validate_username])
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('email', validators=[InputRequired(), validate_email])
     
