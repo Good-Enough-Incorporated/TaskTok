@@ -19,10 +19,6 @@ import sys
 #  ----------------------------------------------------------
 
 app = create_app()
-app.config['HOST'] = '0.0.0.0'
-app.config['PORT'] = 80
-app.config['DEBUG'] = True
-app.config['INITIALIZED'] = False
 
 
 @click.group()
@@ -120,7 +116,7 @@ if __name__ == '__main__':
         cli(app)
     # Else, just run Flask.
     else:
-        app.run(host='0.0.0.0', port=443, debug=True, ssl_context='adhoc')
+        app.run(host='0.0.0.0', port=443, debug=True, use_reloader=True, ssl_context='adhoc')
         # change ssl_context to below when testing locally
         # 'adhoc'
         # or for azure
