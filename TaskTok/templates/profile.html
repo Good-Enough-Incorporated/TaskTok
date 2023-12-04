@@ -216,13 +216,28 @@
                 {{form.first_name(class_='taskTokInput', placeholder_='First Name', id_='first_name', value_=first_name)}}
                 {{form.last_name(class_='taskTokInput', placeholder_='Last Name', id_='last_name', value_=last_name)}}
 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category=='update_credentials'}
+                        <div class="toast-container  flash-animate">
+                        {{ message }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <button id="update_userinfo_btn">Update Info</button>
             </form>
-              
-                <input type="password" class='taskTokInput' placeholder="Current Password">
-                <input type="password" class='taskTokInput' placeholder="New Password">
-                <input type="password" class='taskTokInput' placeholder="Confirm New Password">
+            <form action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
+                {{form.hidden_tag()}}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                {{form.current_password(class_='taskTokInput', placeholder_='Current Password', id_='current_password')}}
+                {{form.new_password(class_='taskTokInput', placeholder_='New Password', id_='new_password')}}
+                {{form.new_password_confirm(class_='taskTokInput', placeholder_='Confirm Password', id_='new_password_confirm')}}
                 <button id="update_userpassword_btn">Update Password</button>
+            </form>
             
         </div>
     </div>

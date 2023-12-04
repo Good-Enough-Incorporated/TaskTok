@@ -36,6 +36,8 @@ def create_app():
     app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     app.config['JWT_CSRF_CHECK_FORM'] = True
     app.config['WTF_CSRF_FIELD_NAME'] = 'flask_wtf_csrf_token'
+    #app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+    app.config['WTF_CSRF_HEADERS'] = ['FLASK-WTF-CSRF']
     hours = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES'))
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
         hours=hours)  # change hours to .001 to test session expires error
