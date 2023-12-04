@@ -4,6 +4,7 @@ from TaskTok.models import User, TaskReminder
 from TaskTok.functions import verify_celery_worker
 from TaskTok.functions import verify_message_broker_online
 from flask_migrate import upgrade, migrate
+from TaskTok import app
 import click
 import datetime
 import sys
@@ -18,7 +19,7 @@ import sys
 #  from TaskTok.models import NoNoTokens
 #  ----------------------------------------------------------
 
-app = create_app()
+
 
 
 @click.group()
