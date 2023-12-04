@@ -112,6 +112,7 @@ def userSettings():
                 new_password = request.form.get('new_password')
                 if user.verify_password(current_password):
                     #update their password
+                    print('updating password')
                     user.set_password(new_password)
         
     else:
