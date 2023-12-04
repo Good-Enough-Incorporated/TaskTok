@@ -1,4 +1,4 @@
-import { showToast, clearModal, getCookie, format_backend_datetime, enableVerticalScroll } from '../utilities.js';
+import { showToast, clearModal, getCookie, format_backend_datetime, enableVerticalScroll, isValidEmailList } from '../utilities.js';
 // Global variable for the Bootstrap 5 modal instance.
 let confirmationModal = null;
 let currentTaskID = null;
@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // Add Event Listener to the Add Task Form.
 document.getElementById('addTaskForm').addEventListener('submit', async function(event) {
     event.preventDefault();
+    const form = event.currentTarget;
+
+
 
     // Fetch form data
     const taskName = document.getElementById('taskName').value;
@@ -34,6 +37,14 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         return;
     }
 
+    // If the user enters an invalid email address return error message.
+    if (!form.checkValidity() || !isValidEmailList(taskEmailList)) {
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        showToast("Please enter valid email addresses.", 5000);
+        return;
+    }
+
     // Convert dates to JavaScript Date objects for comparison.
     taskDueDate = new Date(taskDueDate);
     taskReminderOffset = new Date(taskReminderOffset);
@@ -44,9 +55,7 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
         return;
     }
 
-    // Format dates back to required string format for the Flask API.
-    //taskDueDate = taskDueDate.toISOString().slice(0, 19);
-    //taskReminderOffset = taskReminderOffset.toISOString().slice(0, 19);
+
     console.log(taskDueDate);
     console.log(taskReminderOffset);
     console.log(format_backend_datetime(taskDueDate));
