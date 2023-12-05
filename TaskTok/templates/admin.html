@@ -171,6 +171,48 @@
             margin-left: 175px; 
         }
 
+        .status-light {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin: 5px;
+            display: inline-block;
+        }
+
+        .status-ok {
+            background-color: green;
+            animation: blink-animation 1s infinite; /* Adjust timing as needed */
+        }
+
+        .status-error {
+            background-color: red;
+            animation: blink-animation 1s infinite; /* Adjust timing as needed */
+        }   
+        @keyframes blink-animation {
+            0%   { opacity: 1; }
+            50%  { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes pulse-animation {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        .status-ok {
+            background-color: green;
+            animation: pulse-animation 1s infinite;
+        }
+
+        .status-error {
+            background-color: red;
+            animation: pulse-animation 1s infinite;
+        }
+
+
+
+
     </style>
 </head>
 <body>
@@ -187,13 +229,17 @@
         <div class="card-container">
             <!-- Card 1: Backend Message Broker Status -->
             <div class="card">
-                <h3>Message Broker Status</h3>
-                <!-- Insert backend message broker status details here -->
+                <h3>Celery Status (Worker)</h3>
+                <div>Version: 5.3.4 (emerald-rush)</div>
+                <div>Online: <div id= 'celeryWorkerStatus' name='celeryWorkerStatus' class="status-light"></div> </div>
+                <!-- status-error -->
             </div>
 
             <!-- Card 2: Celery Worker Status -->
             <div class="card">
-                <h3>Celery Worker Status</h3>
+                <h3>Redis Status (Message Broker)</h3>
+                <div>Version: 7.2 </div>
+                <div>Online: <div id= 'messageBrokerStatus' name='messageBrokerStatus' class="status-light"></div> </div>
                 <!-- Insert Celery worker status details here -->
             </div>
 
@@ -207,6 +253,7 @@
             <!-- More cards as needed -->
         </div>
     </div>
+    <script type="module" src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 
 {% endblock %}

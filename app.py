@@ -45,7 +45,7 @@ def check_celery_status():
 @app.cli.command('checkMessageBrokerStatus')
 def check_message_broker_status():
     host = 'localhost'
-    port = 5672
+    port = 6379
     timeout = 5
     try:
         message_broker_status = verify_message_broker_online(host, port, timeout)
@@ -55,7 +55,7 @@ def check_message_broker_status():
     box_width = max(len(status_message), 24) + 4
 
     print("\n" + "╔" + "═" * box_width + "╗")
-    print(f"║ MESSAGE BROKER STATUS: {status_message} ".ljust(box_width) + "║")
+    print(f"║ MESSAGE BROKER STATUS: {status_message} ".ljust(box_width) + " ║")
     print("╚" + "═" * box_width + "╝\n")
 
 
