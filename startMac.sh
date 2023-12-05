@@ -9,10 +9,8 @@ CELERY_SCRIPT="$VENV_DIR/bin/celery"
 cd "$PROJECT_DIR"
 
 # Start the Python application and Celery in the background, while Redis starts.
-"$PYTHON_EXEC" app.py &
-"$CELERY_SCRIPT" -A RemindMeClient.Client.celery_worker worker  
---loglevel=DEBUG --beat  
-&
+"$PYTHON_EXEC" run.py &
+"$CELERY_SCRIPT" -A RemindMeClient.Client.celery worker --loglevel=DEBUG &
 redis-server
 
 # Wait for the background processes to finish

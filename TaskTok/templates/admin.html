@@ -247,13 +247,19 @@
             <!-- Example: -->
             <div class="card">
                 <h3>Server Utilization</h3>
-                <!-- Insert server utilization details/chart here -->
+                <div class="container"> 
+                    <div id="cpu_gage" class="200x160px"></div>
+                    <div id="ram_gage" class="200x160px"></div>
+
+                </div>
             </div>
 
             <!-- More cards as needed -->
         </div>
     </div>
     <script type="module" src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{url_for('static', filename='js/justgage.js')}}"></script>
+    <script src="{{url_for('static', filename='js/raphael-2.1.4.min.js')}}"></script>
 </body>
 
 {% endblock %}

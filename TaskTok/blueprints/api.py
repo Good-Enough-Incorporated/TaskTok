@@ -7,7 +7,9 @@ from TaskTok.schema import UserSchema, TaskSchema
 from TaskTok.utilities import email_message, check_emails_overdue
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
+import psutil
 import re
+import os
 #  ---------- Unused Imports: Needs review ----------------
 #  import subprocess
 #  import socket
@@ -50,6 +52,17 @@ def celeryStatus():
 
     print(results)
     return jsonify({'Message': results})
+
+
+@api.route('/serverUtilization')
+def getServerUtilization():
+    cpu_load_1, cpu_load_5, cpu_load_15 = psutil.getloadavg()
+    cpu_usage = (cpu_load_5/os.cpu_count()) * 100
+    
+    ram_usage = psutil.virtual_memory()[2]
+
+    return jsonify({'data': {'cpu' : cpu_usage, 'ram': ram_usage}})
+
 
 
 @api.route('/addTask', methods=['POST'])
