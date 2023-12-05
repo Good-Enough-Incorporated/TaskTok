@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Task Reminder App</title>
+    <title>Settings - TaskTok</title>
     <style>
 
 
@@ -292,6 +292,13 @@
 
             <button id="update_userinfo_btn">Update Info</button>
             </form>
+
+        </div>
+    </div>
+    <div class="settings-container">
+        <div class="settings-section">
+            <h3>Credentials</h3>
+            
             <form action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
                 {{credential_form.hidden_tag()}}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

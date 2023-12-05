@@ -313,7 +313,7 @@ def forgot_password():
                 "TaskTok - Password Reset",
                 email_body)
             flash("If an account with this email is found, we'll send a link with instructions on how to reset your password", 'error')
-            return render_template('forgotPassword.html')
+            return render_template('forgotPassword.html', form=form)
         print("i didn't find this account")
     return render_template('forgotPassword.html', form=form)
 
