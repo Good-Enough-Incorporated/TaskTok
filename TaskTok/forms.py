@@ -4,7 +4,7 @@ for all web forms
 """
 import re
 from flask_wtf import FlaskForm
-from wtforms import (StringField, PasswordField, ValidationError)
+from wtforms import (StringField, BooleanField, PasswordField, ValidationError)
 from wtforms.validators import InputRequired
 
 
@@ -81,9 +81,13 @@ def validate_last_name(form, field):
         raise ValidationError('Last name must not be more than 50 characters.')
     # Allowing a broader range of characters, including certain special characters like hyphens and apostrophes
     if not re.match(r'^[A-Za-zÀ-ÖØ-öø-ÿ-.\' ]*$', field.data):
-        raise ValidationError('Las name may only contain letters, hyphens, periods, apostrophes, and spaces')
+        raise ValidationError('Last name may only contain letters, hyphens, periods, apostrophes, and spaces')
 
-
+def validate_timezone(form, field):
+    import pytz
+    
+    if field.data.lower() not in list(map(str.lower,pytz.all_timezones)):
+        raise ValidationError("Unknown timezone, please try again.")
 
 class NewUserForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), validate_email])
@@ -131,3 +135,7 @@ class AddTaskForm(FlaskForm):
 class ForgotPasswordForm(FlaskForm):
     email = StringField('email', validators=[InputRequired(), validate_email])
     
+class TimeZoneForm(FlaskForm):
+    timezone_name = StringField('Time Zone', validators=[InputRequired(), validate_timezone])
+    daylight_savings = BooleanField('Daylight Savings (Do you participate in this useless routine?)')
+                    
