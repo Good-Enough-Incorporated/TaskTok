@@ -6,7 +6,7 @@ import socket
 # System is not running'
 def verify_celery_worker():
     try:
-        result = subprocess.check_output(['celery', '-A', 'RemindMeClient.Client.celery', 'status'], stderr=subprocess.STDOUT)
+        result = subprocess.check_output(['celery', '-A', 'RemindMeClient.Client.celery_worker', 'status'], stderr=subprocess.STDOUT)
         return True if result else False
     except subprocess.CalledProcessError as error:
         return False
