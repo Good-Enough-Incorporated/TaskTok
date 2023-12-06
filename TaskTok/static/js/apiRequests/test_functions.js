@@ -2,13 +2,15 @@ import { showToast, clearModal, getCookie, format_backend_datetime, enableVertic
 // Global variable for the Bootstrap 5 modal instance.
 let confirmationModal = null;
 let currentTaskID = null;
-
+let tableGrid = null;
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize the Bootstrap 5 modal.
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
 
     // Other initialization code.
-    listTask();
+    //listTask();
+    //queryTasks();
+    initializeGrid();
     enableVerticalScroll();
     
 });
@@ -392,14 +394,61 @@ async function listTask() {
         //Get our async api call
         const data = await response.json();
 
-        console.log(typeof (data));
-
-        createTableHeader()
+        console.log(typeof (data.TaskList));
+        //legacy table if we need to revert
+        
+        //createTableHeader()
+        
         data.TaskList.forEach(task => {
             console.log(task + ' being added to table')
-            addRowToTable(task);
+            //addRowToTable(task);
         });
         
+       console.log(data.TaskList)
+
+       const columns = [
+         
+       
+        {id: "task_description", name: "Description"},
+        {id: "task_dueDate", name: "Due Date"},
+        {id: "task_emailList", name: "E-Mail List"},
+        {id: "task_message", name: "E-mail Message"},
+        {id: "task_name", name: "Name"},
+        {id: "task_reminderOffSetTime", name: "Early Reminder Time"},
+        {id: "actions", name:"Actions"}]
+
+        
+
+        const formattedData = data.TaskList.map(item => [
+            
+            
+            item.task_description,
+            item.task_dueDate,
+            item.task_emailList,
+            item.task_message,
+            item.task_name,
+            item.task_reminderOffSetTime,
+            gridjs.html(`
+    <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
+    <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
+  `) 
+          ]);
+          
+        var grid = new gridjs.Grid({
+            columns: columns.map(col => col.name),
+            style: { 
+                table: { 
+                  'white-space': 'nowrap'
+                }
+              },
+            data: formattedData,
+            search: true,
+            sort: true,
+            resizable: true,
+            pagination: true}).render(document.getElementById('taskTableGrid'));
+
+        
+
 
 
         const addTableButton = document.getElementById('task-add-btn');
@@ -407,6 +456,113 @@ async function listTask() {
 
     } catch (error) {
         console.error("Error:", error)
+    }
+}
+
+async function queryTasks(){
+    const csrfAccessToken = getCookie('csrf_access_token')
+    const response = await fetch('api/listTask')
+    
+    .then(
+
+        response => response.json()
+
+    .then(
+
+        data => {
+            initializeGrid(data.TaskList);
+        })
+    
+    )
+    .catch (error => console.error('error', error));
+}
+
+async function initializeGrid(){
+
+    tableGrid = new gridjs.Grid({
+        columns: [
+            "Name",
+            "Description",
+            "Reminder Time",
+            "Early Reminder Time",
+            "Email List",
+            "EMail Message",
+            "Actions"
+        ],
+        style: { 
+            table: { 
+              'white-space': 'nowrap'
+            }
+          },
+        search: true,
+        sort: true,
+        resizable: true,
+
+        data: () => {
+            return new Promise((resolve, reject) => {
+                fetch('/api/listTask')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to obtain a list of tasks')
+                    }
+                    
+                    return response.json();
+                })
+                .then(data=> {
+                    setTimeout(()=> { 
+                    const mappedData = data.TaskList.map(item => [
+                        item.task_name,
+                        item.task_description,
+                        item.task_dueDate,
+                        item.task_reminderOffSetTime,
+                        item.task_emailList,
+                        item.task_email_message,
+                        gridjs.html(`
+            <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
+            <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
+        `) 
+
+                    ]);
+                    resolve(mappedData)
+                },5000)
+                })
+                .catch(error => {
+                    console.error("Failed to fetch your tasks")
+                    reject(error)
+                });
+            })
+        }
+
+    }).render(document.getElementById('taskTableGrid'));
+}
+
+async function refreshGridData(){
+    try {
+        const response = await fetch('/api/listTask');
+        if (!response.ok) {
+            throw new Error('Failed to fetch tasks');
+        }
+        const data = await response.json();
+        const mappedData = data.TaskList.map(item => [
+            item.task_name,
+            item.task_description,
+            item.task_dueDate,
+            item.task_reminderOffSetTime,
+            item.task_emailList,
+            item.task_email_message,
+            gridjs.html(`
+<button data-id="${item.id}" class='task-edit-btn'>Edit</button>
+<button data-id="${item.id}" class='task-delete-btn'>Delete</button>
+`) 
+
+        ]);
+
+        // Update the grid with the new data
+        tableGrid.updateConfig({
+            data: mappedData
+        }).forceRender();
+    } catch (error) {
+        console.error('Failed to refresh tasks:', error);
     }
 }
 
@@ -441,7 +597,9 @@ function removeTask(taskID) {
 
 document.getElementById('confirmDelete').addEventListener('click', function () {
     if (currentTaskID !== null) {
-        deleteTask(currentTaskID);
+         deleteTask(currentTaskID)
+         refreshGridData();
+        
     }
     confirmationModal.hide();
 });
@@ -485,14 +643,14 @@ function addRowToTable(task) {
 
 
 
-document.getElementById('taskTable').addEventListener('click', function(event) {
+document.getElementById('taskTableGrid').addEventListener('click', function(event) {
     if (event.target.matches('button.task-edit-btn')) { //event handler for Edit button
-        const dataID = event.target.closest('tr').getAttribute('data-id');
+        const dataID = event.target.getAttribute('data-id');
         console.log('Opening showEditModal on taskID=', dataID);
         showEditModal(dataID); // Call the new function here
     }
     if (event.target.matches('button.task-delete-btn')){
-        const dataID = event.target.closest('tr').getAttribute('data-id');
+        const dataID = event.target.getAttribute('data-id');
         console.log('attempting to remove taskID=', dataID);
         removeTask(dataID);
     }

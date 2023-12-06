@@ -140,6 +140,7 @@ def list_task():
     user_data = current_user
     task_list = TaskReminder.find_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
+    print(type(task_list_string))
     return jsonify({"TaskList": task_list_string}), 200
 
     # create_file.delay("test.txt", "another test!")

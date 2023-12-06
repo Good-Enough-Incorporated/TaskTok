@@ -72,17 +72,22 @@
     align-items: flex-start; /* Align the child div to the top */
     position: relative;
     padding-top: 30px;
+    margin-right: 25px;
     position: relative;
     
     margin-left: 200px;
 }
 .table-wrapper {
-    padding: 25px;
+    padding-left: 50px;
+    padding-right: 50px;
+    width: 100%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     background-color: #17171c;
     transition: 0.3s;
     border-radius: 5px;
     position: relative; /* New positioning context for the button */
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .table-wrapper:hover{
@@ -95,7 +100,7 @@
     position: absolute;
     left: 50%;
     top: -30px;
-    font-size: 16px;
+    font-size: 12px;
     transform: translate(-50%, -50%);
 }
 .task-add-btn {
@@ -146,13 +151,13 @@ table {
 
         th, td {
             text-align: left; /* Align text to left */
-            color: #FFBF00;
+            color: blackß;
             padding: 8px;
         }
 
         th {
             background-color: #17171C;
-            color: #FFBF00;
+            color: Black;
             text-align: center;
         }
 
@@ -165,7 +170,7 @@ border-bottom: 0px solid #444444;
     }
     
     th {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: bold;
     color: #FFBF00;
     text-align: center;
@@ -255,6 +260,11 @@ border-bottom: 0px solid #444444;
     scrollbar-width: thin; /* Can be 'auto', 'thin', or 'none' */
 }
 
+  /* Target the Grid.js table */
+  .gridjs-table {
+    font-size: 14px; /* Set your desired font size */
+  }
+
 
 
 </style>
@@ -283,12 +293,7 @@ border-bottom: 0px solid #444444;
             <button class="btn btn-primary task-add-btn" id="task-add-btn"
                     data-bs-toggle="modal"
                     data-bs-target="#taskAddModal">New Task</button>
-            <table id="taskTable">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div id="taskTableGrid"></div>
         </div>
 
     </div>
@@ -569,6 +574,9 @@ border-bottom: 0px solid #444444;
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- flatpickr used for date/time selection in date/offset input fields for add/edit forms -->
     <script type="module" src="{{ url_for('static', filename='js/apiRequests/test_functions.js') }}"></script>
+
+    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
 
 </body>
 {% endblock %}
