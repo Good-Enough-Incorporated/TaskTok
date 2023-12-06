@@ -200,7 +200,9 @@ window.onbeforeunload = function(){
 
 window.onload = function() {
     //removed query params after an error
-    window.history.replaceState(null, null, "/userSettings");
+    //const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    //window.history.replaceState(null, null, baseUrl);
+
     //this will prevent a reload sending the same bad data
     var scrollPosition = sessionStorage.getItem('scrollPosition');
     if (scrollPosition) {

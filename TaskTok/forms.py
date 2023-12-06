@@ -6,12 +6,22 @@ import re
 from flask_wtf import FlaskForm
 from wtforms import (StringField, BooleanField, PasswordField, ValidationError)
 from wtforms.validators import InputRequired
-
+from wtforms import widgets
 
 #  ---------- Unused imports: Needs review ------------------
 #  from wtforms.widgets import (SubmitInput)
 #  from wtforms import SubmitField, EmailField
 #  from wtforms.validators import DataRequired, Length
+
+class CustomPasswordField(StringField):
+    """
+    Original source: https://github.com/wtforms/wtforms/blob/2.0.2/wtforms/fields/simple.py#L35-L42
+
+    A StringField, except renders an ``<input type="password">``.
+    Also, whatever value is accepted by this field is not rendered back
+    to the browser like normal fields.
+    """
+    widget = widgets.PasswordInput(hide_value=False)
 
 def validate_email(form, field):
     # Found this regex here:
@@ -120,9 +130,9 @@ class UpdatePersonalInfoForm(FlaskForm):
     last_name =  StringField('Last Name',validators=[InputRequired(), validate_last_name])
 
 class UpdateCredentialsForm(FlaskForm):
-    current_password = PasswordField('Password', validators=[InputRequired(), validate_password])
-    new_password = PasswordField('Confirm Password', validators=[InputRequired(), validate_password])
-    new_password_confirm = PasswordField('Confirm Password', validators=[InputRequired(), validate_password])
+    current_password = CustomPasswordField('Password', validators=[InputRequired(), validate_password])
+    new_password = CustomPasswordField('Confirm Password', validators=[InputRequired(), validate_password])
+    new_password_confirm = CustomPasswordField('Confirm Password', validators=[InputRequired(), validate_password])
 
     def validate_new_password_confirm(self, field):
         if field.data != self.new_password.data:
@@ -135,7 +145,7 @@ class AddTaskForm(FlaskForm):
 class ForgotPasswordForm(FlaskForm):
     email = StringField('email', validators=[InputRequired(), validate_email])
     
-class TimeZoneForm(FlaskForm):
+class UpdateTimeZoneForm(FlaskForm):
     timezone_name = StringField('Time Zone', validators=[InputRequired(), validate_timezone])
     daylight_savings = BooleanField('Daylight Savings (Do you participate in this useless routine?)')
                     
