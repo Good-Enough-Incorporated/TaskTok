@@ -149,9 +149,10 @@ async function addTask() {
         console.log(data)
         if (data.Message === "add_success") {
             console.log('whats data.TaskList');
-            data.TaskList.forEach(task => {
-                addRowToTable(task);
-            });
+            //data.TaskList.forEach(task => {
+            //    addRowToTable(task);
+            //});
+            refreshGridData();
  
             showToast(`Task successfully created!`, 5000)
             console.log('adding button event handlers')
@@ -227,7 +228,7 @@ async function showEditModal(taskID) {
 
 
             // Continue with editTask() call if offset date is provided,
-            editTask(taskID); // Call editTask with the specific task ID.
+             editTask(taskID); // Call editTask with the specific task ID.
         });
     } catch (error) {
         console.error('Error fetching task data:', error);
@@ -289,29 +290,7 @@ async function editTask(taskID) {
             console.log('Task was updated in the database');
 
             // Update the corresponding task in the HTML table with the new description.
-            const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
-            if (taskRow) {
-                const nameCell = taskRow.querySelector("td:nth-child(2)")
-                const descriptionCell = taskRow.querySelector("td:nth-child(3)")
-                const dueDateCell = taskRow.querySelector("td:nth-child(4)")
-                const offSetCell = taskRow.querySelector("td:nth-child(5)")
-                const emailListCell = taskRow.querySelector("td:nth-child(6)")
-                if (nameCell) {
-                    nameCell.textContent = taskName;
-                }
-                if (descriptionCell) {
-                    descriptionCell.textContent = taskDescription;
-                }
-                if (dueDateCell) {
-                    dueDateCell.textContent = taskDueDate;
-                }
-                if (offSetCell) {
-                    offSetCell.textContent = taskReminderOffset;
-                }
-                if (emailListCell) {
-                    emailListCell.textContent = taskEmailList;
-                }
-            }
+            refreshGridData();
             // Close the modal.
             let editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
             editModal.hide();
@@ -509,7 +488,7 @@ async function initializeGrid(){
                     return response.json();
                 })
                 .then(data=> {
-                    setTimeout(()=> { 
+                    
                     const mappedData = data.TaskList.map(item => [
                         item.task_name,
                         item.task_description,
@@ -524,7 +503,7 @@ async function initializeGrid(){
 
                     ]);
                     resolve(mappedData)
-                },5000)
+                
                 })
                 .catch(error => {
                     console.error("Failed to fetch your tasks")
