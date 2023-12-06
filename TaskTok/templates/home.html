@@ -304,15 +304,17 @@ border-bottom: 0px solid #444444;
             </div>
             <div class="modal-body">
                 <!-- Task Add Form -->
-                <form id="addTaskForm">
+                <form id="addTaskForm" class="needs-validation" novalidate>
                     {{form.hidden_tag()}}
                     <div class="mb-3">
                         <label for="taskName" class="form-label">Task Name</label>
-                        <input type="text" class="form-control" id="taskName" required>
+                        <input type="text" class="form-control" id="taskName" maxlength="100" required>
+                        <div class="invalid-feedback">Task name cannot exceed 100 characters.</div>
                     </div>
                     <div class="mb-3">
                         <label for="taskDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                        <textarea class="form-control" id="taskDescription" rows="3" maxlength="500" required></textarea>
+                        <div class="invalid-feedback">Description cannot exceed 500 characters.</div>
                     </div>
                     <div class="mb-3">
                         <label for="taskDueDate" class="form-label">Due Date</label>
@@ -324,7 +326,9 @@ border-bottom: 0px solid #444444;
                     </div>
                     <div class="mb-3">
                         <label for="taskEmailList" class="form-label">Email-List</label>
-                        <input type="text" id="taskEmailList" class="form-control" placeholder="example@tasktok.com, example2@tasktok.com">
+                        <input type="text" id="taskEmailList" class="form-control"
+                               placeholder="example@tasktok.com, example2@tasktok.com">
+                        <div class="invalid-feedback">Please enter a valid email address(es).</div>
                     </div>
                     <div class="mb-3">
                         <label for="taskEmailMessage" class="form-label">Email Message</label>
@@ -339,6 +343,7 @@ border-bottom: 0px solid #444444;
         </div>
     </div>
 </div>
+
 
 
 <!-- Delete Confirmation Modal -->
@@ -389,9 +394,13 @@ border-bottom: 0px solid #444444;
                     <input type="text" id="editTaskReminderOffset" class="form-control" placeholder="Off-Set">
                 </div>
                  <div class="mb-3">
-                    <label for="editTaskEmailList" class="form-label">Email-List</label>
-                    <input type="text" id="editTaskEmailList" class="form-control" placeholder="Email-List">
+                <label for="editTaskEmailList" class="form-label">Email-List</label>
+                <input type="text" id="editTaskEmailList" class="form-control"
+                       placeholder="example@tasktok.com, example2@tasktok.com" required>
+                <div class="invalid-feedback">
+                    Please enter a valid email addresses.
                 </div>
+            </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
