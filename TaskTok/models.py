@@ -20,6 +20,8 @@ class User(db.Model):
     password = db.Column(db.Text())
     is_confirmed = db.Column(db.Boolean(), default=False, unique=False)
     confirmed_date = db.Column(db.DateTime())
+    timezone = db.Column(db.String(), nullable=False, unique=False, default="US/Eastern")
+    daylight_savings = db.Column(db.Boolean(), default = False, unique=False)
 
     def __repr__(self):
         return f"<User {self.username}>"

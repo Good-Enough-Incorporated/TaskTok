@@ -1,13 +1,15 @@
 from flask import Blueprint, jsonify, request
 from TaskTok.models import User, TaskReminder
 from TaskTok.extensions import db
+from TaskTok.functions import verify_celery_worker, verify_message_broker_online
 from flask_jwt_extended import jwt_required, get_jwt, current_user
 from TaskTok.schema import UserSchema, TaskSchema
 from TaskTok.utilities import email_message, check_emails_overdue
 from sqlalchemy.exc import SQLAlchemyError
 import datetime
+import psutil
 import re
-
+import os
 #  ---------- Unused Imports: Needs review ----------------
 #  import subprocess
 #  import socket
@@ -25,11 +27,42 @@ def send_mail():
     return 'send_email celery task created :)'
 
 
-@api.route('/testRoute')
-def testRoute():
+@api.route('/messageBroker')
+def messageBroker():
     # test route, will not be kept
-    check_emails_overdue()
-    return "testing check_emails_overdue()"
+    host = 'localhost'
+    port = 6379
+    timeout = 2
+    try:
+        results = verify_message_broker_online(host, port, timeout)
+    except Exception as e:
+        results = e
+
+    print(results)
+    return jsonify({'Message': results})
+
+@api.route('/celeryStatus')
+def celeryStatus():
+    # test route, will not be kept
+
+    try:
+        results = verify_celery_worker()
+    except Exception as e:
+        results = e
+
+    print(results)
+    return jsonify({'Message': results})
+
+
+@api.route('/serverUtilization')
+def getServerUtilization():
+    cpu_load_1, cpu_load_5, cpu_load_15 = psutil.getloadavg()
+    cpu_usage = (cpu_load_5/os.cpu_count()) * 100
+
+    ram_usage = psutil.virtual_memory()[2]
+
+    return jsonify({'data': {'cpu' : cpu_usage, 'ram': ram_usage}})
+
 
 
 @api.route('/addTask', methods=['POST'])

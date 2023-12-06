@@ -20,7 +20,7 @@ from TaskTok.models import NoNoTokens, EmailTokens
 from TaskTok.extensions import db
 from TaskTok.functions import generate_email_token, verify_email_token
 from sqlalchemy.exc import OperationalError
-from TaskTok.forms import NewUserForm, LoginForm, ResetPasswordForm
+from TaskTok.forms import NewUserForm, LoginForm, ResetPasswordForm, ForgotPasswordForm
 from datetime import timedelta
 from TaskTok.utilities import email_message
 
@@ -292,7 +292,7 @@ def logout():
 
 @auth.route('/forgotPassword', methods=['GET', 'POST'])
 def forgot_password():
-    form = ResetPasswordForm()
+    form = ForgotPasswordForm()
     error = None
     if request.method == 'POST':
         
@@ -313,9 +313,9 @@ def forgot_password():
                 "TaskTok - Password Reset",
                 email_body)
             flash("If an account with this email is found, we'll send a link with instructions on how to reset your password", 'error')
-            return render_template('forgotPassword.html')
+            return render_template('forgotPassword.html', form=form)
         print("i didn't find this account")
-    return render_template('forgotPassword.html')
+    return render_template('forgotPassword.html', form=form)
 
 @auth.route('/resetPassword/<token>', methods=['GET','POST'])
 def reset_password(token):

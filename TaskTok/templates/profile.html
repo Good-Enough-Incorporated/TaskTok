@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Task Reminder App</title>
+    <title>Settings - TaskTok</title>
     <style>
 
 
@@ -33,8 +33,7 @@
             position: relative;			
 			background: #0F0F12;		
 						
-		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
-		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+	
         }
         .settings-section {
            
@@ -67,6 +66,83 @@
         .taskTokInput {
             color: white;
         }
+
+        .taskTokReadOnly {
+            background: #17171c;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;     
+			border: 2px solid rgba(51,51,61,0.48);
+			border-radius: 4px;
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+            color: gray;
+        }
+
+        ul.errors {
+            border: 1px solid red; /* Red border around the list */
+            background-color: #ffe6e6; /* Light red background color for visibility */
+            padding: 10px; /* Some padding inside the box */
+            margin: 10px 0; /* Margin to separate the error box from other elements */
+            list-style-type: none; /* Removes the default bullet points */
+        }
+
+        ul.errors li {
+            color: red; /* Red text color for the list items */
+            font-size: 0.9em; /* Adjust the font size as needed */
+        }
+
+        
+/* Style for flash message box */
+.flash-text {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+/* Different categories of messages */
+.personal, .credential {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.credential-error {
+  color: white;
+  background-color: red;
+  border-color: white;
+}
+
+.error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+/* Animation */
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flash-animate {
+  animation: slideDown 0.5s ease forwards;
+}
+
 
 
         .settings-section h3 {
@@ -170,6 +246,9 @@
     }
 
 
+    
+
+
     </style>
 </head>
 <body>
@@ -209,35 +288,139 @@
                 
                 
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                
-                {{form.hidden_tag()}}
-                {{form.username(class_='taskTokInput', placeholder_='Username', id_='username', value_=username)}}
-                {{form.email(class_='taskTokInput', placeholder_='E-Mail', id_='email', value_=email)}}
-                {{form.first_name(class_='taskTokInput', placeholder_='First Name', id_='first_name', value_=first_name)}}
-                {{form.last_name(class_='taskTokInput', placeholder_='Last Name', id_='last_name', value_=last_name)}}
+                {{personal_info_form.hidden_tag()}}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        {% if category=='update_credentials'}
-                        <div class="toast-container  flash-animate">
-                        {{ message }}
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+                <!---------- username input ---------->
+                <div>
+                    <label for="username">{{ personal_info_form.username.label }}</label><br>
+                    {{ personal_info_form.username(class='taskTokReadOnly', readonly='readonly') }}<br>
+                    {% if personal_info_form.username.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!---------- email input ---------->
+                <div>
+                    <label for="email">{{ personal_info_form.email.label }}</label><br>
+                    {{ personal_info_form.email(class='taskTokReadOnly', readonly='readonly') }}<br>
+                    {% if personal_info_form.email.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!---------- first_name input ---------->
+                <div>
+                    <label for="first_name">{{ personal_info_form.first_name.label }}</label><br>
+                    {{ personal_info_form.first_name(class='taskTokInput') }}<br>
+                    {% if personal_info_form.first_name.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.first_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <!---------- last_name input ---------->
+                <div>
+                    <label for="last_name">{{ personal_info_form.last_name.label }}</label><br>
+                    {{ personal_info_form.last_name(class='taskTokInput') }}<br>
+                    {% if personal_info_form.last_name.errors %}
+                        <ul class="errors">
+                            {% for error in personal_info_form.last_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
 
             <button id="update_userinfo_btn">Update Info</button>
             </form>
-            <form action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
-                {{form.hidden_tag()}}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category== 'personal' %}
+                <div class="flash-text {{ category }} flash-animate">
+                  {{ message }}
+                </div>
+              {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+        </div>
+    </div>
+    <div class="settings-container">
+        <div class="settings-section">
+            <h3>Credentials</h3>
+            
+            <form id='form_credential' action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
+                {{credential_form.hidden_tag()}}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                {{form.current_password(class_='taskTokInput', placeholder_='Current Password', id_='current_password')}}
-                {{form.new_password(class_='taskTokInput', placeholder_='New Password', id_='new_password')}}
-                {{form.new_password_confirm(class_='taskTokInput', placeholder_='Confirm Password', id_='new_password_confirm')}}
+
+                <!---------- current_password input ---------->
+                <div>
+                    <label for="current_password">{{ credential_form.current_password.label }}</label><br>
+                    {{ credential_form.current_password(class='taskTokInput', placeholder="Current Password") }}<br>
+                    {% if credential_form.current_password.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.current_password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <!---------- new_password input ---------->
+                <div>
+                    <label for="new_password">{{ credential_form.new_password.label }}</label><br>
+                    {{ credential_form.new_password(class='taskTokInput', placeholder="New Password") }}<br>
+                    {% if credential_form.new_password.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.new_password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <!---------- confirm_password input ---------->
+                <div>
+                    <label for="new_password_confirm">{{ credential_form.new_password_confirm.label }}</label><br>
+                    {{ credential_form.new_password_confirm(class='taskTokInput', placeholder="New Password") }}<br>
+                    {% if credential_form.new_password_confirm.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.new_password_confirm.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
                 <button id="update_userpassword_btn">Update Password</button>
             </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if 'credential' in  category %}
+                    {% if 'error' in category %}
+                    <div class="flash-text {{category}} flash-animate">
+                        {{ message }}
+                      </div>
+                    {% else %}
+                    <div class="flash-text {{category}} flash-animate">
+                        {{ message }}
+                      </div>
+                    {% endif %}
+              {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
             
         </div>
     </div>
@@ -245,8 +428,28 @@
     <div class="settings-container">
         <div class="settings-section">
             <h3>Personalization</h3>
-            
-                <input type="text" class='taskTokInput' id="timezoneInput"  aria-haspopup="true" aria-expanded="false"  placeholder="Select Timezone (US/Eastern)">
+            <form id='form_timezone' action="{{ url_for('views.userSettings', form_id='update_timezone') }}" method="post">
+                {{timezone_form.hidden_tag()}}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div>
+                    <label for="timezoneInput">{{ timezone_form.timezone_name.label }}</label><br>
+                    {{ timezone_form.timezone_name(class='taskTokInput',id='timezoneInput', placeholder="Select Timezone (US/Eastern)") }}<br>
+                    {% if timezone_form.timezone_name.errors %}
+                        <ul class="errors">
+                            {% for error in timezone_form.timezone_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                {% if timezone_form.daylight_savings %}
+                <input type="checkbox" name="daylight_savings" id="daylight_savings" checked>
+                {% else %}
+                <input type="checkbox" name="daylight_savings" id="daylight_savings" >
+                {% endif %}
+                <label for="daylight_savings">Daylight Savings (Do you participate in this useless routine?)</label>
+                <button>Save Personalization</button>
+            </form>
                 <div class="dropdown">
                 <div class="dropdown-menu" aria-labelledby="timezoneDropdown">
                     {% for tz in timezones %}
@@ -255,18 +458,10 @@
                 </div>
             </div>
             
-            <label><input type="checkbox">Daylight Savings (Do you participate in this useless routine?)</label>
-            <button>Save Personalization</button>
+
         </div>
     </div>
-    <div class="settings-container">
-        <div class="settings-section">
-            <h3>Notification Settings</h3>
-            <label><input type="checkbox"> Email Notifications</label>
-            <label><input type="checkbox"> Push Notifications</label>
-            <button>Update Notifications</button>
-        </div>
-    </div>
+
     <div class="settings-container">
         <div class="settings-section">
             <h3>Account Management</h3>
@@ -276,7 +471,7 @@
     </div>
 
     <div class="footer">
-        <p>&copy; 2023 TaskTok</p>
+        <p>&copy; 2023 TaskTok Good Enough Incorporated</p>
     </div>
    
 	
