@@ -2,9 +2,14 @@
 {% block title %}TaskTok{% endblock %}
 
 {% block style %}
-<style>
-    /* CSS styles */
-   body {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - TaskTok</title>
+    <style>
+
+
+        body {
 			font-family: Calibri, Helvetica, sans-serif;
 			color: #FFBF00;
 			background: #0F0F12 ;
@@ -28,8 +33,7 @@
             position: relative;
 			background: #0F0F12;
 
-		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
-		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+
         }
         .settings-section {
 
@@ -90,6 +94,56 @@
         }
 
 
+/* Style for flash message box */
+.flash-text {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+/* Different categories of messages */
+.personal, .credential {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.credential-error {
+  color: white;
+  background-color: red;
+  border-color: white;
+}
+
+.error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+/* Animation */
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flash-animate {
+  animation: slideDown 0.5s ease forwards;
+}
+
+
 
         .settings-section h3 {
             margin-top: 0;
@@ -110,11 +164,34 @@
         }
         .footer {
             background-color: #0F0F12;
-            color: #FFBF00;
+            color: FFBF00;
             text-align: center;
             padding: 10px 0;
             margin-top: 20px;
             width: 100%;
+        }
+		.sidenav {
+            height: 100%;
+            width: 175px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #17171c;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .sidenav a {
+            padding: 6px 6px 6px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            color: #f1f1f1;
         }
 
         .dropdown {
@@ -167,33 +244,16 @@
         padding: 8px;
         font-size:  20px;
     }
-</style>
-{% endblock %}
 
+
+
+
+
+    </style>
+{%  endblock %}
+</head>
 {% block body %}
 <body>
-    <!-- Update Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Update</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    You're about to update the following information, is this correct?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmUpdate">Update</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-
     <!-- Update Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -212,11 +272,7 @@
         </div>
     </div>
 </div>
-	<div class="sidenav">
-		{% for menuItem in sideNavMenuItems %}
-		<a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
-		{% endfor %}
-	  </div>
+
     <div class="header">
         <h1>TaskTok - User Settings</h1>
     </div>
@@ -286,14 +342,31 @@
 
             <button id="update_userinfo_btn">Update Info</button>
             </form>
-            <form action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category== 'personal' %}
+                <div class="flash-text {{ category }} flash-animate">
+                  {{ message }}
+                </div>
+              {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+        </div>
+    </div>
+    <div class="settings-container">
+        <div class="settings-section">
+            <h3>Credentials</h3>
+
+            <form id='form_credential' action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
                 {{credential_form.hidden_tag()}}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-                {{credential_form.hidden_tag()}}
                 <!---------- current_password input ---------->
                 <div>
-                    <label for="username">{{ credential_form.current_password.label }}</label><br>
+                    <label for="current_password">{{ credential_form.current_password.label }}</label><br>
                     {{ credential_form.current_password(class='taskTokInput', placeholder="Current Password") }}<br>
                     {% if credential_form.current_password.errors %}
                         <ul class="errors">
@@ -303,13 +376,49 @@
                         </ul>
                     {% endif %}
                 </div>
-
-
-
-                {{credential_form.new_password(class_='taskTokInput', placeholder_='New Password', id_='new_password')}}
-                {{credential_form.new_password_confirm(class_='taskTokInput', placeholder_='Confirm Password', id_='new_password_confirm')}}
+                <!---------- new_password input ---------->
+                <div>
+                    <label for="new_password">{{ credential_form.new_password.label }}</label><br>
+                    {{ credential_form.new_password(class='taskTokInput', placeholder="New Password") }}<br>
+                    {% if credential_form.new_password.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.new_password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <!---------- confirm_password input ---------->
+                <div>
+                    <label for="new_password_confirm">{{ credential_form.new_password_confirm.label }}</label><br>
+                    {{ credential_form.new_password_confirm(class='taskTokInput', placeholder="New Password") }}<br>
+                    {% if credential_form.new_password_confirm.errors %}
+                        <ul class="errors">
+                            {% for error in credential_form.new_password_confirm.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
                 <button id="update_userpassword_btn">Update Password</button>
             </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if 'credential' in  category %}
+                    {% if 'error' in category %}
+                    <div class="flash-text {{category}} flash-animate">
+                        {{ message }}
+                      </div>
+                    {% else %}
+                    <div class="flash-text {{category}} flash-animate">
+                        {{ message }}
+                      </div>
+                    {% endif %}
+              {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
 
         </div>
     </div>
@@ -317,8 +426,28 @@
     <div class="settings-container">
         <div class="settings-section">
             <h3>Personalization</h3>
-
-                <input type="text" class='taskTokInput' id="timezoneInput"  aria-haspopup="true" aria-expanded="false"  placeholder="Select Timezone (US/Eastern)">
+            <form id='form_timezone' action="{{ url_for('views.userSettings', form_id='update_timezone') }}" method="post">
+                {{timezone_form.hidden_tag()}}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div>
+                    <label for="timezoneInput">{{ timezone_form.timezone_name.label }}</label><br>
+                    {{ timezone_form.timezone_name(class='taskTokInput',id='timezoneInput', placeholder="Select Timezone (US/Eastern)") }}<br>
+                    {% if timezone_form.timezone_name.errors %}
+                        <ul class="errors">
+                            {% for error in timezone_form.timezone_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                {% if timezone_form.daylight_savings %}
+                <input type="checkbox" name="daylight_savings" id="daylight_savings" checked>
+                {% else %}
+                <input type="checkbox" name="daylight_savings" id="daylight_savings" >
+                {% endif %}
+                <label for="daylight_savings">Daylight Savings (Do you participate in this useless routine?)</label>
+                <button>Save Personalization</button>
+            </form>
                 <div class="dropdown">
                 <div class="dropdown-menu" aria-labelledby="timezoneDropdown">
                     {% for tz in timezones %}
@@ -327,18 +456,10 @@
                 </div>
             </div>
 
-            <label><input type="checkbox">Daylight Savings (Do you participate in this useless routine?)</label>
-            <button>Save Personalization</button>
+
         </div>
     </div>
-    <div class="settings-container">
-        <div class="settings-section">
-            <h3>Notification Settings</h3>
-            <label><input type="checkbox"> Email Notifications</label>
-            <label><input type="checkbox"> Push Notifications</label>
-            <button>Update Notifications</button>
-        </div>
-    </div>
+
     <div class="settings-container">
         <div class="settings-section">
             <h3>Account Management</h3>
@@ -348,7 +469,7 @@
     </div>
 
     <div class="footer">
-        <p>&copy; 2023 TaskTok</p>
+        <p>&copy; 2023 TaskTok Good Enough Incorporated</p>
     </div>
 
 
@@ -356,5 +477,4 @@
     <script type="module" src="{{ url_for('static', filename='js/settings.js') }}"></script>
 
 </body>
-
 {% endblock %}
