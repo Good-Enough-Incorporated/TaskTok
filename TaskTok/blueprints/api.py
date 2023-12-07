@@ -243,7 +243,7 @@ def edit_task(task_id):
         # Commit the changes to the database.
         try:
             db.session.commit()
-            return jsonify({'Message': 'Task updated successfully'}), status_code
+            return jsonify({'Message': 'Task updated successfully', 'task_id': task_id}), status_code
         except Exception as e:
             # Rollback in case of error.
             db.session.rollback()
