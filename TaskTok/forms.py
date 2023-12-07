@@ -73,6 +73,10 @@ def validate_first_name(form, field):
     min_length = 2
     max_length = 50
 
+    # Verify name isn't only spaces
+    if not field.data.strip():
+        raise ValidationError('First name must be only spaces.')
+
     if len(field.data) < min_length:
         raise ValidationError('First Name must be at least 2 characters.')
     if len(field.data) > max_length:
@@ -80,10 +84,14 @@ def validate_first_name(form, field):
     # Allowing a broader range of characters, including certain special characters like hyphens and apostrophes
     if not re.match(r'^[A-Za-zÀ-ÖØ-öø-ÿ-.\' ]*$', field.data):
         raise ValidationError('First name may only contain letters, hyphens, periods, apostrophes, and spaces')
-    
+        
 def validate_last_name(form, field):
     min_length = 2
     max_length = 50
+
+    # Verify name isn't only spaces
+    if not field.data.strip():
+        raise ValidationError('Last name must not be only spaces.')
 
     if len(field.data) < min_length:
         raise ValidationError('Last Name must be at least 2 characters.')
