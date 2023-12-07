@@ -429,11 +429,9 @@ function renderButtonCells(params){
     return `
     <div class='grid-button-wrapper'>
     <button data-id="${params.data.id}" class="delete-btn">
-        <span class="icon">🗑️</span> Delete
-    </button>
+        <span class="icon">🗑️</span></button>
     <button data-id="${params.data.id}" class="edit-btn">
-        <span class="icon">✏️</span> Edit
-    </button>
+        <span class="icon">✏️</span></button>
     `
 }
 async function initializeAGGrid(){
@@ -453,7 +451,7 @@ async function initializeAGGrid(){
             {field: "task_reminderOffSetTime", headerName: "Early Reminder Time", valueFormatter: dateFormatter},
             {field: "task_emailList", headerName: "E-Mail Recipient List"},
             {field: "task_message", headerName: "E-Mail Message"},
-            {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRenderParams: {api: api}},
+            {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRenderParams: {api: api}, width: 150, suppressSizeToFit: true },
   
         ]
 
@@ -505,8 +503,8 @@ async function initializeGrid(){
                 item.task_emailList,
                 item.task_email_message,
                 gridjs.html(`
-    <button data-id="${item.id}" class='edit-btn'>Edit</button>
-    <button data-id="${item.id}" class='delete-btn'>Delete</button>
+    <button data-id="${item.id}" class='edit-btn'></button>
+    <button data-id="${item.id}" class='delete-btn'></button>
 `) 
             ])
         }
@@ -595,6 +593,14 @@ document.getElementById('taskTableGrid2').addEventListener('click', function(eve
         removeTask(dataID);
     }
 });
+
+window.addEventListener('resize', event => {
+
+    api.sizeColumnsToFit()
+
+})
+    
+
 
 // DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function () {
