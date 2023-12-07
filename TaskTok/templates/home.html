@@ -108,7 +108,16 @@
     display: inline-block;
 }
 
+.table-header {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+
 .task-add-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-end;
     background-color: #E0A900;
     display: block;
     border: none;
@@ -186,15 +195,56 @@ border-bottom: 0px solid #444444;
     border-left: none;
     }
     .task-edit-btn, .task-delete-btn, .task-update-btn  {
-    background-color: #E0A900;
-    border: none;
-    color: black;
-    padding: 8px 16px;
-    margin-right: 8px;
-    text-decoration: none;      
-    cursor: pointer;
-    border-radius: 8px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto; /* Or set a specific minimum height */
+    padding: 5px 10px; /* Adjust as needed */
+    margin: 5px 5px;
+
     }
+
+    .edit-btn, .add-btn {
+    background-color: #1c4f92;
+    width: auto;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.edit-btn .icon {
+    margin-right: 5px;
+}
+
+.delete-btn {
+    background-color: #f44336; /* Red background */
+    width: auto;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.delete-btn .icon {
+    margin-right: 5px;
+}
+
+button span {
+    pointer-events: none;
+}
+
+
+
 
     .toast-container {
     
@@ -270,6 +320,15 @@ border-bottom: 0px solid #444444;
     font-size: 14px; /* Set your desired font size */
   }
 
+  .grid-button-wrapper {
+    display: flex;
+    justify-content:left;
+    align-items: center;
+    height: 100%; /* Fill the cell height */
+    width: 100%; /* Fill the cell width */
+    
+  }
+
 
 
 </style>
@@ -289,10 +348,13 @@ border-bottom: 0px solid #444444;
         <div class="table-wrapper">
             <label class="tasktable-title-lbl">Active Tasks</label>
             <!-- Add button attached to bootstrap modal -->
-            <button class="btn btn-primary task-add-btn" id="task-add-btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#taskAddModal">New Task</button>
+            <div class="table-header">
+                <button class="add-btn" data-bs-toggle="modal" data-bs-target="#taskAddModal">
+                    <span class="icon">➕</span></button>
+                </div>
             <div id="taskTableGrid"></div>
+            <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+            <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
         </div>
 
     </div>
@@ -576,6 +638,8 @@ border-bottom: 0px solid #444444;
 
     <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
 </body>
 {% endblock %}

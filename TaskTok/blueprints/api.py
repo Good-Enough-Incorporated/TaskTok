@@ -136,14 +136,34 @@ def add_task():
 @api.route('/listTask')
 @jwt_required()
 def list_task():
-    # TODO: Probably need to returned a paged list for a lot of tasks
+
     user_data = current_user
     task_list = TaskReminder.find_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
     print(type(task_list_string))
     return jsonify({"TaskList": task_list_string}), 200
 
-    # create_file.delay("test.txt", "another test!")
+
+@api.route('/listTaskPagination')
+@jwt_required()
+def list_task_pagination():
+    user_data = current_user
+
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    offset = (page - 1) * limit  # Calculate offset for SQL query
+
+    paginated_tasks = TaskReminder.find_task_by_username_pagination(username=user_data.username, page=page, pageSize=limit)
+    task_list_serialized = TaskSchema().dump(paginated_tasks.items, many=True)
+
+    return jsonify({
+
+        "TaskList": task_list_serialized,
+        "totalTasks": paginated_tasks.total
+
+    }),200
+
+
 
 
 @api.route('/removeTask/<task_id>')
@@ -223,7 +243,7 @@ def edit_task(task_id):
         # Commit the changes to the database.
         try:
             db.session.commit()
-            return jsonify({'Message': 'Task updated successfully'}), status_code
+            return jsonify({'Message': 'Task updated successfully', 'task_id': task_id}), status_code
         except Exception as e:
             # Rollback in case of error.
             db.session.rollback()
