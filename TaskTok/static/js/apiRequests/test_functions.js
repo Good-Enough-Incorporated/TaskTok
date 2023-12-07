@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //listTask();
     //queryTasks();
     initializeGrid();
+
     enableVerticalScroll();
     
 });
@@ -81,7 +82,8 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
             showToast(`Task successfully created!`, 5000);
             data.TaskList[0].task_dueDate = format_backend_datetime(data.TaskList[0].task_dueDate);
             data.TaskList[0].task_reminderOffSetTime = format_backend_datetime(data.TaskList[0].task_reminderOffSetTime);
-            addRowToTable(data.TaskList[0]); // Add the new task to the table
+            //addRowToTable(data.TaskList[0]); // Add the new task to the table
+            refreshGridData();
         } else {
             showToast(data.Error, 5000);
         }
@@ -457,7 +459,7 @@ async function queryTasks(){
 }
 
 async function initializeGrid(){
-
+    
     tableGrid = new gridjs.Grid({
         columns: [
             "Name",
@@ -492,8 +494,8 @@ async function initializeGrid(){
                     const mappedData = data.TaskList.map(item => [
                         item.task_name,
                         item.task_description,
-                        item.task_dueDate,
-                        item.task_reminderOffSetTime,
+                        item.task_dueDate ? format_backend_datetime(item.task_dueDate) : "",
+                        item.task_reminderOffSetTime ? format_backend_datetime(item.task_reminderOffSetTime) : "",
                         item.task_emailList,
                         item.task_email_message,
                         gridjs.html(`
@@ -513,6 +515,18 @@ async function initializeGrid(){
         }
 
     }).render(document.getElementById('taskTableGrid'));
+
+    var buttondiv = document.createElement('div')
+    buttondiv.classList.add('gridjs-button');
+    var button = document.createElement('button');
+
+    button.textContent = 'New Task'
+    button.classList.add('task-add-btn')
+    buttondiv.appendChild(button)
+    button.style.visibility = 'visible'
+    var gridHead = document.querySelector('.gridjs-head')
+    //gridHead.appendChild(buttondiv)
+    
 }
 
 async function refreshGridData(){
