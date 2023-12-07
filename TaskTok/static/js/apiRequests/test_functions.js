@@ -106,67 +106,6 @@ document.getElementById('addTaskForm').addEventListener('submit', async function
 
 
 
-async function addTask() {
-    const csrfAccessToken = getCookie('csrf_access_token');
-    const taskInput1 = document.getElementById('taskInput1').value;
-    const taskInput2 = document.getElementById('taskInput2').value;
-    const taskInput3 = document.getElementById('taskInput3').value;
-    const taskInput4 = document.getElementById('taskInput4').value;
-    const taskInput5 = document.getElementById('taskInput5').value;
-    const taskInput6 = document.getElementById('taskInput6').value;
-
-    //terrible way to check, but it'll do for now.
-    if (taskInput1.length === 0 || taskInput2.length === 0 || taskInput3.length === 0 || taskInput4.length === 0
-        || taskInput5.length === 0 || taskInput6.length === 0) {
-        console.log("NULL");
-        showToast("Please fill out all iput boxes before submitting", 5000)
-        return;
-    }
-
-
-    try {
-        console.log('attempting to make api request');
-        const response = await fetch('/api/addTask', {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfAccessToken
-            },
-            body: JSON.stringify({
-
-                task_name: taskInput1,
-                task_description: taskInput2,
-                task_dueDate: taskInput3,
-                task_reminderOffSetTime: taskInput4,
-                task_emailList: taskInput5,
-                task_email_message: taskInput6
-
-
-            })
-        });
-        console.log('made request');
-        // Get our async api call.
-        clearModal();
-        const data = await response.json();
-        console.log(data)
-        if (data.Message === "add_success") {
-            console.log('whats data.TaskList');
-            //data.TaskList.forEach(task => {
-            //    addRowToTable(task);
-            //});
-            refreshGridData();
- 
-            showToast(`Task successfully created!`, 5000)
-            console.log('adding button event handlers')
-        
-        } else {
-            showToast(data.Error, 5000)
-        }
-    } catch (error) {
-        console.error("Error:", error)
-    }
-}
-
 
 async function showEditModal(taskID) {
     // Fetching task data from API.
@@ -440,26 +379,20 @@ async function listTask() {
     }
 }
 
-async function queryTasks(){
-    const csrfAccessToken = getCookie('csrf_access_token')
-    const response = await fetch('api/listTask')
-    
-    .then(
-
-        response => response.json()
-
-    .then(
-
-        data => {
-            initializeGrid(data.TaskList);
-        })
-    
-    )
-    .catch (error => console.error('error', error));
+async function queryTasks() {
+    console.log("QUERYING TASKS")
+    const response = await fetch('/api/listTask');
+    if (!response.ok) {
+        throw new Error('[queryTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
 }
 
+
+
 async function initializeGrid(){
-    
+    console.log("INITIALIZE GRID")
     tableGrid = new gridjs.Grid({
         columns: [
             "Name",
@@ -478,41 +411,29 @@ async function initializeGrid(){
         search: true,
         sort: true,
         resizable: true,
-
-        data: () => {
-            return new Promise((resolve, reject) => {
-                fetch('/api/listTask')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to obtain a list of tasks')
-                    }
-                    
-                    return response.json();
-                })
-                .then(data=> {
-                    
-                    const mappedData = data.TaskList.map(item => [
-                        item.task_name,
-                        item.task_description,
-                        item.task_dueDate ? format_backend_datetime(item.task_dueDate) : "",
-                        item.task_reminderOffSetTime ? format_backend_datetime(item.task_reminderOffSetTime) : "",
-                        item.task_emailList,
-                        item.task_email_message,
-                        gridjs.html(`
-            <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
-            <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
-        `) 
-
-                    ]);
-                    resolve(mappedData)
-                
-                })
-                .catch(error => {
-                    console.error("Failed to fetch your tasks")
-                    reject(error)
-                });
-            })
+        pagination: {
+            limit: 5,
+            server: {
+                url: (prev, page, limit) => `${prev}?page=${page+1}&limit=${limit}`
+            }
+        },
+        server: {
+            url: "/api/listTaskPagination",
+            total: data => data.totalTasks,
+            then: data => data.TaskList.map(item =>[
+                item.task_name,
+                item.task_description,
+                item.task_dueDate ? format_backend_datetime(item.task_dueDate) : "",
+                item.task_reminderOffSetTime ? format_backend_datetime(item.task_reminderOffSetTime) : "",
+                item.task_emailList,
+                item.task_email_message,
+                gridjs.html(`
+    <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
+    <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
+`) 
+            ])
         }
+  
 
     }).render(document.getElementById('taskTableGrid'));
 
@@ -530,58 +451,33 @@ async function initializeGrid(){
 }
 
 async function refreshGridData(){
-    try {
-        const response = await fetch('/api/listTask');
-        if (!response.ok) {
-            throw new Error('Failed to fetch tasks');
-        }
-        const data = await response.json();
-        const mappedData = data.TaskList.map(item => [
-            item.task_name,
-            item.task_description,
-            item.task_dueDate,
-            item.task_reminderOffSetTime,
-            item.task_emailList,
-            item.task_email_message,
-            gridjs.html(`
-<button data-id="${item.id}" class='task-edit-btn'>Edit</button>
-<button data-id="${item.id}" class='task-delete-btn'>Delete</button>
-`) 
+   
+        queryTasks().then(data => {
+            const mappedData = data.map(item => [
+                item.task_name,
+                item.task_description,
+                item.task_dueDate,
+                item.task_reminderOffSetTime,
+                item.task_emailList,
+                item.task_email_message,
+                gridjs.html(`
+    <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
+    <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
+    `) 
+    
+            ]);
 
-        ]);
+            tableGrid.updateConfig({
+                data: mappedData
+            }).forceRender();
+
+        })
+
 
         // Update the grid with the new data
-        tableGrid.updateConfig({
-            data: mappedData
-        }).forceRender();
-    } catch (error) {
-        console.error('Failed to refresh tasks:', error);
-    }
+
 }
 
-function createTableHeader() {
-    var table = document.getElementById('taskTable');
-    var thead = table.getElementsByTagName('thead')[0];
-
-    // Check if header already exists
-    if (thead.rows.length === 0) {
-        var newRow = thead.insertRow(-1); // Add to the bottom
-
-        function createHeaderCell(text) {
-            var cell = document.createElement('th');
-            cell.innerHTML = text;
-            newRow.appendChild(cell);
-        }
-
-        createHeaderCell("Owner");
-        createHeaderCell("Task Name");
-        createHeaderCell("Task Description");
-        createHeaderCell("Task Due Date");
-        createHeaderCell("Task Due (Offset)");
-        createHeaderCell("E-mail List");
-        createHeaderCell("Actions");
-    }
-}
 
 function removeTask(taskID) {
     currentTaskID = taskID;
