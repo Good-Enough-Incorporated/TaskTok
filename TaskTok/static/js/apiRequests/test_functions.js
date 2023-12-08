@@ -5,7 +5,7 @@ let currentTaskID = null;
 let currentTaskAction = null;
 let tableGrid = null;
 let api;
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function() {
     // Initialize the Bootstrap 5 modal.
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
     const filterInput = document.getElementById('filter-text-box');
@@ -22,6 +22,29 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
     setInterval(() => updateTime(selectedTimezone), 1000);
     updateTime(selectedTimezone);
+
+    try {
+        const allTasks = await queryAllTasks();
+        const completedTasks = allTasks.filter(task => task.isCompleted); // Replace `isCompleted` with the actual property name
+        const carouselInner = document.querySelector('#completedTasksCarousel .carousel-inner');
+
+        completedTasks.forEach((task, index) => {
+            const carouselItem = document.createElement('div');
+            carouselItem.className = 'carousel-item' + (index === 0 ? ' active' : '');
+            carouselItem.innerHTML = `
+                <div class="carousel-content">
+                    <h3>${task.title}</h3> <!-- Replace with actual task title -->
+                    <p>${task.description}</p> <!-- Replace with actual task description -->
+                </div>
+            `;
+            carouselInner.appendChild(carouselItem);
+        });
+    } catch (error) {
+        console.error('Error loading tasks:', error);
+    }
+
+
+
 });
     
 
