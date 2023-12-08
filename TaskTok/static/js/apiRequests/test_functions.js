@@ -428,6 +428,8 @@ function onFilterTextBoxChanged() {
 function renderButtonCells(params){
     return `
     <div class='grid-button-wrapper'>
+    <button data-id="${params.data.id}" class="complete-btn">
+    <span class="icon">✅</span></button>
     <button data-id="${params.data.id}" class="delete-btn">
         <span class="icon">🗑️</span></button>
     <button data-id="${params.data.id}" class="edit-btn">
@@ -451,7 +453,7 @@ async function initializeAGGrid(){
             {field: "task_reminderOffSetTime", headerName: "Early Reminder Time", valueFormatter: dateFormatter},
             {field: "task_emailList", headerName: "E-Mail Recipient List"},
             {field: "task_message", headerName: "E-Mail Message"},
-            {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRenderParams: {api: api}, width: 150, suppressSizeToFit: true },
+            {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRenderParams: {api: api}, width: 200, suppressSizeToFit: true },
   
         ]
 
