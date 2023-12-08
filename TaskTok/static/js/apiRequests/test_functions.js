@@ -2,6 +2,7 @@ import { showToast, clearModal, getCookie, format_backend_datetime, enableVertic
 // Global variable for the Bootstrap 5 modal instance.
 let confirmationModal = null;
 let currentTaskID = null;
+let currentTaskAction = null;
 let tableGrid = null;
 let api;
 document.addEventListener('DOMContentLoaded', function () {
@@ -193,7 +194,26 @@ async function showEditModal(taskID) {
     }
 }
 
+async function setCompleteTask(taskID){
+    
+    const csrfAccessToken = getCookie('csrf_access_token');
+    const response = await fetch(`/api/completeTask/${taskID}`, {
+        method: "GET",
+        headers: {
+            'X-CSRF-TOKEN': csrfAccessToken,
+        }
+    })
+    const data = await response.json()
+    if (response.ok && data.Message == "successfully marked complete."){
+        showToast("Task was marked complete!",5000);
+        confirmationModal.hide();
+        refreshAGGrid();
+    } else {
+        showToast("Failed to mark task as complete :(", 5000);
+        confirmationModal.hide();
+    }
 
+}
 
 async function editTask(taskID) {
     // Fetch values from the modal's input fields.
@@ -396,12 +416,34 @@ async function listTask() {
     }
 }
 
-async function queryTasks() {
+async function queryNonCompletedTasks() {
 
-    console.log("QUERYING TASKS")
-    const response = await fetch('/api/listTask');
+    console.log("QUERYING NON COMPLETE TASKS")
+    const response = await fetch('/api/listNonCompleteTask');
     if (!response.ok) {
-        throw new Error('[queryTasks()]: Failed to query tasks');
+        throw new Error('[queryNonCompletedTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
+
+async function queryCompletedTasks() {
+
+    console.log("QUERYING COMPLETED TASKS")
+    const response = await fetch('/api/listCompletedTask');
+    if (!response.ok) {
+        throw new Error('[queryCompletedTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
+
+async function queryAllTasks() {
+
+    console.log("QUERYING ALL TASKS")
+    const response = await fetch('/api/listAllTask');
+    if (!response.ok) {
+        throw new Error('[queryAllTasks()]: Failed to query tasks');
     }
     const data = await response.json();
     return data.TaskList;
@@ -438,9 +480,13 @@ function renderButtonCells(params){
 }
 async function initializeAGGrid(){
 
-    const data = await queryTasks();
+    const data = await queryNonCompletedTasks();
     console.log(data);
     const gridOptions = {
+
+        localeText: {
+            noRowsToShow: 'You have no active tasks, create one now!'
+        },
 
         rowData: [],
     
@@ -528,53 +574,29 @@ async function initializeGrid(){
 }
 
 async function refreshAGGrid(){
-    const data = await queryTasks();
+    const data = await queryNonCompletedTasks();
     console.log("Refreshing grid!");
     api.setGridOption('rowData', data);
 }
 
-async function refreshGridData(){
-   
-        queryTasks().then(data => {
-            const mappedData = data.map(item => [
-                item.task_name,
-                item.task_description,
-                item.task_dueDate,
-                item.task_reminderOffSetTime,
-                item.task_emailList,
-                item.task_email_message,
-                gridjs.html(`
-    <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
-    <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
-    `) 
-    
-            ]);
-
-            tableGrid.updateConfig({
-                data: mappedData
-            }).forceRender();
-
-        })
-
-
-        // Update the grid with the new data
-
-}
 
 
 function removeTask(taskID) {
     currentTaskID = taskID;
+    currentTaskAction = "delete";
     confirmationModal.show();
 }
 
-document.getElementById('confirmDelete').addEventListener('click', function () {
-    if (currentTaskID !== null) {
+document.getElementById('confirmAction').addEventListener('click', function () {setCompleteTask
+    if (currentTaskID !== null && currentTaskAction === "delete") {
          deleteTask(currentTaskID)
          refreshAGGrid();
-         //refreshGridData();
+         confirmationModal.hide();
         
+    } else if (currentTaskID !== null && currentTaskAction === "complete"){
+        setCompleteTask(currentTaskID);
     }
-    confirmationModal.hide();
+    
 });
 
 
@@ -589,11 +611,28 @@ document.getElementById('taskTableGrid2').addEventListener('click', function(eve
         console.log('Opening showEditModal on taskID=', dataID);
         showEditModal(dataID); // Call the new function here
     }
-    if (event.target.matches('.delete-btn')){
+    else if (event.target.matches('.delete-btn')){
         const dataID = event.target.getAttribute('data-id');
+        currentTaskID = dataID;
+        currentTaskAction = "delete";
         console.log('attempting to remove taskID=', dataID);
+        const confirmationBody = document.getElementById('confirmTextContent')
+        confirmationBody.innerHTML = ""
+        confirmationBody.innerHTML = `<p> Are you sure you want to delete ${dataID}?</p> <p>Warning, this is a permanent action!</p> `;
         removeTask(dataID);
     }
+    else if (event.target.matches(".complete-btn")){
+        const dataID = event.target.getAttribute('data-id');
+        currentTaskID = dataID;
+        currentTaskAction = "complete";
+        console.log(`Attempting to mark task complete (${dataID})`);
+        const confirmationBody = document.getElementById('confirmTextContent')
+        confirmationBody.innerHTML = ""
+        confirmationBody.innerHTML = `<p> Are you sure you want to mark ${dataID} as complete?</p> <p>Warning, this is permanent action!</p>`;
+        confirmationModal.show();
+        //setCompleteTask(dataID);
+    }
+    
 });
 
 window.addEventListener('resize', event => {

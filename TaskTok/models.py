@@ -130,6 +130,8 @@ class TaskReminder(db.Model):
     task_description = db.Column(db.String(255), nullable=False)
     task_name = db.Column(db.String(255), nullable=False)
     task_message = db.Column(db.String(255), nullable=False)
+    task_is_recurring = db.Column(db.Boolean(), default=False, unique=False)
+    task_archived = db.Column(db.Boolean(), default=False, unique=False)
     task_completed = db.Column(db.Boolean(), default=False, unique=False)
     task_completed_date = db.Column(db.DateTime, nullable=True)
     task_email_sent = db.Column(db.Boolean(), default=False, unique=False)
@@ -138,12 +140,12 @@ class TaskReminder(db.Model):
     def __repr__(self) -> str:
         return f"<taskReminder {self.task_description}>"
 
-    # add blocked token to the database
+    # add task to the database
     def add(self):
         db.session.add(self)
         db.session.commit()
 
-    # remove blocked token to the database
+    # remove task from the database
     def remove(self):
         db.session.delete(self)
         db.session.commit()
@@ -152,16 +154,30 @@ class TaskReminder(db.Model):
         print("Setting task to email_sent: True")
         self.task_email_sent = update
         db.session.commit()
-        
 
     def task_email_date(self, date):
         self.email_date = date
+        db.session.commit()
+
+    def set_task_complete(self):
+        self.task_completed = True
+        self.task_completed_date = datetime.now()
         db.session.commit()
 
     @classmethod
     def find_task_by_username(cls, username):
         print(f'looking for {username} tasks')
         return cls.query.filter_by(owner_username=username).all()
+    
+    @classmethod
+    def find_completed_task_by_username(cls, username):
+        print(f'looking for {username}s completed tasks')
+        return cls.query.filter_by(owner_username=username, task_completed=True).all()
+
+    @classmethod 
+    def find_noncomplete_task_by_username(cls, username):
+        print(f'looking for {username}s non-completed tasks')
+        return cls.query.filter_by(owner_username=username, task_completed=False).all()
     
     @classmethod
     def find_task_by_username_pagination(cls, username, page, pageSize):

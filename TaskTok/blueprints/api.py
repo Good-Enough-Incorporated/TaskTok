@@ -133,16 +133,35 @@ def add_task():
         return jsonify({'Message': 'add_failed', 'Error': str(e)}), 500
 
 
-@api.route('/listTask')
+@api.route('/listNonCompleteTask')
 @jwt_required()
-def list_task():
+def list_noncomplete_task():
+
+    user_data = current_user
+    task_list = TaskReminder.find_noncomplete_task_by_username(username=user_data.username)
+    task_list_string = TaskSchema().dump(task_list, many=True)
+    print(type(task_list_string))
+    return jsonify({"TaskList": task_list_string}), 200
+
+@api.route('/listCompletedTask')
+@jwt_required()
+def list_completed_task():
+
+    user_data = current_user
+    task_list = TaskReminder.find_completed_task_by_username(username=user_data.username)
+    task_list_string = TaskSchema().dump(task_list, many=True)
+    print(type(task_list_string))
+    return jsonify({"TaskList": task_list_string}), 200
+
+@api.route('/listAllTask')
+@jwt_required()
+def list_all_task():
 
     user_data = current_user
     task_list = TaskReminder.find_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
     print(type(task_list_string))
     return jsonify({"TaskList": task_list_string}), 200
-
 
 @api.route('/listTaskPagination')
 @jwt_required()
@@ -186,6 +205,30 @@ def remove_task(task_id):
             return jsonify({'Message': "remove_fail", 'Error': str(e), "task_id": task_id})
     else:
         return jsonify({'Message': "remove_fail", 'Error': f'Task [{task_id}] was not found, or permission denied'})
+
+@api.route('/completeTask/<task_id>', methods=["GET"])
+@jwt_required()
+def complete_task(task_id):
+    user_data = current_user
+    current_task = TaskReminder.query.get(task_id)
+
+    if current_task is None:
+        return jsonify({'Message': 'Task not found or not authorized'}), 404
+    
+
+    if current_task.task_completed == True: #if recurring, make sure we allow this
+        return jsonify({'Message': "Task was already marked complete!"})
+    else:
+        try:
+            current_task.set_task_complete()
+            return jsonify({'Message': "successfully marked complete.", "task_id": task_id})
+        except Exception as e:
+            print(e)
+            return jsonify({'Message': "Failed to mark task as complete.", "task_id": task_id})
+    
+
+
+    
 
 
 @api.route('/editTask/<task_id>', methods=['PUT'])
