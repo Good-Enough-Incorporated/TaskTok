@@ -8,7 +8,6 @@
     <style>
         body {
             font-family: Calibri, Helvetica, sans-serif;
-            color: #FFBF00;
             background: #0F0F12;
             margin: 0;
             padding: 0;
@@ -54,7 +53,7 @@
 
 
         .main h2, .main p {
-            color: #FFBF00;
+            color: White;
         }
 
         .main {
@@ -65,13 +64,16 @@
         }
 
 .table-container {
-    max-width: 1200px; /* or any maximum width you prefer */
-    margin: 0 auto; /* centers the table */
+     /* or any maximum width you prefer */
+     width: 60%;
+    margin: 1; /* centers the table */
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: flex-start;
     padding-top: 30px;
     position: relative;
+    
 }
 .table-wrapper {
     padding-left: 50px;
@@ -169,7 +171,12 @@
     align-items: center;
     margin: 5px;
 }
+/* add spacing  between the table and the search filter */
+.search-container{
 
+    margin-bottom: 5px;
+
+}
 .edit-btn .icon {
     margin-right: 5px;
 }
@@ -198,26 +205,43 @@ button span {
 
 
 
-    .toast-container {
+.toast-container {
     
     display: block;
         visibility: visible; /* Moved visibility here */
-        background-color: #0a0a0a;
+        background-color: green;
         visibility: hidden;
-        color: #fff;
+        color: black;
         text-align: center;
-        border-radius: 2px;
-        padding: 16px;
+        
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 15px;
+        padding-right: 15px;
         position: fixed;
         z-index: 1;
         margin: auto;
         left: 50%;
         bottom: 30px;
         font-size: 17px;
+        border-radius: 15px;
+}
+
+.toast-container.success {
+
+    background-color: green;
+    color: black;
+    
+}
+
+.toast-container.error {
+    
+ background-color: red;
+ color: white;
 }
 
 .toast-container.show {
-    visibility: visible; /* This will now work as expected */
+    visibility: visible; 
 }
 
 
@@ -289,12 +313,116 @@ button span {
 
     /* Ensuring the controls are positioned within the max width of the carousel. */
     #completedTasksCarousel .carousel-control-prev {
-        left: calc((100% - 1200px) / 2); /* Adjusts based on the max-width of the carousel. */
+        top: 75px;
+        left: calc((100% - 1200px) / 2)/2; /* Adjusts based on the max-width of the carousel. */
     }
 
     #completedTasksCarousel .carousel-control-next {
-        right: calc((100% - 1200px) / 2); /* Adjusts based on the max-width of the carousel as prev. */
+        top: 75px;
+        right: calc((100% - 1200px) / 2)/2; /* Adjusts based on the max-width of the carousel as prev. */
     }
+
+.content-container {
+    display:flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    position: relative;
+}
+
+ /* Grid Container */
+ .grid-container {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto; /* Three columns: auto for sides, 1fr for center */
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 56px); /* to account for navbar */
+        }
+
+        .card-container {
+            grid-column: 1 / 2;
+            display: flex;
+            flex-direction: column; /* Align children vertically */
+            background-color: white;
+            padding: 1em;
+            border-radius: 15px;
+            width: 250px;
+            
+            
+            /* Position and other styles */
+        }
+
+        .table-container {
+            grid-column: 2 / 3;
+            max-width: 1200px; /* or any maximum width you prefer */
+            margin: 0 auto; /* centers the table */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 30px;
+            position: relative;
+            
+        }
+
+
+    /* Card for reminder quick glance*/
+
+
+
+
+.reminder-card{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 45px;
+    margin-bottom: 30px;
+     /* Adjust as needed */
+    /* Space between cards */
+    border: 2px solid transparent; /* Default border to maintain consistent size */
+    transition: border-color 0.3s, background-color 0.3s; /* Smooth transition for hover effect */
+    border-radius: 15px;
+}
+
+.reminder-card:hover {
+  cursor: pointer;
+  background-color: lightgray;
+
+
+
+
+}
+
+
+
+
+.card-heading {
+  color: black;
+  font-size: 1.1em;
+  font-weight: bold;
+  align-self: center;
+}
+
+.title{
+  display: flex;
+  margin-top: 15px;
+  flex-direction: column;
+  color: black;
+  
+  
+
+}
+
+.count{
+  margin-top: 10px;
+  display:flex;
+  flex-direction:column;
+  margin-left: auto;
+  font-size: 3em;
+}
+
+
+
 
 
 
@@ -302,16 +430,42 @@ button span {
 {% endblock %}
 {% block body %}
 <body>
-    <div class="main">
-        <h2>TaskTok Dashboard</h2>
-        <p>"Clarity about what matters provides clarity about what does not."</p>
-        <p><b>Welcome back {{username}}</b></p>
-    </div>
+
+    
     <div id="toast-container" class="toast-container">
         <div id="toast-user-content">
         </div>
     </div>
-    <div class="table-container">
+    <div class="grid-container">
+        
+        <div class="card-container">
+  <div class="card-heading">
+    <p class="card-heading">Upcoming Reminders</p>
+  </div>
+    
+      <div class="reminder-card">
+      <p class="title">Today</p>
+      <p class="count">3</p>
+      </div>
+
+      <div class="reminder-card">
+      <p class="title">This Week</p>
+      <p class="count">12</p>
+      </div>
+
+  
+      <div class="reminder-card">
+      <p class="title">This month</p>
+      <p class="count">23</p>
+      </div>
+
+</div>
+        <div class="table-container">
+            <div class="main">
+        <h2>TaskTok Dashboard</h2>
+        <p>"Clarity about what matters provides clarity about what does not."</p>
+        <p><b>Welcome back {{username}}</b></p>
+    </div>
         <div class="table-wrapper">
             <label class="tasktable-title-lbl">Active Tasks</label>
             <!-- Add button attached to bootstrap modal -->
@@ -320,13 +474,12 @@ button span {
                     <span class="icon">➕</span></button>
                 </div>
             <div id="taskTableGrid"></div>
+            <div class="search-container">
             <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+            </div>
             <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
         </div>
-
-    </div>
-
-    <!--------------------- Completed Tasks Carousel----------- -->
+        <!--------------------- Completed Tasks Carousel----------- -->
 <div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
         <!-- Dynamic tasks will be added here -->
@@ -341,6 +494,11 @@ button span {
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+
+    </div>
+    </div>
+
+
 
 
 
