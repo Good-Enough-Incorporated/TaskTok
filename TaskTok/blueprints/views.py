@@ -54,7 +54,6 @@ def home():
     nav_menu_items = generate_links()
     cookies = {'access_token_cookie': request.cookies.get('access_token_cookie')}
     # response = requests.get(url_for('auth.getCurrentUser',_external=True), cookies=cookies)
-
     return render_template('home.html', username=current_user.username, navMenuItems=nav_menu_items, form=form)
 
 

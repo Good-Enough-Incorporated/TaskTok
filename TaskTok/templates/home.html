@@ -52,31 +52,26 @@
         }
         }
 
-        .main {
-            margin-left: 200px; /* Same as the width of the sidenav */
-            padding: 0px 10px;
-
-        }
 
         .main h2, .main p {
             color: #FFBF00;
         }
 
         .main {
-            margin-left: 200px; /* Same as the width of the sidenav */
+            max-width: 1200px;
+            margin: 0 auto;
             padding-top: 40px;
+
         }
 
 .table-container {
-    display: flex; /* Use flexbox to center the child div */
-    justify-content: center; /* Center the child div horizontally */
-    align-items: flex-start; /* Align the child div to the top */
-    position: relative;
+    max-width: 1200px; /* or any maximum width you prefer */
+    margin: 0 auto; /* centers the table */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     padding-top: 30px;
-    margin-right: 25px;
     position: relative;
-    
-    margin-left: 200px;
 }
 .table-wrapper {
     padding-left: 50px;
@@ -271,26 +266,6 @@ button span {
 
 
 
-.archived-tasks-container {
-  display: flex;
-  overflow-x: auto;
-  margin-left: 200px; /* Same as the width of the sidenav */
-  margin-top: 30px;
-  scroll-behavior: smooth;
-  white-space: nowrap; /* Ensures cards are in a single line */
-}
-
-.archived-task-card {
-  display: inline-block;
-  background-color: #2a2a2e; /* Dark theme card */
-  color: white;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding: 15px;
-  border-radius: 10px;
-  min-width: 200px; /* Minimum width for each card */
-  /* Other styling as needed */
-}
 
 /* scroll bar */
 /* This styles the scrollbar track */
@@ -329,6 +304,41 @@ button span {
     width: 100%; /* Fill the cell width */
     
   }
+    /*------------------- Carousel CSS Section -------------------------*/
+    .carousel {
+        padding-top:70px;
+        width: 80%;
+        margin: auto;
+    }
+    .carousel-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: black;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+
+        background-color: #000;
+        border-radius: 50%;
+        padding: 10px;
+    }
+
+    /* Adjust the positioning of the carousel controls */
+    .carousel-control-prev, .carousel-control-next {
+        display: inline-block; /* Align controls in a line. */
+    }
+
+    /* Ensuring the controls are positioned within the max width of the carousel. */
+    #completedTasksCarousel .carousel-control-prev {
+        left: calc((100% - 1200px) / 2); /* Adjusts based on the max-width of the carousel. */
+    }
+
+    #completedTasksCarousel .carousel-control-next {
+        right: calc((100% - 1200px) / 2); /* Adjusts based on the max-width of the carousel as prev. */
+    }
 
 
 
@@ -359,6 +369,41 @@ button span {
         </div>
 
     </div>
+
+    <!--------------------- Completed Tasks Carousel----------- -->
+<div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <!-- Example Task 1 -->
+        <div class="carousel-item active">
+            <div class="carousel-content">
+                <!-- Content for the first item -->
+                <h3>Completed Task Title 1</h3>
+                <p>Description or details of the completed task.</p>
+            </div>
+        </div>
+
+        <!-- Example Task 2 -->
+        <div class="carousel-item">
+            <div class="carousel-content">
+                <!-- Content for the second item -->
+                <h3>Completed Task Title 2</h3>
+                <p>Description or details of the completed task.</p>
+            </div>
+        </div>
+        <!--- Add more cards down here -->
+    </div>
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+
 
 
 <!-- Task Add Modal -->
@@ -479,127 +524,7 @@ button span {
 
 
 
-    <!-- Archived Tasks Section -->
-<div class="archived-tasks-container">
-    <!-- Repeat this block for each archived task -->
-    <div class="archived-task-card">
-      <h3>Task Title</h3>
-      <p>Completed on: Date</p>
-      <p>Summary of the task...</p>
-      <button>View Details</button>
-    </div>
-    <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-    <!-- More archived task cards -->
-  </div>
 
-    </div>
 <!-- The Modal -->
     <div id="editModal" class="modal">
 
@@ -611,25 +536,11 @@ button span {
             
         </div>
         <div class="modal-body" id="modal-body">
-            <!--<label>Name </label> 
-            <input class="modal-fields" type="text" name="test" id="test" placeholder="Task Name">
-            <label>Description </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <label>Email Message </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <label>Due Date </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <label>Offset </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <button type="submit">Update</button>
-            <p>Some other text...</p>
-            !-->
         </div>
         <div class="modal-footer" id="modal-footer">
             
         </div>
-        </div>
-    
+            </div>
     </div>
     <!-- Home.html Scripts Section -->
     
