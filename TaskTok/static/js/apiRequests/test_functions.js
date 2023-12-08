@@ -1,4 +1,4 @@
-import { showToast, clearModal, getCookie, format_backend_datetime, enableVerticalScroll, isValidEmailList } from '../utilities.js';
+import { showToast, clearModal, getCookie, format_backend_datetime, enableVerticalScroll, isValidEmailList, updateTime } from '../utilities.js';
 // Global variable for the Bootstrap 5 modal instance.
 let confirmationModal = null;
 let currentTaskID = null;
@@ -17,8 +17,14 @@ document.addEventListener('DOMContentLoaded', function () {
     //initializeGrid();
     initializeAGGrid();
     enableVerticalScroll();
-    
+
+   // Initialize timezone-based clock update.
+    let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
+    setInterval(() => updateTime(selectedTimezone), 1000);
+    updateTime(selectedTimezone);
 });
+    
+
 
 
 
