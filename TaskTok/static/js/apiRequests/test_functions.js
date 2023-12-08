@@ -23,27 +23,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     setInterval(() => updateTime(selectedTimezone), 1000);
     updateTime(selectedTimezone);
 
-    try {
-        const allTasks = await queryAllTasks();
-        const completedTasks = allTasks.filter(task => task.isCompleted); // Replace `isCompleted` with the actual property name
+    // Fetch and display completed tasks in the carousel.
+    fetch('/api/completed-tasks')
+    .then(response => response.json())
+    .then(tasks => {
         const carouselInner = document.querySelector('#completedTasksCarousel .carousel-inner');
-
-        completedTasks.forEach((task, index) => {
-            const carouselItem = document.createElement('div');
-            carouselItem.className = 'carousel-item' + (index === 0 ? ' active' : '');
-            carouselItem.innerHTML = `
-                <div class="carousel-content">
-                    <h3>${task.title}</h3> <!-- Replace with actual task title -->
-                    <p>${task.description}</p> <!-- Replace with actual task description -->
-                </div>
+        tasks.forEach((task, index) => {
+            const div = document.createElement('div');
+            div.className = 'carousel-item' + (index === 0 ? ' active' : '');
+            div.innerHTML = `
+                <h5>${task.task_name}</h5>
+                <p>${task.task_description}</p>
             `;
-            carouselInner.appendChild(carouselItem);
+            carouselInner.appendChild(div);
         });
-    } catch (error) {
-        console.error('Error loading tasks:', error);
-    }
-
-
+    })
+    .catch(error => console.error('Error:', error));
 
 });
     
