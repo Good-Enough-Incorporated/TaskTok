@@ -80,3 +80,16 @@ export function isValidEmailList(emailList) {
     // If all emails are valid, return true.
     return true;
 }
+
+// Used to update the top right of the nav bar with the current time.
+export function updateTime(timezone = null) {
+    const options = { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const now = new Date();
+    const timeString = timezone ? now.toLocaleTimeString('en-US', options) : now.toLocaleTimeString();
+    document.getElementById('currentTime').textContent = timeString;
+}
+
+
+
+
+
