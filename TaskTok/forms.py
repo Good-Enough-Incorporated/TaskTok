@@ -75,7 +75,7 @@ def validate_first_name(form, field):
 
     # Verify name isn't only spaces
     if not field.data.strip():
-        raise ValidationError('First name must be only spaces.')
+        raise ValidationError('First name must not be only spaces.')
 
     if len(field.data) < min_length:
         raise ValidationError('First Name must be at least 2 characters.')
