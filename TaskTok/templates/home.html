@@ -52,37 +52,38 @@
         }
         }
 
-        .main {
-            margin-left: 200px; /* Same as the width of the sidenav */
-            padding: 0px 10px;
-        }
 
         .main h2, .main p {
             color: #FFBF00;
         }
 
         .main {
-    margin-left: 200px; /* Same as the width of the sidenav */
-    padding: 0 10px;
-}
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 40px;
+
+        }
 
 .table-container {
-    display: flex; /* Use flexbox to center the child div */
-    justify-content: center; /* Center the child div horizontally */
-    align-items: flex-start; /* Align the child div to the top */
-    position: relative;
+    max-width: 1200px; /* or any maximum width you prefer */
+    margin: 0 auto; /* centers the table */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     padding-top: 30px;
     position: relative;
-    
-    margin-left: 200px;
 }
 .table-wrapper {
-    padding: 25px;
+    padding-left: 50px;
+    padding-right: 50px;
+    width: 100%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     background-color: #17171c;
     transition: 0.3s;
     border-radius: 5px;
     position: relative; /* New positioning context for the button */
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .table-wrapper:hover{
@@ -95,22 +96,36 @@
     position: absolute;
     left: 50%;
     top: -30px;
-    font-size: 16px;
+    font-size: 12px;
     transform: translate(-50%, -50%);
 }
+
+.gridjs-button{
+    display: inline-block;
+}
+
+.table-header {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+
 .task-add-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-end;
     background-color: #E0A900;
+    display: block;
     border: none;
-    visibility: hidden; /* make button visible once table loads */
+
     color: black;
     padding: 8px 16px;
     min-width: 93px;
     text-decoration: none;      
     cursor: pointer;
     border-radius: 8px;
-    top: -50px;
-    right: 0;
-    position: absolute;
+   
+   
    
     
     /* Style your button as needed */
@@ -146,13 +161,13 @@ table {
 
         th, td {
             text-align: left; /* Align text to left */
-            color: #FFBF00;
+            color: #0a0a0a;
             padding: 8px;
         }
 
         th {
             background-color: #17171C;
-            color: #FFBF00;
+            color: Black;
             text-align: center;
         }
 
@@ -165,7 +180,7 @@ border-bottom: 0px solid #444444;
     }
     
     th {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: bold;
     color: #FFBF00;
     text-align: center;
@@ -176,15 +191,56 @@ border-bottom: 0px solid #444444;
     border-left: none;
     }
     .task-edit-btn, .task-delete-btn, .task-update-btn  {
-    background-color: #E0A900;
-    border: none;
-    color: black;
-    padding: 8px 16px;
-    margin-right: 8px;
-    text-decoration: none;      
-    cursor: pointer;
-    border-radius: 8px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto; /* Or set a specific minimum height */
+    padding: 5px 10px; /* Adjust as needed */
+    margin: 5px 5px;
+
     }
+
+    .edit-btn, .add-btn, .complete-btn {
+    background-color: transparent;
+    width: auto;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.edit-btn .icon {
+    margin-right: 5px;
+}
+
+.delete-btn {
+    background-color: transparent; /* Red background */
+    width: auto;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.delete-btn .icon {
+    margin-right: 5px;
+}
+
+button span {
+    pointer-events: none;
+}
+
+
+
 
     .toast-container {
     
@@ -210,26 +266,6 @@ border-bottom: 0px solid #444444;
 
 
 
-.archived-tasks-container {
-  display: flex;
-  overflow-x: auto;
-  margin-left: 200px; /* Same as the width of the sidenav */
-  margin-top: 30px;
-  scroll-behavior: smooth;
-  white-space: nowrap; /* Ensures cards are in a single line */
-}
-
-.archived-task-card {
-  display: inline-block;
-  background-color: #2a2a2e; /* Dark theme card */
-  color: white;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding: 15px;
-  border-radius: 10px;
-  min-width: 200px; /* Minimum width for each card */
-  /* Other styling as needed */
-}
 
 /* scroll bar */
 /* This styles the scrollbar track */
@@ -255,21 +291,64 @@ border-bottom: 0px solid #444444;
     scrollbar-width: thin; /* Can be 'auto', 'thin', or 'none' */
 }
 
+  /* Target the Grid.js table */
+  .gridjs-table {
+    font-size: 14px; /* Set your desired font size */
+  }
+
+  .grid-button-wrapper {
+    display: flex;
+    justify-content:left;
+    align-items: center;
+    height: 100%; /* Fill the cell height */
+    width: 100%; /* Fill the cell width */
+    
+  }
+    /*------------------- Carousel CSS Section -------------------------*/
+    .carousel {
+        padding-top:70px;
+        width: 80%;
+        margin: auto;
+    }
+    .carousel-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: black;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+
+        background-color: #000;
+        border-radius: 50%;
+        padding: 10px;
+    }
+
+    /* Adjust the positioning of the carousel controls */
+    .carousel-control-prev, .carousel-control-next {
+        display: inline-block; /* Align controls in a line. */
+    }
+
+    /* Ensuring the controls are positioned within the max width of the carousel. */
+    #completedTasksCarousel .carousel-control-prev {
+        left: calc((100% - 1200px) / 2); /* Adjusts based on the max-width of the carousel. */
+    }
+
+    #completedTasksCarousel .carousel-control-next {
+        right: calc((100% - 1200px) / 2); /* Adjusts based on the max-width of the carousel as prev. */
+    }
+
 
 
 </style>
 {% endblock %}
 {% block body %}
 <body>
-  <div class="sidenav">
-    {% for menuItem in sideNavMenuItems %}
-    <a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
-    {% endfor %}
-  </div>
-
     <div class="main">
-        <h2>TaskTok</h2>
-        <p>Fancy Slogan</p>
+        <h2>TaskTok Dashboard</h2>
+        <p>"Clarity about what matters provides clarity about what does not."</p>
         <p><b>Welcome back {{username}}</b></p>
     </div>
     <div id="toast-container" class="toast-container">
@@ -280,18 +359,51 @@ border-bottom: 0px solid #444444;
         <div class="table-wrapper">
             <label class="tasktable-title-lbl">Active Tasks</label>
             <!-- Add button attached to bootstrap modal -->
-            <button class="btn btn-primary task-add-btn" id="task-add-btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#taskAddModal">New Task</button>
-            <table id="taskTable">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div class="table-header">
+                <button class="add-btn" data-bs-toggle="modal" data-bs-target="#taskAddModal">
+                    <span class="icon">➕</span></button>
+                </div>
+            <div id="taskTableGrid"></div>
+            <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+            <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
         </div>
 
     </div>
+
+    <!--------------------- Completed Tasks Carousel----------- -->
+<div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <!-- Example Task 1 -->
+        <div class="carousel-item active">
+            <div class="carousel-content">
+                <!-- Content for the first item -->
+                <h3>Completed Task Title 1</h3>
+                <p>Description or details of the completed task.</p>
+            </div>
+        </div>
+
+        <!-- Example Task 2 -->
+        <div class="carousel-item">
+            <div class="carousel-content">
+                <!-- Content for the second item -->
+                <h3>Completed Task Title 2</h3>
+                <p>Description or details of the completed task.</p>
+            </div>
+        </div>
+        <!--- Add more cards down here -->
+    </div>
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+
 
 
 <!-- Task Add Modal -->
@@ -412,127 +524,7 @@ border-bottom: 0px solid #444444;
 
 
 
-    <!-- Archived Tasks Section -->
-<div class="archived-tasks-container">
-    <!-- Repeat this block for each archived task -->
-    <div class="archived-task-card">
-      <h3>Task Title</h3>
-      <p>Completed on: Date</p>
-      <p>Summary of the task...</p>
-      <button>View Details</button>
-    </div>
-    <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-      <div class="archived-task-card">
-        <h3>Task Title</h3>
-        <p>Completed on: Date</p>
-        <p>Summary of the task...</p>
-        <button>View Details</button>
-      </div>
-    <!-- More archived task cards -->
-  </div>
 
-    </div>
 <!-- The Modal -->
     <div id="editModal" class="modal">
 
@@ -544,31 +536,22 @@ border-bottom: 0px solid #444444;
             
         </div>
         <div class="modal-body" id="modal-body">
-            <!--<label>Name </label> 
-            <input class="modal-fields" type="text" name="test" id="test" placeholder="Task Name">
-            <label>Description </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <label>Email Message </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <label>Due Date </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <label>Offset </label> 
-            <input class='modal-fields' type="text" name="test" id="test">
-            <button type="submit">Update</button>
-            <p>Some other text...</p>
-            !-->
         </div>
         <div class="modal-footer" id="modal-footer">
             
         </div>
-        </div>
-    
+            </div>
     </div>
     <!-- Home.html Scripts Section -->
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- flatpickr used for date/time selection in date/offset input fields for add/edit forms -->
     <script type="module" src="{{ url_for('static', filename='js/apiRequests/test_functions.js') }}"></script>
+
+    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
 </body>
 {% endblock %}

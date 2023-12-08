@@ -162,3 +162,11 @@ class TaskReminder(db.Model):
     def find_task_by_username(cls, username):
         print(f'looking for {username} tasks')
         return cls.query.filter_by(owner_username=username).all()
+    
+    @classmethod
+    def find_task_by_username_pagination(cls, username, page, pageSize):
+        query =  cls.query.filter_by(owner_username=username)
+        paginated_query = query.paginate(page=page, per_page=pageSize)
+        return paginated_query
+
+    
