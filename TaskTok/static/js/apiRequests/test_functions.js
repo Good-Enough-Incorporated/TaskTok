@@ -201,6 +201,8 @@ async function showEditModal(taskID) {
 }
 
 async function setCompleteTask(taskID){
+    try{
+
     
     const csrfAccessToken = getCookie('csrf_access_token');
     const response = await fetch(`/api/completeTask/${taskID}`, {
@@ -213,11 +215,18 @@ async function setCompleteTask(taskID){
     if (response.ok && data.Message == "successfully marked complete."){
         showToast("Task was marked complete!",5000);
         confirmationModal.hide();
-        refreshAGGrid();
+        
     } else {
         showToast("Failed to mark task as complete :(", 5000);
         confirmationModal.hide();
     }
+    } catch {
+        showToast("An error occurred while trying to mark the task as complete.", 5000);
+        console.error(error);
+        // Handle any additional error logic here
+        confirmationModal.hide();
+    }
+
 
 }
 
@@ -319,10 +328,7 @@ async function deleteTask(taskID) {
             const taskRow = document.querySelector(`tr[data-id="${taskID}"]`);
             const $taskRow = $(taskRow)
 
-            $taskRow.addClass('fadeOutSlideRight');
-            $taskRow.on('animationend', function () {
-                $taskRow.remove(); // This will remove the row from the DOM after the animation
-            });
+            //refreshAGGrid();
 
             //removeRowFromTable(taskID);
 
@@ -505,7 +511,7 @@ async function initializeAGGrid(){
             {field: "task_reminderOffSetTime", headerName: "Early Reminder Time", valueFormatter: dateFormatter},
             {field: "task_emailList", headerName: "E-Mail Recipient List"},
             {field: "task_message", headerName: "E-Mail Message"},
-            {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRenderParams: {api: api}, width: 200, suppressSizeToFit: true },
+            {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRendererParams: {api: api}, width: 200, suppressSizeToFit: true },
   
         ]
 
@@ -595,12 +601,12 @@ function removeTask(taskID) {
 
 document.getElementById('confirmAction').addEventListener('click', function () {setCompleteTask
     if (currentTaskID !== null && currentTaskAction === "delete") {
-         deleteTask(currentTaskID)
-         refreshAGGrid();
+        //make our API query to delete the task, then refresh the grid
+         deleteTask(currentTaskID).then( () => refreshAGGrid() );
          confirmationModal.hide();
         
     } else if (currentTaskID !== null && currentTaskAction === "complete"){
-        setCompleteTask(currentTaskID);
+        setCompleteTask(currentTaskID).then( () => refreshAGGrid());
     }
     
 });
