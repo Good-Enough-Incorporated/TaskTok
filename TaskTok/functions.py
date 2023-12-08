@@ -13,7 +13,7 @@ import os
 # System is not running'
 def verify_celery_worker():
     try:
-        result = subprocess.check_output(['celery', '-A', 'RemindMeClient.Client.celery', 'status'])
+        result = subprocess.check_output(['celery', '-A', 'RemindMeClient.Client.celery_worker', 'status'])
         # print(f"OUTPUT RESULT: {result}")
         return True if result else False
     except subprocess.CalledProcessError:

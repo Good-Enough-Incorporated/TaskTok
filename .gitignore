@@ -7,3 +7,7 @@ instance/db.sqlite3
 *.pem
 .env
 .idea
+.env
+.DS_Store
+*.db
+*.rdb

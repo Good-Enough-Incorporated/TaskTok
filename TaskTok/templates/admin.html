@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}TaskTok{% endblock %}
+
+{% block style %}
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - TaskTok</title>
+    <style>
+        body {
+			font-family: Calibri, Helvetica, sans-serif;
+			color: #FFBF00; 
+			background: #0F0F12 ;
+        }
+        .header {
+            display: block;
+            width: 50%;
+            margin-left: calc((100% - 50%)/2 + 175px/2); 
+            padding: 0px 10px;
+            text-align: center;
+            
+        }
+        .settings-container {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            width: 30%;
+            margin-left: calc((100% - 30%)/2 + 175px/2); 
+            display: block;
+            flex-direction: column;
+            align-items: center;
+            position: relative;			
+			background: #0F0F12;		
+						
+		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
+		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+        }
+        .settings-section {
+           
+            display: flex;
+            flex-direction: column;
+            position: relative;
+			padding: 25px; 
+			background: #17171c;
+			min-width: 400px;
+			width: 100%;
+			margin: auto;
+			border-right: 3px inset #ad7231;
+			border-radius: 0px 12px 12px 0px;
+		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
+		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+        }
+        
+        .taskTokInput, .taskTokButton {
+            /* Shared styles for inputs and buttons */
+            background: #17171c;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;     
+			border: 2px solid rgba(51,51,61,0.48);
+			border-radius: 4px;
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+			}
+        .taskTokInput {
+            color: white;
+        }
+
+        .taskTokReadOnly {
+            background: #17171c;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;     
+			border: 2px solid rgba(51,51,61,0.48);
+			border-radius: 4px;
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
+            color: gray;
+        }
+
+        ul.errors {
+            border: 1px solid red; /* Red border around the list */
+            background-color: #ffe6e6; /* Light red background color for visibility */
+            padding: 10px; /* Some padding inside the box */
+            margin: 10px 0; /* Margin to separate the error box from other elements */
+            list-style-type: none; /* Removes the default bullet points */
+        }
+
+        ul.errors li {
+            color: red; /* Red text color for the list items */
+            font-size: 0.9em; /* Adjust the font size as needed */
+        }
+
+
+
+        .settings-section h3 {
+            margin-top: 0;
+        }
+
+        button {
+			background-color: #ad7231 ; 
+			width: 100%;
+			color: black; 
+			padding: 15px; 
+			margin: 10px 0px; 
+			border: none; 
+			cursor: pointer; 
+			position: relative;
+        }
+        button:hover {
+            opacity: 0.5;
+        }
+        .footer {
+            background-color: #0F0F12;
+            color: FFBF00;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+            width: 100%;
+        }
+		.sidenav {
+            height: 100%;
+            width: 175px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #17171c;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .sidenav a {
+            padding: 6px 6px 6px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px; /* Spacing between cards */
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+        }
+
+        .card {
+            background: #17171c;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            width: calc(50% - 20px); /* Two cards per line minus gap */
+            padding: 20px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .main {
+            margin-left: 175px; 
+        }
+
+        .status-light {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin: 5px;
+            display: inline-block;
+        }
+
+        .status-ok {
+            background-color: green;
+            animation: blink-animation 1s infinite; /* Adjust timing as needed */
+        }
+
+        .status-error {
+            background-color: red;
+            animation: blink-animation 1s infinite; /* Adjust timing as needed */
+        }   
+        @keyframes blink-animation {
+            0%   { opacity: 1; }
+            50%  { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes pulse-animation {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        .status-ok {
+            background-color: green;
+            animation: pulse-animation 1s infinite;
+        }
+
+        .status-error {
+            background-color: red;
+            animation: pulse-animation 1s infinite;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+    <div class="sidenav">
+        {% for menuItem in sideNavMenuItems %}
+        <a href="{{ menuItem.url }}"> {{ menuItem.title }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="header">
+        <h1>TaskTok - Admin Dashboard</h1>
+    </div>
+    <div class="main">
+        <div class="card-container">
+            <!-- Card 1: Backend Message Broker Status -->
+            <div class="card">
+                <h3>Celery Status (Worker)</h3>
+                <div>Version: 5.3.4 (emerald-rush)</div>
+                <div>Online: <div id= 'celeryWorkerStatus' name='celeryWorkerStatus' class="status-light"></div> </div>
+                <!-- status-error -->
+            </div>
+
+            <!-- Card 2: Celery Worker Status -->
+            <div class="card">
+                <h3>Redis Status (Message Broker)</h3>
+                <div>Version: 7.2 </div>
+                <div>Online: <div id= 'messageBrokerStatus' name='messageBrokerStatus' class="status-light"></div> </div>
+                <!-- Insert Celery worker status details here -->
+            </div>
+
+            <!-- Additional cards for server utilization, CPU, traffic, etc. -->
+            <!-- Example: -->
+            <div class="card">
+                <h3>Server Utilization</h3>
+                <div class="container"> 
+                    <div id="cpu_gage" class="200x160px"></div>
+                    <div id="ram_gage" class="200x160px"></div>
+
+                </div>
+            </div>
+
+            <!-- More cards as needed -->
+        </div>
+    </div>
+    <script type="module" src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{url_for('static', filename='js/justgage.js')}}"></script>
+    <script src="{{url_for('static', filename='js/raphael-2.1.4.min.js')}}"></script>
+</body>
+
+{% endblock %}

@@ -3,12 +3,19 @@ import { showToast, clearModal, getCookie, format_backend_datetime, enableVertic
 document.addEventListener('DOMContentLoaded', function () {
     var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
     var form = document.querySelector('form');
+    var credentialForm = document.getElementById('form_credential')
+    var updateCredentialButton = document.getElementById('update_userpassword_btn')
     var updatePersonalInfoButton = document.getElementById('update_userpassword_btn');
     var timezoneInput = document.getElementById('timezoneInput');
     var timezoneOptions = document.querySelectorAll('.timezone-option');
     var dropdownMenu = document.querySelector('.dropdown-menu');
     var dropDownOpen = false;
     var isConfirmPressed = false;
+    
+    credentialForm.addEventListener('submit', function(event) {
+        var scrollPosition = window.scrollY || document.documentElement.scrollTop;
+        sessionStorage.setItem('scrollPosition', scrollPosition);
+    });
 
 
     //event handler for updating user info
@@ -183,3 +190,23 @@ function addInputFieldsToModal() {
   
 
 });
+
+window.onbeforeunload = function(){
+    var scrollPosition = window.scrollY || document.documentElement.scrollTop;
+    sessionStorage.setItem('scrollPosition', scrollPosition);
+};
+
+
+
+window.onload = function() {
+    //removed query params after an error
+    //const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    //window.history.replaceState(null, null, baseUrl);
+
+    //this will prevent a reload sending the same bad data
+    var scrollPosition = sessionStorage.getItem('scrollPosition');
+    if (scrollPosition) {
+        window.scrollTo(0, scrollPosition);
+        sessionStorage.removeItem('scrollPosition');  // Clear the saved position
+    }
+};
