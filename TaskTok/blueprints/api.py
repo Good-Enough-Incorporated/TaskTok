@@ -10,6 +10,7 @@ import datetime
 import psutil
 import re
 import os
+
 #  ---------- Unused Imports: Needs review ----------------
 #  import subprocess
 #  import socket
@@ -41,6 +42,7 @@ def messageBroker():
     print(results)
     return jsonify({'Message': results})
 
+
 @api.route('/celeryStatus')
 def celeryStatus():
     # test route, will not be kept
@@ -57,12 +59,11 @@ def celeryStatus():
 @api.route('/serverUtilization')
 def getServerUtilization():
     cpu_load_1, cpu_load_5, cpu_load_15 = psutil.getloadavg()
-    cpu_usage = (cpu_load_5/os.cpu_count()) * 100
+    cpu_usage = (cpu_load_5 / os.cpu_count()) * 100
 
     ram_usage = psutil.virtual_memory()[2]
 
-    return jsonify({'data': {'cpu' : cpu_usage, 'ram': ram_usage}})
-
+    return jsonify({'data': {'cpu': cpu_usage, 'ram': ram_usage}})
 
 
 @api.route('/addTask', methods=['POST'])
@@ -136,32 +137,32 @@ def add_task():
 @api.route('/listNonCompleteTask')
 @jwt_required()
 def list_noncomplete_task():
-
     user_data = current_user
     task_list = TaskReminder.find_noncomplete_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
     print(type(task_list_string))
     return jsonify({"TaskList": task_list_string}), 200
 
+
 @api.route('/listCompletedTask')
 @jwt_required()
 def list_completed_task():
-
     user_data = current_user
     task_list = TaskReminder.find_completed_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
     print(type(task_list_string))
     return jsonify({"TaskList": task_list_string}), 200
 
+
 @api.route('/listAllTask')
 @jwt_required()
 def list_all_task():
-
     user_data = current_user
     task_list = TaskReminder.find_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
     print(type(task_list_string))
     return jsonify({"TaskList": task_list_string}), 200
+
 
 @api.route('/listTaskPagination')
 @jwt_required()
@@ -172,7 +173,8 @@ def list_task_pagination():
     limit = request.args.get('limit', 10, type=int)
     offset = (page - 1) * limit  # Calculate offset for SQL query
 
-    paginated_tasks = TaskReminder.find_task_by_username_pagination(username=user_data.username, page=page, pageSize=limit)
+    paginated_tasks = TaskReminder.find_task_by_username_pagination(username=user_data.username, page=page,
+                                                                    pageSize=limit)
     task_list_serialized = TaskSchema().dump(paginated_tasks.items, many=True)
 
     return jsonify({
@@ -180,9 +182,7 @@ def list_task_pagination():
         "TaskList": task_list_serialized,
         "totalTasks": paginated_tasks.total
 
-    }),200
-
-
+    }), 200
 
 
 @api.route('/removeTask/<task_id>')
@@ -206,6 +206,7 @@ def remove_task(task_id):
     else:
         return jsonify({'Message': "remove_fail", 'Error': f'Task [{task_id}] was not found, or permission denied'})
 
+
 @api.route('/completeTask/<task_id>', methods=["GET"])
 @jwt_required()
 def complete_task(task_id):
@@ -214,9 +215,8 @@ def complete_task(task_id):
 
     if current_task is None:
         return jsonify({'Message': 'Task not found or not authorized'}), 404
-    
 
-    if current_task.task_completed == True: #if recurring, make sure we allow this
+    if current_task.task_completed == True:  # if recurring, make sure we allow this
         return jsonify({'Message': "Task was already marked complete!"})
     else:
         try:
@@ -225,10 +225,6 @@ def complete_task(task_id):
         except Exception as e:
             print(e)
             return jsonify({'Message': "Failed to mark task as complete.", "task_id": task_id})
-    
-
-
-    
 
 
 @api.route('/editTask/<task_id>', methods=['PUT'])

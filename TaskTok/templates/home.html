@@ -282,45 +282,44 @@ button span {
     align-items: center;
     height: 100%; /* Fill the cell height */
     width: 100%; /* Fill the cell width */
-    
+
   }
     /*------------------- Carousel CSS Section -------------------------*/
-    .carousel {
-        padding-top:70px;
-        width: 80%;
-        margin: auto;
-    }
-    .carousel-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px;
-        background-color: black;
-        border-radius: 10px;
-        text-align: center;
-    }
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
+#completedTasksCarousel {
+    width: 90%;
+    margin: auto;
+    background-color: #343a40;
+    color: #fff;
+    padding-bottom: 60px; /* Extra padding to accommodate the arrows below the carousel */
+    position: relative; /* Needed for absolute positioning of children */
+}
 
-        background-color: #000;
-        border-radius: 50%;
-        padding: 10px;
-    }
+#completedTasksCarousel .carousel-item {
+    padding: 15px; /* Add padding for content inside carousel items */
+}
 
-    /* Adjust the positioning of the carousel controls */
-    .carousel-control-prev, .carousel-control-next {
-        display: inline-block; /* Align controls in a line. */
-    }
+#completedTasksCarousel .carousel-control-prev,
+#completedTasksCarousel .carousel-control-next {
+    position: absolute;
+    top: auto;
+    bottom: -50px; /* Adjust this value to move the arrows up or down */
+    z-index: 1; /* Ensure the arrows are above other content */
+}
 
-    /* Ensuring the controls are positioned within the max width of the carousel. */
-    #completedTasksCarousel .carousel-control-prev {
-        top: 75px;
-        left: calc((100% - 1200px) / 2)/2; /* Adjusts based on the max-width of the carousel. */
-    }
+#completedTasksCarousel .carousel-control-prev {
+    left: 10%; /* Position to the left */
+}
 
-    #completedTasksCarousel .carousel-control-next {
-        top: 75px;
-        right: calc((100% - 1200px) / 2)/2; /* Adjusts based on the max-width of the carousel as prev. */
-    }
+#completedTasksCarousel .carousel-control-next {
+    right: 10%; /* Position to the right */
+}
+
+#completedTasksCarousel .carousel-control-prev-icon,
+#completedTasksCarousel .carousel-control-next-icon {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+}
+
 
 .content-container {
     display:flex;
@@ -388,12 +387,7 @@ button span {
   cursor: pointer;
   background-color: lightgray;
 
-
-
-
 }
-
-
 
 
 .card-heading {
@@ -408,8 +402,6 @@ button span {
   margin-top: 15px;
   flex-direction: column;
   color: black;
-  
-  
 
 }
 
@@ -420,10 +412,6 @@ button span {
   margin-left: auto;
   font-size: 3em;
 }
-
-
-
-
 
 
 </style>
@@ -482,24 +470,7 @@ button span {
         <!--------------------- Completed Tasks Carousel----------- -->
 <div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
-        <!-- Example Task 1 -->
-        <div class="carousel-item active">
-            <div class="carousel-content">
-                <!-- Content for the first item -->
-                <h3>Completed Task Title 1</h3>
-                <p>Description or details of the completed task.</p>
-            </div>
-        </div>
-
-        <!-- Example Task 2 -->
-        <div class="carousel-item">
-            <div class="carousel-content">
-                <!-- Content for the second item -->
-                <h3>Completed Task Title 2</h3>
-                <p>Description or details of the completed task.</p>
-            </div>
-        </div>
-        <!--- Add more cards down here -->
+        <!-- Dynamic Completed Tasks will appear here. -->
     </div>
     <!-- Carousel Controls -->
     <button class="carousel-control-prev" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="prev">
@@ -514,9 +485,6 @@ button span {
 
     </div>
     </div>
-
-
-
 
 
 

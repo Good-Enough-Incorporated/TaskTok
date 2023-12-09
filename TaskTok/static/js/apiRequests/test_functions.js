@@ -5,7 +5,8 @@ let currentTaskID = null;
 let currentTaskAction = null;
 let tableGrid = null;
 let api;
-document.addEventListener('DOMContentLoaded', function () {
+
+document.addEventListener('DOMContentLoaded', async function() {
     // Initialize the Bootstrap 5 modal.
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
     const filterInput = document.getElementById('filter-text-box');
@@ -22,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
     setInterval(() => updateTime(selectedTimezone), 1000);
     updateTime(selectedTimezone);
+
+    // Initialize and update the completed tasks carousel.
+    await updateCompletedTasksCarousel();
 });
     
 
@@ -215,6 +219,9 @@ async function setCompleteTask(taskID){
     if (response.ok && data.Message == "successfully marked complete."){
         showToast("Task was marked complete!",5000);
         confirmationModal.hide();
+
+        // Refresh the carousel with the updated list of completed tasks.
+        await updateCompletedTasksCarousel();
         
     } else {
         showToast("Failed to mark task as complete :(", 5000);
@@ -223,12 +230,33 @@ async function setCompleteTask(taskID){
     } catch {
         showToast("An error occurred while trying to mark the task as complete.", 5000);
         console.error(error);
-        // Handle any additional error logic here
         confirmationModal.hide();
     }
-
-
 }
+
+async function updateCompletedTasksCarousel() {
+    try {
+        const completedTasks = await queryCompletedTasks();
+
+        const carouselInner = document.querySelector('#completedTasksCarousel .carousel-inner');
+        carouselInner.innerHTML = ''; // Clear existing content.
+
+        if (completedTasks.length === 0) {
+            carouselInner.innerHTML = '<div class="carousel-item active"><p>No completed tasks.</p></div>';
+        } else {
+            completedTasks.forEach((task, index) => {
+                const div = document.createElement('div');
+                div.className = 'carousel-item' + (index === 0 ? ' active' : '');
+                div.innerHTML = `<h5>${task.task_name}</h5><p>${task.task_description}</p>`;
+                carouselInner.appendChild(div);
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
 
 async function editTask(taskID) {
     // Fetch values from the modal's input fields.
