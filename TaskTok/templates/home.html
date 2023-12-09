@@ -76,8 +76,8 @@
     
 }
 .table-wrapper {
-    padding-left: 50px;
-    padding-right: 50px;
+    padding-left: 5px;
+    padding-right: 5px;
     width: 100%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     background-color: #17171c;
@@ -106,8 +106,9 @@
     display: inline-block;
 }
 
-.table-header {
+.table-widgets {
     display: flex;
+    position: relative;
     width: 100%;
     justify-content: flex-end;
 }
@@ -159,7 +160,7 @@
 
     }
 
-    .edit-btn, .add-btn, .complete-btn {
+    .edit-btn, .add-btn, .complete-btn, .export-btn {
     background-color: transparent;
     width: auto;
     color: white;
@@ -173,8 +174,11 @@
 }
 /* add spacing  between the table and the search filter */
 .search-container{
-
-    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+   
 
 }
 .edit-btn .icon {
@@ -401,7 +405,7 @@ button span {
 .title{
   display: flex;
   margin-top: 15px;
-  flex-direction: column;
+  flex-direction: row;
   color: black;
 
 }
@@ -409,7 +413,7 @@ button span {
 .count{
   margin-top: 10px;
   display:flex;
-  flex-direction:column;
+  flex-direction:row;
   margin-left: auto;
   font-size: 3em;
 }
@@ -458,13 +462,17 @@ button span {
         <div class="table-wrapper">
             <label class="tasktable-title-lbl">Active Tasks</label>
             <!-- Add button attached to bootstrap modal -->
-            <div class="table-header">
-                <button class="add-btn" data-bs-toggle="modal" data-bs-target="#taskAddModal">
-                    <span class="icon">➕</span></button>
-                </div>
+
             <div id="taskTableGrid"></div>
             <div class="search-container">
             <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+            <div class="table-widgets">
+                <button class="add-btn" title="Add Task" data-bs-toggle="modal" data-bs-target="#taskAddModal">
+                    <span class="icon">➕</span></button>
+                    <button class="export-btn" title="Export to Excel" id="exportToExcelButton">
+                        <span class="icon">📊 </span></button>
+                        
+                </div>
             </div>
             <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
         </div>
@@ -634,7 +642,12 @@ button span {
     <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
 
+    <!-- AG Grid, used for our table -->
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <!-- used to export to excel for AG GRID, since that feature is only for enterprise -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
 
 </body>
 {% endblock %}

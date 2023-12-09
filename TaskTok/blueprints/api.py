@@ -1,15 +1,37 @@
-from flask import Blueprint, jsonify, request
-from TaskTok.models import User, TaskReminder
-from TaskTok.extensions import db
-from TaskTok.functions import verify_celery_worker, verify_message_broker_online
-from flask_jwt_extended import jwt_required, get_jwt, current_user
-from TaskTok.schema import UserSchema, TaskSchema
-from TaskTok.utilities import email_message, check_emails_overdue
-from sqlalchemy.exc import SQLAlchemyError
-import datetime
-import psutil
+"""
+This module contains the API relatied functions for supporting TaskTok's client side, it returns a json format which
+is easily adaptable for clients like js, or any other no html based client.
+
+It includes functions for listing tasks, adding, removing, and completing tasks, as well as other features such
+as updating user settings, and the admin statistics.
+
+
+Functions:
+- messageBroker: Gets the current status of the message broker, diplays on admin page.
+- celeryStatus: Gets the current status of the celery worker, displays on admin page.
+- getServerUtilization: gets the current CPU/RAM utilization, displays on admin apge.
+- list_completed_task: Lists all completed tasks for the current user.
+- list_noncomplete_task: Lists all non complete tasks for the current user.
+- list_all_task: Lists all tasks for the current user.
+- list_task_pagination: Lists all tasks for the current user (by pages).
+- remove_task: Removes a specific task from the current user.
+- complete_task: Marks a task as complete for the current user.
+- add_task: Adds a new task for the current user.
+- edit_task: Modifies an existing task for the current user.
+"""
 import re
 import os
+import datetime
+import psutil
+from flask import Blueprint, jsonify, request
+from TaskTok.functions import verify_celery_worker, verify_message_broker_online
+from flask_jwt_extended import jwt_required, get_jwt, current_user
+from sqlalchemy.exc import SQLAlchemyError
+from TaskTok.models import User, TaskReminder
+from TaskTok.extensions import db
+from TaskTok.schema import UserSchema, TaskSchema
+from TaskTok.utilities import email_message, check_emails_overdue
+
 
 #  ---------- Unused Imports: Needs review ----------------
 #  import subprocess
@@ -20,6 +42,7 @@ import os
 api = Blueprint('api', __name__)
 
 
+# TODO: Delete, but make sure nothing is still using this test function
 @api.route('/sendMail')
 @jwt_required()
 def send_mail():
@@ -30,7 +53,11 @@ def send_mail():
 
 @api.route('/messageBroker')
 def messageBroker():
-    # test route, will not be kept
+    """
+    Retrieves the current status of the message broker and returns it as JSON. 
+    This is used to display the status on the admin page. If the message broker 
+    is not online or an exception occurs, it will return the exception message.
+    """
     host = 'localhost'
     port = 6379
     timeout = 2
@@ -45,8 +72,11 @@ def messageBroker():
 
 @api.route('/celeryStatus')
 def celeryStatus():
-    # test route, will not be kept
-
+    """
+    Retrieves the current status of the Celery worker and returns it as JSON. 
+    This is intended for display on the admin page. In case of an error, the 
+    exception message is returned.
+    """
     try:
         results = verify_celery_worker()
     except Exception as e:
@@ -58,6 +88,12 @@ def celeryStatus():
 
 @api.route('/serverUtilization')
 def getServerUtilization():
+    """
+    Gets the current CPU and RAM utilization of the server. The CPU usage is 
+    calculated based on the load average over 5 minutes and the total number 
+    of CPU cores. The RAM usage is obtained directly. The information is returned 
+    as JSON, suitable for display on the admin page.
+    """
     cpu_load_1, cpu_load_5, cpu_load_15 = psutil.getloadavg()
     cpu_usage = (cpu_load_5 / os.cpu_count()) * 100
 
@@ -69,6 +105,12 @@ def getServerUtilization():
 @api.route('/addTask', methods=['POST'])
 @jwt_required()
 def add_task():
+    """
+    Adds a new task for the current user. It expects JSON input containing 
+    task details such as name, description, due date, reminder offset time, 
+    email list, and email message. Performs basic validation on input fields. 
+    Returns JSON indicating success or failure, including error messages for failures.
+    """
     # get the current user's information
     user_data = current_user
 
@@ -137,6 +179,10 @@ def add_task():
 @api.route('/listNonCompleteTask')
 @jwt_required()
 def list_noncomplete_task():
+    """
+    Lists all non-completed tasks for the current user. Returns a JSON list 
+    of tasks, serialized using TaskSchema.
+    """
     user_data = current_user
     task_list = TaskReminder.find_noncomplete_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
@@ -147,6 +193,10 @@ def list_noncomplete_task():
 @api.route('/listCompletedTask')
 @jwt_required()
 def list_completed_task():
+    """
+    Lists all completed tasks for the current user. Returns a JSON list of 
+    tasks, serialized using TaskSchema.
+    """
     user_data = current_user
     task_list = TaskReminder.find_completed_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
@@ -157,6 +207,10 @@ def list_completed_task():
 @api.route('/listAllTask')
 @jwt_required()
 def list_all_task():
+    """
+    Lists all tasks for the current user, regardless of their completion status. 
+    Returns a JSON list of tasks, serialized using TaskSchema.
+    """
     user_data = current_user
     task_list = TaskReminder.find_task_by_username(username=user_data.username)
     task_list_string = TaskSchema().dump(task_list, many=True)
@@ -167,6 +221,11 @@ def list_all_task():
 @api.route('/listTaskPagination')
 @jwt_required()
 def list_task_pagination():
+    """
+    Lists tasks for the current user, with pagination. The page number and 
+    limit per page can be specified as query parameters. Returns paginated 
+    tasks in JSON format, including total task count.
+    """
     user_data = current_user
 
     page = request.args.get('page', 1, type=int)
@@ -188,9 +247,12 @@ def list_task_pagination():
 @api.route('/removeTask/<task_id>')
 @jwt_required()
 def remove_task(task_id):
+    """
+    Removes a specific task, identified by its task ID, for the current user. 
+    Performs a check to ensure that the task belongs to the user. Returns JSON 
+    indicating success or failure of the operation.
+    """
     # Get the current user, check to make sure the supplied taskID belongs to them
-    # TODO: Need to make sure <taskID> is safe
-    # TODO: task should be UUID4, throw error message for invalid task type
     print("beginning removeTask")
     user_data = current_user
     current_task = TaskReminder.query.get(task_id)
@@ -210,13 +272,18 @@ def remove_task(task_id):
 @api.route('/completeTask/<task_id>', methods=["GET"])
 @jwt_required()
 def complete_task(task_id):
-    user_data = current_user
+    """
+    Marks a specific task, identified by its task ID, as complete for the current 
+    user. Checks for task existence and ownership before updating. Returns JSON 
+    indicating the result of the operation.
+    """
+    
     current_task = TaskReminder.query.get(task_id)
 
     if current_task is None:
         return jsonify({'Message': 'Task not found or not authorized'}), 404
 
-    if current_task.task_completed == True:  # if recurring, make sure we allow this
+    if current_task.task_completed is True:  # if recurring, make sure we allow this
         return jsonify({'Message': "Task was already marked complete!"})
     else:
         try:
@@ -230,6 +297,11 @@ def complete_task(task_id):
 @api.route('/editTask/<task_id>', methods=['PUT'])
 @jwt_required()
 def edit_task(task_id):
+    """
+    Modifies an existing task for the current user. The task is identified by 
+    its task ID. Expects JSON input for the fields to be updated. Performs validation 
+    on input data and returns JSON indicating success or failure, including error messages.
+    """
     user_data = current_user
     task = TaskReminder.query.get(task_id)
     error = []
@@ -292,10 +364,15 @@ def edit_task(task_id):
     return jsonify({'Message': 'Failed to update task', 'Error': error}), 400 if error else status_code
 
 
+# TODO: Do not believe we're using these last three functions
+####
 @api.route('/getTask/<task_id>', methods=['GET'])
 @jwt_required()
 def get_task(task_id):
-    # Logic to fetch a single task by its ID
+    """
+    Fetches a single task by its ID for the current user. Checks for task existence 
+    and ownership. Returns the task data as JSON, serialized using TaskSchema.
+    """
     task = TaskReminder.query.get(task_id)
 
     if task is None:
@@ -312,6 +389,11 @@ def get_task(task_id):
 @api.route('/get_users', methods=['GET'])
 @jwt_required()
 def get_users():
+    """
+    Fetches a list of users with pagination. Intended for admin users. The page 
+    number and items per page can be specified as query parameters. Returns user 
+    data in JSON format.
+    """
     jwt_info = get_jwt()
     if jwt_info.get('is_admin'):
 
@@ -331,6 +413,11 @@ def get_users():
 
 
 def format_date(string_date):
+    """
+    Converts a date string into a datetime object. Supports two date string formats: 
+    'MM/DD/YYYY HH:MM' and ISO format 'YYYY-MM-DDTHH:MM:SS'. Returns a datetime object 
+    or None if the input string does not match the expected format.
+    """
     pattern = r"^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/(20\d{2})\s([01]?[0-9]|2[0-3]):([0-5][0-9])$"
     match = re.match(pattern, string_date)
     try:
@@ -340,3 +427,4 @@ def format_date(string_date):
             return datetime.datetime.strptime(string_date, f'%Y-%m-%dT%H:%M:%S')
     except Exception as e:
         print(f'Failed to parse date {e}')
+####### TODO: see statement above ^

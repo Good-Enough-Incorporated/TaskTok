@@ -32,8 +32,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 async function queryNonCompletedTasks() {
-
-    console.log("QUERYING NON COMPLETE TASKS")
     const response = await fetch('/api/listNonCompleteTask');
     if (!response.ok) {
         throw new Error('[queryNonCompletedTasks()]: Failed to query tasks');
@@ -41,6 +39,8 @@ async function queryNonCompletedTasks() {
     const data = await response.json();
     return data.TaskList;
 }
+
+
 
 async function queryCompletedTasks() {
 
@@ -413,86 +413,6 @@ async function deleteTask(taskID) {
 }
 
 
-async function listTask() {
-    const csrfAccessToken = getCookie('csrf_access_token');
-    //pretend long load time
-    //await new Promise(r => setTimeout(r, 10000));
-    try {
-        const response = await fetch('/api/listTask', {
-            method: "GET",
-            headers: {
-                'X-CSRF-TOKEN': csrfAccessToken,
-            },
-        });
-
-        //Get our async api call
-        const data = await response.json();
-
-        console.log(typeof (data.TaskList));
-        //legacy table if we need to revert
-        
-        //createTableHeader()
-        
-        data.TaskList.forEach(task => {
-            console.log(task + ' being added to table')
-            //addRowToTable(task);
-        });
-        
-       console.log(data.TaskList)
-
-       const columns = [
-         
-       
-        {id: "task_description", name: "Description"},
-        {id: "task_dueDate", name: "Due Date"},
-        {id: "task_emailList", name: "E-Mail List"},
-        {id: "task_message", name: "E-mail Message"},
-        {id: "task_name", name: "Name"},
-        {id: "task_reminderOffSetTime", name: "Early Reminder Time"},
-        {id: "actions", name:"Actions"}]
-
-        
-
-        const formattedData = data.TaskList.map(item => [
-            
-            
-            item.task_description,
-            item.task_dueDate,
-            item.task_emailList,
-            item.task_message,
-            item.task_name,
-            item.task_reminderOffSetTime,
-            gridjs.html(`
-    <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
-    <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
-  `) 
-          ]);
-          
-        var grid = new gridjs.Grid({
-            columns: columns.map(col => col.name),
-            style: { 
-                table: { 
-                  'white-space': 'nowrap'
-                }
-              },
-            data: formattedData,
-            search: true,
-            sort: true,
-            resizable: true,
-            pagination: true}).render(document.getElementById('taskTableGrid'));
-
-        
-
-
-
-        const addTableButton = document.getElementById('task-add-btn');
-        addTableButton.style.visibility = 'visible';
-
-    } catch (error) {
-        console.error("Error:", error)
-    }
-}
-
 
 const dateFormatter = (params) => {
     const date =  new Date(params.value).toLocaleDateString('en-us', {
@@ -534,6 +454,7 @@ function onBtShowNoRows() {
 
 async function initializeAGGrid(){
     const gridDataLoadFailedError = "Brad here... yikes I couldn't find any tasks."
+
     console.log("initializting AG Grid")
     const gridOptions = {
 
@@ -546,7 +467,8 @@ overlayLoadingTemplate:
         <p style="margin: 0; line-height: normal;">${gridDataLoadFailedError}</p>
     </div>
 </div>`,
-
+        pagination: true,
+        paginationPageSize: 10,
         rowData: [],
     
         columnDefs:[
@@ -582,8 +504,52 @@ overlayLoadingTemplate:
     
     
     
+    
 }
 
+function csvJSON(csv){
+
+    var lines=csv.split("\n");
+  
+    var result = [];
+  
+    // NOTE: If your columns contain commas in their values, you'll need
+    // to deal with those before doing the next step 
+    // (you might convert them to &&& or something, then covert them back later)
+    // jsfiddle showing the issue https://jsfiddle.net/
+    var headers=lines[0].split(",");
+  
+    for(var i=1;i<lines.length;i++){
+  
+        var obj = {};
+        var currentline=lines[i].split(",");
+  
+        for(var j=0;j<headers.length;j++){
+            obj[headers[j]] = currentline[j];
+        }
+  
+        result.push(obj);
+  
+    }
+  
+    //return result; //JavaScript object
+    return JSON.stringify(result); //JSON
+  }
+
+function exportTableToExcel(){
+    queryAllTasks()
+    .then(data =>
+        {
+            console.log(data);
+            const worksheet = XLSX.utils.json_to_sheet(data)
+            const workbook = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1")
+            XLSX.writeFile(workbook,"TaskTokData.xlsx")
+        }
+    )
+    .catch( exportError => console.log("Failed to export to excel, ", exportError));
+
+}
 
 async function refreshAGGrid(){
     const data = await queryNonCompletedTasks();
@@ -599,7 +565,7 @@ function removeTask(taskID) {
     confirmationModal.show();
 }
 
-document.getElementById('confirmAction').addEventListener('click', function () {setCompleteTask
+document.getElementById('confirmAction').addEventListener('click', function () {
     if (currentTaskID !== null && currentTaskAction === "delete") {
         //make our API query to delete the task, then refresh the grid
          deleteTask(currentTaskID).then( () => refreshAGGrid() );
@@ -611,7 +577,7 @@ document.getElementById('confirmAction').addEventListener('click', function () {
     
 });
 
-
+document.getElementById('exportToExcelButton').addEventListener('click', exportTableToExcel);
 
 
 document.getElementById('taskTableGrid2').addEventListener('click', function(event) {
