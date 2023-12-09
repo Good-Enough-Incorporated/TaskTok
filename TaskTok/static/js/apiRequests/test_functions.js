@@ -19,17 +19,50 @@ document.addEventListener('DOMContentLoaded', async function() {
     initializeAGGrid();
     enableVerticalScroll();
 
+    updateCompletedTasksCarousel();
    // Initialize timezone-based clock update.
     let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
     setInterval(() => updateTime(selectedTimezone), 1000);
-    updateTime(selectedTimezone);
+    //updateTime(selectedTimezone);
 
     // Initialize and update the completed tasks carousel.
-    await updateCompletedTasksCarousel();
+    
 });
     
 
 
+async function queryNonCompletedTasks() {
+    const response = await fetch('/api/listNonCompleteTask');
+    if (!response.ok) {
+        throw new Error('[queryNonCompletedTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
+
+
+
+async function queryCompletedTasks() {
+
+    console.log("QUERYING COMPLETED TASKS")
+    const response = await fetch('/api/listCompletedTask');
+    if (!response.ok) {
+        throw new Error('[queryCompletedTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
+
+async function queryAllTasks() {
+
+    console.log("QUERYING ALL TASKS")
+    const response = await fetch('/api/listAllTask');
+    if (!response.ok) {
+        throw new Error('[queryAllTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
 
 
 
@@ -236,14 +269,18 @@ async function setCompleteTask(taskID){
 
 async function updateCompletedTasksCarousel() {
     try {
+        
+        console.log('checking for completed tasks')
         const completedTasks = await queryCompletedTasks();
 
         const carouselInner = document.querySelector('#completedTasksCarousel .carousel-inner');
         carouselInner.innerHTML = ''; // Clear existing content.
 
         if (completedTasks.length === 0) {
+            console.log('no completed tasks found for user');
             carouselInner.innerHTML = '<div class="carousel-item active"><p>No completed tasks.</p></div>';
         } else {
+            console.log('adding completed tasks');
             completedTasks.forEach((task, index) => {
                 const div = document.createElement('div');
                 div.className = 'carousel-item' + (index === 0 ? ' active' : '');
@@ -376,118 +413,6 @@ async function deleteTask(taskID) {
 }
 
 
-async function listTask() {
-    const csrfAccessToken = getCookie('csrf_access_token');
-    //pretend long load time
-    //await new Promise(r => setTimeout(r, 10000));
-    try {
-        const response = await fetch('/api/listTask', {
-            method: "GET",
-            headers: {
-                'X-CSRF-TOKEN': csrfAccessToken,
-            },
-        });
-
-        //Get our async api call
-        const data = await response.json();
-
-        console.log(typeof (data.TaskList));
-        //legacy table if we need to revert
-        
-        //createTableHeader()
-        
-        data.TaskList.forEach(task => {
-            console.log(task + ' being added to table')
-            //addRowToTable(task);
-        });
-        
-       console.log(data.TaskList)
-
-       const columns = [
-         
-       
-        {id: "task_description", name: "Description"},
-        {id: "task_dueDate", name: "Due Date"},
-        {id: "task_emailList", name: "E-Mail List"},
-        {id: "task_message", name: "E-mail Message"},
-        {id: "task_name", name: "Name"},
-        {id: "task_reminderOffSetTime", name: "Early Reminder Time"},
-        {id: "actions", name:"Actions"}]
-
-        
-
-        const formattedData = data.TaskList.map(item => [
-            
-            
-            item.task_description,
-            item.task_dueDate,
-            item.task_emailList,
-            item.task_message,
-            item.task_name,
-            item.task_reminderOffSetTime,
-            gridjs.html(`
-    <button data-id="${item.id}" class='task-edit-btn'>Edit</button>
-    <button data-id="${item.id}" class='task-delete-btn'>Delete</button>
-  `) 
-          ]);
-          
-        var grid = new gridjs.Grid({
-            columns: columns.map(col => col.name),
-            style: { 
-                table: { 
-                  'white-space': 'nowrap'
-                }
-              },
-            data: formattedData,
-            search: true,
-            sort: true,
-            resizable: true,
-            pagination: true}).render(document.getElementById('taskTableGrid'));
-
-        
-
-
-
-        const addTableButton = document.getElementById('task-add-btn');
-        addTableButton.style.visibility = 'visible';
-
-    } catch (error) {
-        console.error("Error:", error)
-    }
-}
-
-async function queryNonCompletedTasks() {
-
-    console.log("QUERYING NON COMPLETE TASKS")
-    const response = await fetch('/api/listNonCompleteTask');
-    if (!response.ok) {
-        throw new Error('[queryNonCompletedTasks()]: Failed to query tasks');
-    }
-    const data = await response.json();
-    return data.TaskList;
-}
-
-async function queryCompletedTasks() {
-
-    console.log("QUERYING COMPLETED TASKS")
-    const response = await fetch('/api/listCompletedTask');
-    if (!response.ok) {
-        throw new Error('[queryCompletedTasks()]: Failed to query tasks');
-    }
-    const data = await response.json();
-    return data.TaskList;
-}
-
-async function queryAllTasks() {
-
-    console.log("QUERYING ALL TASKS")
-    const response = await fetch('/api/listAllTask');
-    if (!response.ok) {
-        throw new Error('[queryAllTasks()]: Failed to query tasks');
-    }
-    const data = await response.json();
-    return data.TaskList;
-}
 
 const dateFormatter = (params) => {
     const date =  new Date(params.value).toLocaleDateString('en-us', {
@@ -518,16 +443,32 @@ function renderButtonCells(params){
         <span class="icon">✏️</span></button>
     `
 }
-async function initializeAGGrid(){
 
-    const data = await queryNonCompletedTasks();
-    console.log(data);
+function onBtShowNoRows() {
+    api.showNoRowsOverlay();
+  }
+  
+  function onBtHide() {
+    api.hideOverlay();
+  }
+
+async function initializeAGGrid(){
+    const gridDataLoadFailedError = "Brad here... yikes I couldn't find any tasks."
+
+    console.log("initializting AG Grid")
     const gridOptions = {
 
-        localeText: {
-            noRowsToShow: 'You have no active tasks, create one now!'
-        },
-
+overlayLoadingTemplate:
+    '<div style="position:absolute;top:0;left:0;right:0; bottom:0; background: url(https://ag-grid.com/images/ag-grid-loading-spinner.svg) center no-repeat" aria-label="loading"></div>',
+  overlayNoRowsTemplate:
+    `<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin-top: 100px; text-align: center;" aria-label="loading">
+    <div style="background: url(/static/images/no_content_loaded.png) center no-repeat; background-size: contain; height: 60%;"></div>
+    <div style="display: inline-flex; justify-content: center; align-items: center; border: 2px solid #ccc; color: white; background-color: rgb(15, 61, 77); margin-top: 10px; padding: 10px; border-radius: 10px;">
+        <p style="margin: 0; line-height: normal;">${gridDataLoadFailedError}</p>
+    </div>
+</div>`,
+        pagination: true,
+        paginationPageSize: 10,
         rowData: [],
     
         columnDefs:[
@@ -544,73 +485,70 @@ async function initializeAGGrid(){
         ]
 
     };
+    //setting AG Grid to use the empty element TaskTableGrid2
     const myGridElement = document.querySelector("#taskTableGrid2");
-    api = agGrid.createGrid(myGridElement, gridOptions);
+    api = agGrid.createGrid(myGridElement, gridOptions)
+    //shows our loading overlay
+    api.showLoadingOverlay();
+    //await new Promise(resolve => setTimeout(resolve, 5000)).then( data => console.log("done pretend waiting"));
+    const data = await queryNonCompletedTasks();
+    if (data.length == 0){
+        api.showNoRowsOverlay();
+    }else {
+        api.hideOverlay();
+    }
+   
     api.setGridOption('rowData',  data);
     api.sizeColumnsToFit();
     
     
     
     
+    
 }
 
-async function initializeGrid(){
-    console.log("INITIALIZE GRID")
-    tableGrid = new gridjs.Grid({
-        columns: [
-            "Name",
-            "Description",
-            "Reminder Time",
-            "Early Reminder Time",
-            "Email List",
-            "EMail Message",
-            "Actions"
-        ],
-        style: { 
-            table: { 
-              'white-space': 'nowrap'
-            }
-          },
-        search: true,
-        sort: true,
-        resizable: true,
-        pagination: {
-            limit: 5,
-            server: {
-                url: (prev, page, limit) => `${prev}?page=${page+1}&limit=${limit}`
-            }
-        },
-        server: {
-            url: "/api/listTaskPagination",
-            total: data => data.totalTasks,
-            then: data => data.TaskList.map(item =>[
-                item.task_name,
-                item.task_description,
-                item.task_dueDate ? format_backend_datetime(item.task_dueDate) : "",
-                item.task_reminderOffSetTime ? format_backend_datetime(item.task_reminderOffSetTime) : "",
-                item.task_emailList,
-                item.task_email_message,
-                gridjs.html(`
-    <button data-id="${item.id}" class='edit-btn'></button>
-    <button data-id="${item.id}" class='delete-btn'></button>
-`) 
-            ])
+function csvJSON(csv){
+
+    var lines=csv.split("\n");
+  
+    var result = [];
+  
+    // NOTE: If your columns contain commas in their values, you'll need
+    // to deal with those before doing the next step 
+    // (you might convert them to &&& or something, then covert them back later)
+    // jsfiddle showing the issue https://jsfiddle.net/
+    var headers=lines[0].split(",");
+  
+    for(var i=1;i<lines.length;i++){
+  
+        var obj = {};
+        var currentline=lines[i].split(",");
+  
+        for(var j=0;j<headers.length;j++){
+            obj[headers[j]] = currentline[j];
         }
   
+        result.push(obj);
+  
+    }
+  
+    //return result; //JavaScript object
+    return JSON.stringify(result); //JSON
+  }
 
-    }).render(document.getElementById('taskTableGrid'));
+function exportTableToExcel(){
+    queryAllTasks()
+    .then(data =>
+        {
+            console.log(data);
+            const worksheet = XLSX.utils.json_to_sheet(data)
+            const workbook = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(workbook, worksheet, "sheet1")
+            XLSX.writeFile(workbook,"TaskTokData.xlsx")
+        }
+    )
+    .catch( exportError => console.log("Failed to export to excel, ", exportError));
 
-    var buttondiv = document.createElement('div')
-    buttondiv.classList.add('gridjs-button');
-    var button = document.createElement('button');
-
-    button.textContent = 'New Task'
-    button.classList.add('task-add-btn')
-    buttondiv.appendChild(button)
-    button.style.visibility = 'visible'
-    var gridHead = document.querySelector('.gridjs-head')
-    //gridHead.appendChild(buttondiv)
-    
 }
 
 async function refreshAGGrid(){
@@ -627,7 +565,7 @@ function removeTask(taskID) {
     confirmationModal.show();
 }
 
-document.getElementById('confirmAction').addEventListener('click', function () {setCompleteTask
+document.getElementById('confirmAction').addEventListener('click', function () {
     if (currentTaskID !== null && currentTaskAction === "delete") {
         //make our API query to delete the task, then refresh the grid
          deleteTask(currentTaskID).then( () => refreshAGGrid() );
@@ -639,7 +577,7 @@ document.getElementById('confirmAction').addEventListener('click', function () {
     
 });
 
-
+document.getElementById('exportToExcelButton').addEventListener('click', exportTableToExcel);
 
 
 document.getElementById('taskTableGrid2').addEventListener('click', function(event) {
