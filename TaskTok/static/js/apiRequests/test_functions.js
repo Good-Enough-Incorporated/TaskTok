@@ -19,17 +19,50 @@ document.addEventListener('DOMContentLoaded', async function() {
     initializeAGGrid();
     enableVerticalScroll();
 
+    updateCompletedTasksCarousel();
    // Initialize timezone-based clock update.
     let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
     setInterval(() => updateTime(selectedTimezone), 1000);
-    updateTime(selectedTimezone);
+    //updateTime(selectedTimezone);
 
     // Initialize and update the completed tasks carousel.
-    await updateCompletedTasksCarousel();
+    
 });
     
 
 
+async function queryNonCompletedTasks() {
+
+    console.log("QUERYING NON COMPLETE TASKS")
+    const response = await fetch('/api/listNonCompleteTask');
+    if (!response.ok) {
+        throw new Error('[queryNonCompletedTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
+
+async function queryCompletedTasks() {
+
+    console.log("QUERYING COMPLETED TASKS")
+    const response = await fetch('/api/listCompletedTask');
+    if (!response.ok) {
+        throw new Error('[queryCompletedTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
+
+async function queryAllTasks() {
+
+    console.log("QUERYING ALL TASKS")
+    const response = await fetch('/api/listAllTask');
+    if (!response.ok) {
+        throw new Error('[queryAllTasks()]: Failed to query tasks');
+    }
+    const data = await response.json();
+    return data.TaskList;
+}
 
 
 
@@ -237,14 +270,17 @@ async function setCompleteTask(taskID){
 async function updateCompletedTasksCarousel() {
     try {
         
+        console.log('checking for completed tasks')
         const completedTasks = await queryCompletedTasks();
 
         const carouselInner = document.querySelector('#completedTasksCarousel .carousel-inner');
         carouselInner.innerHTML = ''; // Clear existing content.
 
         if (completedTasks.length === 0) {
+            console.log('no completed tasks found for user');
             carouselInner.innerHTML = '<div class="carousel-item active"><p>No completed tasks.</p></div>';
         } else {
+            console.log('adding completed tasks');
             completedTasks.forEach((task, index) => {
                 const div = document.createElement('div');
                 div.className = 'carousel-item' + (index === 0 ? ' active' : '');
@@ -457,38 +493,6 @@ async function listTask() {
     }
 }
 
-async function queryNonCompletedTasks() {
-
-    console.log("QUERYING NON COMPLETE TASKS")
-    const response = await fetch('/api/listNonCompleteTask');
-    if (!response.ok) {
-        throw new Error('[queryNonCompletedTasks()]: Failed to query tasks');
-    }
-    const data = await response.json();
-    return data.TaskList;
-}
-
-async function queryCompletedTasks() {
-
-    console.log("QUERYING COMPLETED TASKS")
-    const response = await fetch('/api/listCompletedTask');
-    if (!response.ok) {
-        throw new Error('[queryCompletedTasks()]: Failed to query tasks');
-    }
-    const data = await response.json();
-    return data.TaskList;
-}
-
-async function queryAllTasks() {
-
-    console.log("QUERYING ALL TASKS")
-    const response = await fetch('/api/listAllTask');
-    if (!response.ok) {
-        throw new Error('[queryAllTasks()]: Failed to query tasks');
-    }
-    const data = await response.json();
-    return data.TaskList;
-}
 
 const dateFormatter = (params) => {
     const date =  new Date(params.value).toLocaleDateString('en-us', {
@@ -580,64 +584,6 @@ overlayLoadingTemplate:
     
 }
 
-async function initializeGrid(){
-    console.log("INITIALIZE GRID")
-    tableGrid = new gridjs.Grid({
-        columns: [
-            "Name",
-            "Description",
-            "Reminder Time",
-            "Early Reminder Time",
-            "Email List",
-            "EMail Message",
-            "Actions"
-        ],
-        style: { 
-            table: { 
-              'white-space': 'nowrap'
-            }
-          },
-        search: true,
-        sort: true,
-        resizable: true,
-        pagination: {
-            limit: 5,
-            server: {
-                url: (prev, page, limit) => `${prev}?page=${page+1}&limit=${limit}`
-            }
-        },
-        server: {
-            url: "/api/listTaskPagination",
-            total: data => data.totalTasks,
-            then: data => data.TaskList.map(item =>[
-                item.task_name,
-                item.task_description,
-                item.task_dueDate ? format_backend_datetime(item.task_dueDate) : "",
-                item.task_reminderOffSetTime ? format_backend_datetime(item.task_reminderOffSetTime) : "",
-                item.task_emailList,
-                item.task_email_message,
-                gridjs.html(`
-    <button data-id="${item.id}" class='edit-btn'></button>
-    <button data-id="${item.id}" class='delete-btn'></button>
-`) 
-            ])
-        }
-  
-
-    }).render(document.getElementById('taskTableGrid'));
-
-    var buttondiv = document.createElement('div')
-    buttondiv.classList.add('gridjs-button');
-    var button = document.createElement('button');
-
-    button.textContent = 'New Task'
-    button.classList.add('task-add-btn')
-    buttondiv.appendChild(button)
-    button.style.visibility = 'visible'
-    var gridHead = document.querySelector('.gridjs-head')
-    //gridHead.appendChild(buttondiv)
-    
-}
 
 async function refreshAGGrid(){
     const data = await queryNonCompletedTasks();
