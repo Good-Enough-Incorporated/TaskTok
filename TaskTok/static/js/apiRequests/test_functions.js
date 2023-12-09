@@ -236,6 +236,7 @@ async function setCompleteTask(taskID){
 
 async function updateCompletedTasksCarousel() {
     try {
+        
         const completedTasks = await queryCompletedTasks();
 
         const carouselInner = document.querySelector('#completedTasksCarousel .carousel-inner');
@@ -518,15 +519,29 @@ function renderButtonCells(params){
         <span class="icon">✏️</span></button>
     `
 }
-async function initializeAGGrid(){
 
-    const data = await queryNonCompletedTasks();
-    console.log(data);
+function onBtShowNoRows() {
+    api.showNoRowsOverlay();
+  }
+  
+  function onBtHide() {
+    api.hideOverlay();
+  }
+
+async function initializeAGGrid(){
+    const gridDataLoadFailedError = "Brad here... yikes I couldn't find any tasks."
+    console.log("initializting AG Grid")
     const gridOptions = {
 
-        localeText: {
-            noRowsToShow: 'You have no active tasks, create one now!'
-        },
+overlayLoadingTemplate:
+    '<div style="position:absolute;top:0;left:0;right:0; bottom:0; background: url(https://ag-grid.com/images/ag-grid-loading-spinner.svg) center no-repeat" aria-label="loading"></div>',
+  overlayNoRowsTemplate:
+    `<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin-top: 100px; text-align: center;" aria-label="loading">
+    <div style="background: url(/static/images/no_content_loaded.png) center no-repeat; background-size: contain; height: 60%;"></div>
+    <div style="display: inline-flex; justify-content: center; align-items: center; border: 2px solid #ccc; color: white; background-color: rgb(15, 61, 77); margin-top: 10px; padding: 10px; border-radius: 10px;">
+        <p style="margin: 0; line-height: normal;">${gridDataLoadFailedError}</p>
+    </div>
+</div>`,
 
         rowData: [],
     
@@ -544,8 +559,19 @@ async function initializeAGGrid(){
         ]
 
     };
+    //setting AG Grid to use the empty element TaskTableGrid2
     const myGridElement = document.querySelector("#taskTableGrid2");
-    api = agGrid.createGrid(myGridElement, gridOptions);
+    api = agGrid.createGrid(myGridElement, gridOptions)
+    //shows our loading overlay
+    api.showLoadingOverlay();
+    //await new Promise(resolve => setTimeout(resolve, 5000)).then( data => console.log("done pretend waiting"));
+    const data = await queryNonCompletedTasks();
+    if (data.length == 0){
+        api.showNoRowsOverlay();
+    }else {
+        api.hideOverlay();
+    }
+   
     api.setGridOption('rowData',  data);
     api.sizeColumnsToFit();
     
