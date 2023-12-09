@@ -73,11 +73,15 @@ def verify_email(token):
 
 
 @auth.route('/register', methods=['GET', 'POST'])
+@jwt_required(optional=True)
 def register():
     form = NewUserForm()
     error = None
 
     if request.method == "GET":
+        if(current_user):
+            #user is already registered (logged in), so dont let them register without logging out
+            return redirect(url_for('views.home'))
         return render_template('register.html', form=form)
 
     if form.validate_on_submit():
