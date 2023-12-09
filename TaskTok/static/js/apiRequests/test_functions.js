@@ -10,23 +10,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize the Bootstrap 5 modal.
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
     const filterInput = document.getElementById('filter-text-box');
+    const tasks = await queryAllTasks();
+    console.log("Tasks:", tasks); // Check the data
+
+
     filterInput.addEventListener('input', onFilterTextBoxChanged)
   
-    // Other initialization code.
-    //listTask();
-    //queryTasks();
-    //initializeGrid();
+
     initializeAGGrid();
     enableVerticalScroll();
-
+    updateReminderCounts(tasks);
     updateCompletedTasksCarousel();
-   // Initialize timezone-based clock update.
+
+    // Initialize timezone-based clock update.
     let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
     setInterval(() => updateTime(selectedTimezone), 1000);
-    //updateTime(selectedTimezone);
-
-    // Initialize and update the completed tasks carousel.
-    
 });
     
 
@@ -62,6 +60,37 @@ async function queryAllTasks() {
     }
     const data = await response.json();
     return data.TaskList;
+}
+
+function updateReminderCounts(taskList) {
+    let dueToday = 0, dueThisWeek = 0, dueThisMonth = 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today.
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1); // Set to start of tomorrow.
+    const startOfNextWeek = new Date(today);
+    startOfNextWeek.setDate(today.getDate() - today.getDay() + 7); // Set to next week.
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1); // Set to start of next month.
+
+    taskList.forEach(task => {
+        const dueDate = new Date(task.task_dueDate);
+        dueDate.setHours(0, 0, 0, 0); // Standardize time component.
+
+        if (dueDate >= today && dueDate < tomorrow) {
+            dueToday++;
+        }
+        if (dueDate < startOfNextWeek) {
+            dueThisWeek++;
+        }
+        if (dueDate < startOfNextMonth) {
+            dueThisMonth++;
+        }
+    });
+
+    document.getElementById('dueTodayCount').textContent = dueToday;
+    document.getElementById('dueThisWeekCount').textContent = dueThisWeek;
+    document.getElementById('dueThisMonthCount').textContent = dueThisMonth;
 }
 
 
