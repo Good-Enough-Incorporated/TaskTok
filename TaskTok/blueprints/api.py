@@ -227,20 +227,6 @@ def complete_task(task_id):
             return jsonify({'Message': "Failed to mark task as complete.", "task_id": task_id})
 
 
-@api.route('/completed-tasks')
-@jwt_required()
-def get_completed_tasks():
-    user_data = current_user
-    try:
-        completed_tasks = TaskReminder.query.filter_by(owner_username=user_data.username, task_completed=True).all()
-        tasks_json = [{'id': task.id, 'task_name': task.task_name, 'task_description': task.task_description} for task
-                      in completed_tasks]
-        return jsonify(tasks_json)
-    except Exception as e:
-        print(e)  # Log the exception for debugging.
-        return jsonify({'error': 'Internal Server Error'}), 500
-
-
 @api.route('/editTask/<task_id>', methods=['PUT'])
 @jwt_required()
 def edit_task(task_id):
