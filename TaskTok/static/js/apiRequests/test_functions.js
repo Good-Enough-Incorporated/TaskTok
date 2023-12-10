@@ -10,22 +10,30 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize the Bootstrap 5 modal.
     confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
     const filterInput = document.getElementById('filter-text-box');
-    const tasks = await queryAllTasks();
-    console.log("Tasks:", tasks); // Check the data
 
+    // Check if reminder counts are in localStorage and update if they are.
+    // If not, fetch tasks and update count for upcoming reminders card.
+    if (localStorage.getItem('dueTodayCount')) {
+        document.getElementById('dueTodayCount').textContent = localStorage.getItem('dueTodayCount');
+        document.getElementById('dueThisWeekCount').textContent = localStorage.getItem('dueThisWeekCount');
+        document.getElementById('dueThisMonthCount').textContent = localStorage.getItem('dueThisMonthCount');
+    } else {
+        // Fetch and update counts if not in localStorage.
+        const tasks = await queryAllTasks();
+        updateReminderCounts(tasks);
+    }
 
-    filterInput.addEventListener('input', onFilterTextBoxChanged)
-  
+    filterInput.addEventListener('input', onFilterTextBoxChanged);
 
     initializeAGGrid();
     enableVerticalScroll();
-    updateReminderCounts(tasks);
     updateCompletedTasksCarousel();
 
     // Initialize timezone-based clock update.
     let selectedTimezone = localStorage.getItem('userTimezone') || 'Default_Timezone'; // Use stored timezone.
     setInterval(() => updateTime(selectedTimezone), 1000);
 });
+
     
 
 
@@ -101,13 +109,20 @@ function updateReminderCounts(taskList) {
         }
     });
 
+    // Save the counts to localStorage.
+    localStorage.setItem('dueTodayCount', dueToday);
+    localStorage.setItem('dueThisWeekCount', dueThisWeek);
+    localStorage.setItem('dueThisMonthCount', dueThisMonth);
+
+    // Update the DOM elements.
     document.getElementById('dueTodayCount').textContent = dueToday;
     document.getElementById('dueThisWeekCount').textContent = dueThisWeek;
     document.getElementById('dueThisMonthCount').textContent = dueThisMonth;
 }
 
-// Call the function immediately to update reminders on page load.
-fetchNonCompletedTasksAndUpdateReminders();
+
+
+// Defining when up-coming Task Reminders is updated.
 setInterval(fetchNonCompletedTasksAndUpdateReminders, 60000); // Update every 60 seconds.
 
 
