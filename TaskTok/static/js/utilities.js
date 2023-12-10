@@ -1,14 +1,20 @@
 export function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast-container");
     const toastContent = document.getElementById("toast-user-content");
-    toastContent.textContent = message;
-    toast.classList.add("show");
 
-    // Hide the toast after 'duration' milliseconds
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
+    if (toast && toastContent) {
+        toastContent.textContent = message;
+        toast.classList.add("show");
+
+        // Hide the toast after 'duration' milliseconds
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, duration);
+    } else {
+        console.error("Toast elements not found!");
+    }
 }
+
 
 export function clearModal(){
     var editModal = document.getElementById('editModal');

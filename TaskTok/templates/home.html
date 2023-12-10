@@ -370,89 +370,91 @@ button span {
 
 
     /* Card for reminder quick glance*/
+.card-custom {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        margin-top: 60px;
+    }
+
+    .card-header-custom {
+        background-color: grey;
+        color: black;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        padding: 15px 20px;
+        font-size: 1.5rem;
+    }
+
+    .card-body-custom {
+        padding: 25px;
+    }
+
+    .reminder-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd; /* for separation */
+        padding: 15px 0;
+    }
+
+    .reminder-title {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        color: #333;
+    }
+
+    .reminder-count {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 0;
+    }
 
 
 
 
-.reminder-card{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 45px;
-    margin-bottom: 30px;
-     /* Adjust as needed */
-    /* Space between cards */
-    border: 2px solid transparent; /* Default border to maintain consistent size */
-    transition: border-color 0.3s, background-color 0.3s; /* Smooth transition for hover effect */
-    border-radius: 15px;
-}
-
-.reminder-card:hover {
-  cursor: pointer;
-  background-color: lightgray;
-
-}
-
-
-.card-heading {
-  color: black;
-  font-size: 1.1em;
-  font-weight: bold;
-  align-self: center;
-}
-
-.title{
-  display: flex;
-  margin-top: 15px;
-  flex-direction: row;
-  color: black;
-
-}
-
-.count{
-  margin-top: 10px;
-  display:flex;
-  flex-direction:row;
-  margin-left: auto;
-  font-size: 3em;
-}
 
 
 </style>
 {% endblock %}
 {% block body %}
 <body>
-
-    
+<!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container">
         <div id="toast-user-content">
         </div>
     </div>
-    <div class="grid-container">
-        
-        <div class="card-container">
-  <div class="card-heading">
-    <p class="card-heading">Upcoming Reminders</p>
-  </div>
-    
-      <div class="reminder-card">
-      <p class="title">Today</p>
-      <p class="count">3</p>
-      </div>
+<!---- Upcoming Reminders Card Section -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Upcoming Reminders Card Section -->
+            <div class="col-md-4"> <!-- Adjust the size as needed -->
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom">
+                        Upcoming Reminders
+                    </div>
+                    <div class="card-body card-body-custom">
+                        <!-- Today Reminder -->
+                        <div class="reminder-item">
+                            <p class="reminder-title">Due Today</p>
+                            <p class="reminder-count" id="dueTodayCount">0</p>
+                        </div>
 
-      <div class="reminder-card">
-      <p class="title">This Week</p>
-      <p class="count">12</p>
-      </div>
+                        <!-- This Week Reminder -->
+                        <div class="reminder-item">
+                            <p class="reminder-title">Due This Week</p>
+                            <p class="reminder-count" id="dueThisWeekCount">0</p>
+                        </div>
 
-  
-      <div class="reminder-card">
-      <p class="title">This month</p>
-      <p class="count">23</p>
-      </div>
+                        <!-- This Month Reminder -->
+                        <div class="reminder-item">
+                            <p class="reminder-title">Due This Month</p>
+                            <p class="reminder-count" id="dueThisMonthCount">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-</div>
         <div class="table-container">
             <div class="main">
         <h2>TaskTok Dashboard</h2>
