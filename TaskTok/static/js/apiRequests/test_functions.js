@@ -62,28 +62,41 @@ async function queryAllTasks() {
     return data.TaskList;
 }
 
+
+// This function fetches nonCompletedTasks() and updates reminder counts.
+async function fetchNonCompletedTasksAndUpdateReminders() {
+    try {
+        const nonCompletedTasks = await queryNonCompletedTasks();
+        updateReminderCounts(nonCompletedTasks);
+    } catch (error) {
+        console.error("Error fetching non-completed tasks:", error);
+    }
+}
+
+// This function calculates and updates the counts for dueToday, dueThisWeek, and dueThisMonth
+// for the upcoming reminders card.
 function updateReminderCounts(taskList) {
     let dueToday = 0, dueThisWeek = 0, dueThisMonth = 0;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of today.
+    today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1); // Set to start of tomorrow.
+    tomorrow.setDate(tomorrow.getDate() + 1);
     const startOfNextWeek = new Date(today);
-    startOfNextWeek.setDate(today.getDate() - today.getDay() + 7); // Set to next week.
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1); // Set to start of next month.
+    startOfNextWeek.setDate(today.getDate() - today.getDay() + 7);
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
     taskList.forEach(task => {
         const dueDate = new Date(task.task_dueDate);
-        dueDate.setHours(0, 0, 0, 0); // Standardize time component.
+        dueDate.setHours(0, 0, 0, 0);
 
         if (dueDate >= today && dueDate < tomorrow) {
             dueToday++;
         }
-        if (dueDate < startOfNextWeek) {
+        if (dueDate >= today && dueDate < startOfNextWeek) {
             dueThisWeek++;
         }
-        if (dueDate < startOfNextMonth) {
+        if (dueDate >= today && dueDate < startOfNextMonth) {
             dueThisMonth++;
         }
     });
@@ -92,6 +105,11 @@ function updateReminderCounts(taskList) {
     document.getElementById('dueThisWeekCount').textContent = dueThisWeek;
     document.getElementById('dueThisMonthCount').textContent = dueThisMonth;
 }
+
+// Call the function immediately to update reminders on page load.
+fetchNonCompletedTasksAndUpdateReminders();
+setInterval(fetchNonCompletedTasksAndUpdateReminders, 60000); // Update every 60 seconds.
+
 
 
 
