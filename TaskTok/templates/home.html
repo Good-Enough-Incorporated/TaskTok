@@ -65,8 +65,8 @@
 
   .table-container {
     /* or any maximum width you prefer */
-    width: 60%;
-    margin: 1; /* centers the table */
+    width: 100%;
+    margin: 0 auto; /* centers the table */
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -117,7 +117,6 @@
     justify-content: flex-end;
     align-self: flex-end;
     background-color: #e0a900;
-    display: block;
     border: none;
 
     color: black;
@@ -204,7 +203,6 @@
 
   .toast-container {
     display: block;
-    visibility: visible; /* Moved visibility here */
     background-color: green;
     visibility: hidden;
     color: black;
@@ -393,115 +391,80 @@
 </style>
 {% endblock %} {% block body %}
 <body>
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="toast-container">
-    <div id="toast-user-content"></div>
-  </div>
-  <!---- Upcoming Reminders Card Section -->
-  <div class="container mt-4">
-    <div class="row">
-      <!-- Upcoming Reminders Card Section -->
-      <div class="col-md-4">
-        <!-- Adjust the size as needed -->
-        <div class="card card-custom">
-          <div class="card-header card-header-custom">Upcoming Reminders</div>
-          <div class="card-body card-body-custom">
-            <!-- Today Reminder -->
-            <div class="reminder-item">
-              <p class="reminder-title">Due Today</p>
-              <p class="reminder-count" id="dueTodayCount">0</p>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container">
+        <div id="toast-user-content"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mt-3">
+        <div class="row">
+            <!-- Upcoming Reminders Card Section -->
+            <div class="col-md-3">
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom">Upcoming Reminders</div>
+                    <div class="card-body card-body-custom">
+                        <!-- Reminder Items -->
+                        <div class="reminder-item">
+                            <p class="reminder-title">Due Today</p>
+                            <p class="reminder-count" id="dueTodayCount">0</p>
+                        </div>
+                        <div class="reminder-item">
+                            <p class="reminder-title">Due This Week</p>
+                            <p class="reminder-count" id="dueThisWeekCount">0</p>
+                        </div>
+                        <div class="reminder-item">
+                            <p class="reminder-title">Due This Month</p>
+                            <p class="reminder-count" id="dueThisMonthCount">0</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- This Week Reminder -->
-            <div class="reminder-item">
-              <p class="reminder-title">Due This Week</p>
-              <p class="reminder-count" id="dueThisWeekCount">0</p>
-            </div>
+            <!-- Table and Carousel Section -->
+            <div class="col-md-9">
+                <!-- Table Container -->
+                <div class="table-container">
+                    <div class="main">
+                        <h2>TaskTok Dashboard</h2>
+                        <p>"Clarity about what matters provides clarity about what does not."</p>
+                        <p><b>Welcome back {{username}}</b></p>
+                    </div>
+                    <div class="table-wrapper">
+                        <label class="tasktable-title-lbl">Active Tasks</label>
+                        <div id="taskTableGrid"></div>
+                        <div class="search-container">
+                            <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+                            <div class="table-widgets">
+                                <button class="add-btn" title="Add Task" data-bs-toggle="modal" data-bs-target="#taskAddModal">
+                                    <span class="icon">➕</span>
+                                </button>
+                                <button class="export-btn" title="Export to Excel" id="exportToExcelButton">
+                                    <span class="icon">📊</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
+                    </div>
+                </div>
 
-            <!-- This Month Reminder -->
-            <div class="reminder-item">
-              <p class="reminder-title">Due This Month</p>
-              <p class="reminder-count" id="dueThisMonthCount">0</p>
+                <!-- Completed Tasks Carousel -->
+                <div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <!-- Dynamic Completed Tasks will appear here. -->
+                    </div>
+                    <!-- Carousel Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-
-      <div class="table-container">
-        <div class="main">
-          <h2>TaskTok Dashboard</h2>
-          <p>
-            "Clarity about what matters provides clarity about what does not."
-          </p>
-          <p><b>Welcome back {{username}}</b></p>
-        </div>
-        <div class="table-wrapper">
-          <label class="tasktable-title-lbl">Active Tasks</label>
-          <!-- Add button attached to bootstrap modal -->
-
-          <div id="taskTableGrid"></div>
-          <div class="search-container">
-            <input
-              type="text"
-              id="filter-text-box"
-              class="ag-theme-quartz-auto-dark"
-              placeholder="Filter..."
-              oninput="onFilterTextBoxChanged()"
-            />
-            <div class="table-widgets">
-              <button
-                class="add-btn"
-                title="Add Task"
-                data-bs-toggle="modal"
-                data-bs-target="#taskAddModal"
-              >
-                <span class="icon">➕</span>
-              </button>
-              <button
-                class="export-btn"
-                title="Export to Excel"
-                id="exportToExcelButton"
-              >
-                <span class="icon">📊 </span>
-              </button>
-            </div>
-          </div>
-          <div
-            id="taskTableGrid2"
-            class="ag-theme-quartz-auto-dark"
-            style="height: 500px; width: 100%"
-          ></div>
-        </div>
-        <!--------------------- Completed Tasks Carousel----------- -->
-        <div
-          id="completedTasksCarousel"
-          class="carousel slide"
-          data-bs-ride="carousel"
-        >
-          <div class="carousel-inner">
-            <!-- Dynamic Completed Tasks will appear here. -->
-          </div>
-          <!-- Carousel Controls -->
-          <button
-            class="carousel-control-prev"
-            type="button"
-            data-bs-target="#completedTasksCarousel"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button
-            class="carousel-control-next"
-            type="button"
-            data-bs-target="#completedTasksCarousel"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Task Add Modal -->
