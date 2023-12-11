@@ -1,98 +1,131 @@
-{% extends "base.html" %}
-{% block title %}TaskTok{% endblock %}
-    
-{% block style %}
-    <!-- Flatpicker for date and time input CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% extends "base.html" %} {% block title %}TaskTok{% endblock %} {% block style
+%}
+<!-- Flatpicker for date and time input CSS -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
 
-    <style>
-        body {
-            font-family: Calibri, Helvetica, sans-serif;
-            background: #0F0F12;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+  body {
+    font-family: Calibri, Helvetica, sans-serif;
+    background: #FBFBFF;
+    margin: 0;
+    padding: 0;
+  }
 
-        .sidenav {
-            height: 100%;
-            width: 175px;
-            position: fixed;
-            z-index: 1;
-            top: 0;
-            left: 0;
-            background-color: #17171c;
-            overflow-x: hidden;
-            padding-top: 20px;
-        }
+  .sidenav {
+    height: 100%;
+    width: 175px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #17171c;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
 
-        .sidenav a {
-            padding: 6px 6px 6px 32px;
-            text-decoration: none;
-            font-size: 25px;
-            color: #818181;
-            display: block;
-        }
+  .sidenav a {
+    padding: 6px 6px 6px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+  }
 
-        .sidenav a:hover {
-            color: #f1f1f1;
-        }
-        .fadeOutSlideRight {
-        animation: fadeOutSlideRight 0.5s forwards;
-        }
+  .sidenav a:hover {
+    color: #f1f1f1;
+  }
+  .fadeOutSlideRight {
+    animation: fadeOutSlideRight 0.5s forwards;
+  }
 
-        @keyframes fadeOutSlideRight {
-        0% {
-        opacity: 1;
-        transform: translateX(0);
-        }
-        100% {
-        opacity: 0;
-        transform: translateX(100%);
-        }
-        }
+  @keyframes fadeOutSlideRight {
+    0% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  .main h2,
+  .main p {
+    color: #0D0106;
+  }
+
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 40px;
+  }
+
+   /* Card for reminder quick glance*/
+.card.card-custom .card-header-custom {
+  background-color: #C6D8FF !important; /* Light blue background */
+  padding: 15px 20px;
+  font-size: 1.5rem;
+}
 
 
-        .main h2, .main p {
-            color: White;
-        }
+  .card-body-custom {
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 
-        .main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-top: 40px;
+  }
 
-        }
+  .reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd; /* for separation */
+    padding: 15px 0;
+  }
 
-.table-container {
-     /* or any maximum width you prefer */
-     width: 60%;
-    margin: 1; /* centers the table */
+  .reminder-title {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    color: #333;
+  }
+
+  .reminder-count {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 0;
+  }
+
+  .table-container {
+    /* or any maximum width you prefer */
+    width: 100%;
+    margin: 0 auto; /* centers the table */
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: flex-start;
     padding-top: 30px;
     position: relative;
-    
-}
-.table-wrapper {
+
+  }
+  .table-wrapper {
     padding-left: 5px;
     padding-right: 5px;
     width: 100%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    background-color: #17171c;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    background-color: #C6D8FF;
     transition: 0.3s;
     border-radius: 5px;
     position: relative; /* New positioning context for the button */
     overflow-y: auto;
     overflow-x: auto;
-}
+  }
 
-.table-wrapper:hover{
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-}
+  .table-wrapper:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  }
 
-.tasktable-title-lbl{
+  .tasktable-title-lbl {
     display: block;
     padding-bottom: 10px;
     position: absolute;
@@ -100,67 +133,65 @@
     top: -30px;
     font-size: 12px;
     transform: translate(-50%, -50%);
-}
+  }
 
-.gridjs-button{
+  .gridjs-button {
     display: inline-block;
-}
+  }
 
-.table-widgets {
+  .table-widgets {
     display: flex;
     position: relative;
     width: 100%;
     justify-content: flex-end;
-}
+  }
 
-.task-add-btn {
+  .task-add-btn {
     display: flex;
     justify-content: flex-end;
     align-self: flex-end;
-    background-color: #E0A900;
-    display: block;
+    background-color: #e0a900;
     border: none;
 
     color: black;
     padding: 8px 16px;
     min-width: 93px;
-    text-decoration: none;      
+    text-decoration: none;
     cursor: pointer;
     border-radius: 8px;
-   
-   
-   
-    
+
     /* Style your button as needed */
-}
-.fadeOutSlideUp {
-  animation: fadeOutSlideUp 0.5s forwards;
-}
-
-@keyframes fadeOutSlideUp {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
   }
-  100% {
-    opacity: 0;
-    transform: translateY(-100%);
+  .fadeOutSlideUp {
+    animation: fadeOutSlideUp 0.5s forwards;
   }
-}
 
+  @keyframes fadeOutSlideUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+  }
 
-    .task-edit-btn, .task-delete-btn, .task-update-btn  {
-    
+  .task-edit-btn,
+  .task-delete-btn,
+  .task-update-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     height: auto; /* Or set a specific minimum height */
     padding: 5px 10px; /* Adjust as needed */
     margin: 5px 5px;
+  }
 
-    }
-
-    .edit-btn, .add-btn, .complete-btn, .export-btn {
+  .edit-btn,
+  .add-btn,
+  .complete-btn,
+  .export-btn {
     background-color: transparent;
     width: auto;
     color: white;
@@ -171,21 +202,20 @@
     display: inline-flex;
     align-items: center;
     margin: 5px;
-}
-/* add spacing  between the table and the search filter */
-.search-container{
+  }
+  /* add spacing  between the table and the search filter */
+  .search-container {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-   
-
-}
-.edit-btn .icon {
+      padding-left: 15px;
+  }
+  .edit-btn .icon {
     margin-right: 5px;
-}
+  }
 
-.delete-btn {
+  .delete-btn {
     background-color: transparent; /* Red background */
     width: auto;
     color: white;
@@ -196,84 +226,73 @@
     display: inline-flex;
     align-items: center;
     margin: 10px;
-}
+  }
 
-.delete-btn .icon {
+  .delete-btn .icon {
     margin-right: 5px;
-}
+  }
 
-button span {
+  button span {
     pointer-events: none;
-}
+  }
 
-
-
-
-.toast-container {
-    
+  .toast-container {
     display: block;
-        visibility: visible; /* Moved visibility here */
-        background-color: green;
-        visibility: hidden;
-        color: black;
-        text-align: center;
-        
-        padding-top: 5px;
-        padding-bottom: 5px;
-        padding-left: 15px;
-        padding-right: 15px;
-        position: fixed;
-        z-index: 1;
-        margin: auto;
-        left: 50%;
-        bottom: 30px;
-        font-size: 17px;
-        border-radius: 15px;
-}
+    background-color: green;
+    visibility: hidden;
+    color: black;
+    text-align: center;
 
-.toast-container.success {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: fixed;
+    z-index: 1;
+    margin: auto;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+    border-radius: 15px;
+  }
 
+  .toast-container.success {
     background-color: green;
     color: black;
-    
-}
+  }
 
-.toast-container.error {
-    
- background-color: red;
- color: white;
-}
+  .toast-container.error {
+    background-color: red;
+    color: white;
+  }
 
-.toast-container.show {
-    visibility: visible; 
-}
+  .toast-container.show {
+    visibility: visible;
+  }
 
-
-
-
-/* scroll bar */
-/* This styles the scrollbar track */
-::-webkit-scrollbar-track {
+  /* scroll bar */
+  /* This styles the scrollbar track */
+  ::-webkit-scrollbar-track {
     background: #2a2a2e; /* Dark track background */
-}
+  }
 
-/* This styles the scrollbar handle */
-::-webkit-scrollbar-thumb {
+  /* This styles the scrollbar handle */
+  ::-webkit-scrollbar-thumb {
     background: #444; /* Dark thumb color */
     border-radius: 10px; /* Optional: round corners for the scrollbar handle */
-}
+  }
 
-/* This styles the scrollbar itself (the entire component) */
-::-webkit-scrollbar {
+  /* This styles the scrollbar itself (the entire component) */
+  ::-webkit-scrollbar {
     width: 8px; /* Width of the vertical scrollbar */
     height: 8px; /* Height of the horizontal scrollbar */
-}
+  }
 
-/* Use the scrollbar-color property to set the thumb and track color */
-.scrollable-element {
+  /* Use the scrollbar-color property to set the thumb and track color */
+  .scrollable-element {
     scrollbar-color: #444 #2a2a2e;
     scrollbar-width: thin; /* Can be 'auto', 'thin', or 'none' */
-}
+  }
 
   /* Target the Grid.js table */
   .gridjs-table {
@@ -282,25 +301,33 @@ button span {
 
   .grid-button-wrapper {
     display: flex;
-    justify-content:left;
+    justify-content: left;
     align-items: center;
     height: 100%; /* Fill the cell height */
     width: 100%; /* Fill the cell width */
-
   }
-    /*------------------- Carousel CSS Section -------------------------*/
-#completedTasksCarousel {   
+
+  /*------------------- Carousel CSS Section -------------------------*/
+
+  .completed-tasks-header {
+    color: #0D0106;
+    margin-top: 40px;
+}
+#completedTasksCarousel {
     align-self: center;
-    width: 90%;
+    width: 100%;
     margin-top: 5%;
-    background-color: #343a40;
-    color: #fff;
-    padding-bottom: 60px; /* Extra padding to accommodate the arrows below the carousel */
-    position: relative; /* Needed for absolute positioning of children */
+    background-color: #C6D8FF;
+    color: #0D0106;
+    padding-bottom: 60px;
+    position: relative;
+    border: 4px solid #0D0106;
 }
 
 #completedTasksCarousel .carousel-item {
-    padding: 15px; /* Add padding for content inside carousel items */
+    padding-top: 40px; /* Top padding */
+    padding-left: 90px; /* Left padding */
+    padding-right: 15px; /* Right padding */
 }
 
 #completedTasksCarousel .carousel-control-prev,
@@ -309,19 +336,20 @@ button span {
     top: auto;
     bottom: -50px; /* Adjust this value to move the arrows up or down */
     z-index: 1; /* Ensure the arrows are above other content */
+
 }
 
 #completedTasksCarousel .carousel-control-prev {
-    left: 10%; /* Position to the left */
+    left: 20%; /* Position to the left */
 }
 
 #completedTasksCarousel .carousel-control-next {
-    right: 10%; /* Position to the right */
+    right: 20%; /* Position to the right */
 }
 
 #completedTasksCarousel .carousel-control-prev-icon,
 #completedTasksCarousel .carousel-control-next-icon {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #000000;
     border-radius: 50%;
 }
 
@@ -332,121 +360,74 @@ button span {
     gap: 20px;
     padding: 20px;
     position: relative;
-}
-
- /* Grid Container */
- .grid-container {
-            display: grid;
-            grid-template-columns: auto minmax(0, 1fr) auto; /* Three columns: auto for sides, 1fr for center */
-            gap: 20px;
-            padding: 20px;
-            height: calc(100vh - 56px); /* to account for navbar */
-        }
-
-        .card-container {
-            grid-column: 1 / 2;
-            display: flex;
-            flex-direction: column; /* Align children vertically */
-            background-color: white;
-            padding: 1em;
-            border-radius: 15px;
-            width: 250px;
-            
-            
-            /* Position and other styles */
-        }
-
-        .table-container {
-            grid-column: 2 / 3;
-            max-width: 1200px; /* or any maximum width you prefer */
-            margin: 0 auto; /* centers the table */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 30px;
-            position: relative;
-            
-        }
 
 
-    /* Card for reminder quick glance*/
-.card-custom {
-        background-color: #fff;
-        border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        margin-top: 60px;
-    }
+  .content-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    position: relative;
+  }
 
-    .card-header-custom {
-        background-color: grey;
-        color: black;
-        border-top-left-radius: 15px;
-        border-top-right-radius: 15px;
-        padding: 15px 20px;
-        font-size: 1.5rem;
-    }
+  /* Grid Container */
+  .grid-container {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto; /* Three columns: auto for sides, 1fr for center */
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 56px); /* to account for navbar */
+  }
 
-    .card-body-custom {
-        padding: 25px;
-    }
+  .card-container {
+    grid-column: 1 / 2;
+    display: flex;
+    flex-direction: column; /* Align children vertically */
+    background-color: white;
+    padding: 1em;
+    border-radius: 15px;
+    width: 250px;
 
-    .reminder-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #ddd; /* for separation */
-        padding: 15px 0;
-    }
+    /* Position and other styles */
+  }
 
-    .reminder-title {
-        font-size: 1.2rem;
-        margin-bottom: 0;
-        color: #333;
-    }
-
-    .reminder-count {
-        font-size: 1.5rem;
-        color: #333;
-        margin-bottom: 0;
-    }
-
-
-
-
+  .table-container {
+    grid-column: 2 / 3;
+    max-width: 1200px; /* or any maximum width you prefer */
+    margin: 0 auto; /* centers the table */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 30px;
+    position: relative;
+  }
 
 
 </style>
-{% endblock %}
-{% block body %}
+{% endblock %} {% block body %}
 <body>
-<!-- Toast Notification Container -->
+    <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container">
-        <div id="toast-user-content">
-        </div>
+        <div id="toast-user-content"></div>
     </div>
-<!---- Upcoming Reminders Card Section -->
-    <div class="container mt-4">
+
+    <!-- Main Container -->
+    <div class="container mt-3">
         <div class="row">
             <!-- Upcoming Reminders Card Section -->
-            <div class="col-md-4"> <!-- Adjust the size as needed -->
+            <div class="col-md-3">
                 <div class="card card-custom">
-                    <div class="card-header card-header-custom">
-                        Upcoming Reminders
-                    </div>
+                    <div class="card-header card-header-custom">Upcoming Reminders</div>
                     <div class="card-body card-body-custom">
-                        <!-- Today Reminder -->
+                        <!-- Reminder Items -->
                         <div class="reminder-item">
                             <p class="reminder-title">Due Today</p>
                             <p class="reminder-count" id="dueTodayCount">0</p>
                         </div>
-
-                        <!-- This Week Reminder -->
                         <div class="reminder-item">
                             <p class="reminder-title">Due This Week</p>
                             <p class="reminder-count" id="dueThisWeekCount">0</p>
                         </div>
-
-                        <!-- This Month Reminder -->
                         <div class="reminder-item">
                             <p class="reminder-title">Due This Month</p>
                             <p class="reminder-count" id="dueThisMonthCount">0</p>
@@ -455,170 +436,299 @@ button span {
                 </div>
             </div>
 
-        <div class="table-container">
-            <div class="main">
-        <h2>TaskTok Dashboard</h2>
-        <p>"Clarity about what matters provides clarity about what does not."</p>
-        <p><b>Welcome back {{username}}</b></p>
-    </div>
-        <div class="table-wrapper">
-            <label class="tasktable-title-lbl">Active Tasks</label>
-            <!-- Add button attached to bootstrap modal -->
-
-            <div id="taskTableGrid"></div>
-            <div class="search-container">
-            <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
-            <div class="table-widgets">
-                <button class="add-btn" title="Add Task" data-bs-toggle="modal" data-bs-target="#taskAddModal">
-                    <span class="icon">➕</span></button>
-                    <button class="export-btn" title="Export to Excel" id="exportToExcelButton">
-                        <span class="icon">📊 </span></button>
-                        
+            <!-- Table and Carousel Section -->
+            <div class="col-md-9">
+                <!-- Table Container -->
+                <div class="table-container">
+                    <div class="main">
+                        <h2>TaskTok Dashboard</h2>
+                        <p>"Clarity about what matters provides clarity about what does not."</p>
+                        <p><b>Welcome back {{username}}</b></p>
+                    </div>
+                    <div class="table-wrapper">
+                        <label class="tasktable-title-lbl">Active Tasks</label>
+                        <div id="taskTableGrid"></div>
+                        <div class="search-container">
+                            <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+                            <div class="table-widgets">
+                                <button class="add-btn" title="Add Task" data-bs-toggle="modal" data-bs-target="#taskAddModal">
+                                    <span class="icon">➕</span>
+                                </button>
+                                <button class="export-btn" title="Export to Excel" id="exportToExcelButton">
+                                    <span class="icon">📊</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
+                    </div>
                 </div>
-            </div>
-            <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
-        </div>
-        <!--------------------- Completed Tasks Carousel----------- -->
-<div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        <!-- Dynamic Completed Tasks will appear here. -->
-    </div>
-    <!-- Carousel Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
-
-    </div>
-    </div>
-
-
-
-<!-- Task Add Modal -->
-<div class="modal fade" id="taskAddModal" tabindex="-1" aria-labelledby="taskAddModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="taskAddModalLabel">Add New Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Task Add Form -->
-                <form id="addTaskForm" class="needs-validation" novalidate>
-                    {{form.hidden_tag()}}
-                    <div class="mb-3">
-                        <label for="taskName" class="form-label">Task Name</label>
-                        <input type="text" class="form-control" id="taskName" maxlength="100" required>
-                        <div class="invalid-feedback">Task name cannot exceed 100 characters.</div>
+                <h3 class="completed-tasks-header">Completed Tasks</h3>
+                <!-- Completed Tasks Carousel -->
+                <div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <!-- Dynamic Completed Tasks will appear here. -->
                     </div>
-                    <div class="mb-3">
-                        <label for="taskDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="taskDescription" rows="3" maxlength="500" required></textarea>
-                        <div class="invalid-feedback">Description cannot exceed 500 characters.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="taskDueDate" class="form-label">Due Date</label>
-                        <input type="text" id="taskDueDate" class="form-control" placeholder="mm/dd/yyyy hh:mm">
-                    </div>
-                    <div class="mb-3">
-                        <label for="taskReminderOffset" class="form-label">Off-Set</label>
-                        <input type="text" id="taskReminderOffset" class="form-control" placeholder="mm/dd/yyyy hh:mm">
-                    </div>
-                    <div class="mb-3">
-                        <label for="taskEmailList" class="form-label">Email-List</label>
-                        <input type="text" id="taskEmailList" class="form-control"
-                               placeholder="example@tasktok.com, example2@tasktok.com">
-                        <div class="invalid-feedback">Please enter a valid email address(es).</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="taskEmailMessage" class="form-label">Email Message</label>
-                        <textarea class="form-control" id="taskEmailMessage" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" form="addTaskForm">Add Task</button>
+                    <!-- Carousel Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#completedTasksCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-
-<!--  Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <!-- Task Add Modal -->
+    <div
+      class="modal fade"
+      id="taskAddModal"
+      tabindex="-1"
+      aria-labelledby="taskAddModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="confirmTextContent">Are you sure you want to delete this task?</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-danger" id="confirmAction">Yes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Complete Task Confirmation Modal -->
-
-
-<!-- Edit Task Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Form inputs for editing task -->
-                {{form.hidden_tag()}}
-                <div class="mb-3">
-                    <label for="editTaskName" class="form-label">Task Name</label>
-                    <input type="text" id="editTaskName" class="form-control" placeholder="Task Name">
-                </div>
-                <div class="mb-3">
-                    <label for="editTaskDescription" class="form-label">Description</label>
-                    <input id="editTaskDescription" class="form-control" placeholder="Description">
-                </div>
-                 <div class="mb-3">
-                    <label for="editTaskDueDate" class="form-label">Due Date</label>
-                    <input type="text" id="editTaskDueDate" class="form-control" placeholder="Due Date">
-                </div>
-                 <div class="mb-3">
-                    <label for="editTaskReminderOffset" class="form-label">Off-Set</label>
-                    <input type="text" id="editTaskReminderOffset" class="form-control" placeholder="Off-Set">
-                </div>
-                 <div class="mb-3">
-                <label for="editTaskEmailList" class="form-label">Email-List</label>
-                <input type="text" id="editTaskEmailList" class="form-control"
-                       placeholder="example@tasktok.com, example2@tasktok.com" required>
+          <div class="modal-header">
+            <h5 class="modal-title" id="taskAddModalLabel">Add New Task</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Task Add Form -->
+            <form id="addTaskForm" class="needs-validation" novalidate>
+              {{form.hidden_tag()}}
+              <div class="mb-3">
+                <label for="taskName" class="form-label">Task Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="taskName"
+                  maxlength="100"
+                  required
+                />
                 <div class="invalid-feedback">
-                    Please enter a valid email addresses.
+                  Task name cannot exceed 100 characters.
                 </div>
-            </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveEdit">Save changes</button>
-            </div>
+              </div>
+              <div class="mb-3">
+                <label for="taskDescription" class="form-label"
+                  >Description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="taskDescription"
+                  rows="3"
+                  maxlength="500"
+                  required
+                ></textarea>
+                <div class="invalid-feedback">
+                  Description cannot exceed 500 characters.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="taskDueDate" class="form-label">Due Date</label>
+                <input
+                  type="text"
+                  id="taskDueDate"
+                  class="form-control"
+                  placeholder="mm/dd/yyyy hh:mm"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="taskReminderOffset" class="form-label"
+                  >Off-Set</label
+                >
+                <input
+                  type="text"
+                  id="taskReminderOffset"
+                  class="form-control"
+                  placeholder="mm/dd/yyyy hh:mm"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="taskEmailList" class="form-label">Email-List</label>
+                <input
+                  type="text"
+                  id="taskEmailList"
+                  class="form-control"
+                  placeholder="example@tasktok.com, example2@tasktok.com"
+                />
+                <div class="invalid-feedback">
+                  Please enter a valid email address(es).
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="taskEmailMessage" class="form-label"
+                  >Email Message</label
+                >
+                <textarea
+                  class="form-control"
+                  id="taskEmailMessage"
+                  rows="3"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary" form="addTaskForm">
+              Add Task
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
+    <!--  Confirmation Modal -->
+    <div
+      class="modal fade"
+      id="confirmationModal"
+      tabindex="-1"
+      aria-labelledby="confirmationModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmationModalLabel">
+              Confirm Action
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="confirmTextContent">
+            Are you sure you want to delete this task?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              No
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmAction">
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- Complete Task Confirmation Modal -->
 
+    <!-- Edit Task Modal -->
+    <div
+      class="modal fade"
+      id="editModal"
+      tabindex="-1"
+      aria-labelledby="editModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Task</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Form inputs for editing task -->
+            {{form.hidden_tag()}}
+            <div class="mb-3">
+              <label for="editTaskName" class="form-label">Task Name</label>
+              <input
+                type="text"
+                id="editTaskName"
+                class="form-control"
+                placeholder="Task Name"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editTaskDescription" class="form-label"
+                >Description</label
+              >
+              <input
+                id="editTaskDescription"
+                class="form-control"
+                placeholder="Description"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editTaskDueDate" class="form-label">Due Date</label>
+              <input
+                type="text"
+                id="editTaskDueDate"
+                class="form-control"
+                placeholder="Due Date"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editTaskReminderOffset" class="form-label"
+                >Off-Set</label
+              >
+              <input
+                type="text"
+                id="editTaskReminderOffset"
+                class="form-control"
+                placeholder="Off-Set"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editTaskEmailList" class="form-label"
+                >Email-List</label
+              >
+              <input
+                type="text"
+                id="editTaskEmailList"
+                class="form-control"
+                placeholder="example@tasktok.com, example2@tasktok.com"
+                required
+              />
+              <div class="invalid-feedback">
+                Please enter a valid email addresses.
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="saveEdit">
+              Save changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<!-- The Modal -->
+      <!-- Part of edit Modal, unless utilities,js and test_functions.js is reworked. it will break if removed. -->
     <div id="editModal" class="modal">
 
         <!-- Modal content -->
@@ -626,22 +736,29 @@ button span {
         <div class="modal-header">
             <h2>Update Task</h2>
             <span class="close">&times;</span>
-            
+
         </div>
         <div class="modal-body" id="modal-body">
         </div>
         <div class="modal-footer" id="modal-footer">
-            
+
         </div>
             </div>
     </div>
+
     <!-- Home.html Scripts Section -->
-    
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- flatpickr used for date/time selection in date/offset input fields for add/edit forms -->
-    <script type="module" src="{{ url_for('static', filename='js/apiRequests/test_functions.js') }}"></script>
+    <script
+      type="module"
+      src="{{ url_for('static', filename='js/apiRequests/test_functions.js') }}"
+    ></script>
 
-    <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+    <link
+      href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
 
     <!-- AG Grid, used for our table -->
@@ -649,7 +766,6 @@ button span {
 
     <!-- used to export to excel for AG GRID, since that feature is only for enterprise -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-
-
+  </div>
 </body>
 {% endblock %}
