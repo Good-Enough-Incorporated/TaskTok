@@ -474,7 +474,11 @@ async function deleteTask(taskID) {
 
 }
 
-
+const stringFormatter = (params) => {
+    var str = params.value;
+    str[0] = str[0].toUpperCase();
+    return stringFormatter;
+}
 
 const dateFormatter = (params) => {
     const date =  new Date(params.value).toLocaleDateString('en-us', {
@@ -535,8 +539,8 @@ overlayLoadingTemplate:
     
         columnDefs:[
            
-            {field: "id"},
-            {field: "task_name", headerName: "Name"},
+            
+            {field: "task_name", headerName: "Name", valueFormatter: stringFormatter},
             {field: "task_description", headerName: "Description"},
             {field: "task_dueDate",  headerName: "Reminder Time", valueFormatter: dateFormatter},
             {field: "task_reminderOffSetTime", headerName: "Early Reminder Time", valueFormatter: dateFormatter},

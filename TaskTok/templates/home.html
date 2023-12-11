@@ -59,8 +59,8 @@
 
   .main {
     max-width: 1200px;
-    margin: 0 auto;
-    padding-top: 40px;
+    
+   
   }
 
    /* Card for reminder quick glance*/
@@ -68,6 +68,12 @@
   background-color: #C6D8FF !important; /* Light blue background */
   padding: 15px 20px;
   font-size: 1.5rem;
+  height: 60px;
+ 
+}
+
+.card.card-custom {
+    margin-top: 115px;
 }
 
 
@@ -99,7 +105,7 @@
   .table-container {
     /* or any maximum width you prefer */
     width: 100%;
-    margin: 0 auto; /* centers the table */
+    
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -294,10 +300,13 @@
     scrollbar-width: thin; /* Can be 'auto', 'thin', or 'none' */
   }
 
-  /* Target the Grid.js table */
-  .gridjs-table {
-    font-size: 14px; /* Set your desired font size */
-  }
+
+
+  .container {
+    
+    padding: 0; /* Adjust padding as needed */
+    max-width: 80%;
+}
 
   .grid-button-wrapper {
     display: flex;
@@ -316,12 +325,13 @@
 #completedTasksCarousel {
     align-self: center;
     width: 100%;
-    margin-top: 5%;
+    
     background-color: #C6D8FF;
     color: #0D0106;
     padding-bottom: 60px;
     position: relative;
-    border: 4px solid #0D0106;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    
 }
 
 #completedTasksCarousel .carousel-item {
@@ -334,7 +344,7 @@
 #completedTasksCarousel .carousel-control-next {
     position: absolute;
     top: auto;
-    bottom: -50px; /* Adjust this value to move the arrows up or down */
+    /* Adjust this value to move the arrows up or down */
     z-index: 1; /* Ensure the arrows are above other content */
 
 }
@@ -380,13 +390,13 @@
   }
 
   .card-container {
-    grid-column: 1 / 2;
+    
     display: flex;
     flex-direction: column; /* Align children vertically */
     background-color: white;
     padding: 1em;
     border-radius: 15px;
-    width: 250px;
+    width: 100px;
 
     /* Position and other styles */
   }
@@ -412,7 +422,7 @@
     </div>
 
     <!-- Main Container -->
-    <div class="container mt-3">
+    <div class="container">
         <div class="row">
             <!-- Upcoming Reminders Card Section -->
             <div class="col-md-3">
@@ -442,14 +452,14 @@
                 <div class="table-container">
                     <div class="main">
                         <h2>TaskTok Dashboard</h2>
-                        <p>"Clarity about what matters provides clarity about what does not."</p>
-                        <p><b>Welcome back {{username}}</b></p>
+            
+                        <p><b>Active Tasks</b></p>
                     </div>
                     <div class="table-wrapper">
                         <label class="tasktable-title-lbl">Active Tasks</label>
                         <div id="taskTableGrid"></div>
                         <div class="search-container">
-                            <input type="text" id="filter-text-box" class="ag-theme-quartz-auto-dark" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
+                            <input type="text" id="filter-text-box" class="ag-theme-quartz" placeholder="Filter..." oninput="onFilterTextBoxChanged()">
                             <div class="table-widgets">
                                 <button class="add-btn" title="Add Task" data-bs-toggle="modal" data-bs-target="#taskAddModal">
                                     <span class="icon">➕</span>
@@ -459,10 +469,11 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
+                        <div id="taskTableGrid2" class="ag-theme-quartz" style="height: 500px; width: 100%;"></div>
                     </div>
                 </div>
-                <h3 class="completed-tasks-header">Completed Tasks</h3>
+                <div class="mt-5"></div>
+                <p><b>Completed Tasks</b></p>
                 <!-- Completed Tasks Carousel -->
                 <div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
