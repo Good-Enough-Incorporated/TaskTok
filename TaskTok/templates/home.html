@@ -271,42 +271,55 @@
     height: 100%; /* Fill the cell height */
     width: 100%; /* Fill the cell width */
   }
+
   /*------------------- Carousel CSS Section -------------------------*/
-  #completedTasksCarousel {
+#completedTasksCarousel {
     align-self: center;
-    width: 90%;
+    width: 100%;
     margin-top: 5%;
     background-color: #343a40;
     color: #fff;
-    padding-bottom: 60px; /* Extra padding to accommodate the arrows below the carousel */
-    position: relative; /* Needed for absolute positioning of children */
-  }
+    padding-bottom: 60px;
+    position: relative;
+    border: 2px solid #fff;
+}
 
-  #completedTasksCarousel .carousel-item {
-    padding: 15px; /* Add padding for content inside carousel items */
-  }
+#completedTasksCarousel .carousel-item {
+    padding-top: 40px; /* Top padding */
+    padding-left: 90px; /* Left padding */
+    padding-right: 15px; /* Right padding */
+}
 
-  #completedTasksCarousel .carousel-control-prev,
-  #completedTasksCarousel .carousel-control-next {
+#completedTasksCarousel .carousel-control-prev,
+#completedTasksCarousel .carousel-control-next {
     position: absolute;
     top: auto;
     bottom: -50px; /* Adjust this value to move the arrows up or down */
     z-index: 1; /* Ensure the arrows are above other content */
-  }
+}
 
-  #completedTasksCarousel .carousel-control-prev {
+#completedTasksCarousel .carousel-control-prev {
     left: 10%; /* Position to the left */
-  }
+}
 
-  #completedTasksCarousel .carousel-control-next {
+#completedTasksCarousel .carousel-control-next {
     right: 10%; /* Position to the right */
-  }
+}
 
-  #completedTasksCarousel .carousel-control-prev-icon,
-  #completedTasksCarousel .carousel-control-next-icon {
+#completedTasksCarousel .carousel-control-prev-icon,
+#completedTasksCarousel .carousel-control-next-icon {
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 50%;
-  }
+}
+
+
+.content-container {
+    display:flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    position: relative;
+
 
   .content-container {
     display: flex;
