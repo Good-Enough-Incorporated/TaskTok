@@ -308,6 +308,11 @@
   }
 
   /*------------------- Carousel CSS Section -------------------------*/
+
+  .completed-tasks-header {
+    color: #0D0106;
+    margin-top: 40px;
+}
 #completedTasksCarousel {
     align-self: center;
     width: 100%;
@@ -331,19 +336,20 @@
     top: auto;
     bottom: -50px; /* Adjust this value to move the arrows up or down */
     z-index: 1; /* Ensure the arrows are above other content */
+
 }
 
 #completedTasksCarousel .carousel-control-prev {
-    left: 10%; /* Position to the left */
+    left: 20%; /* Position to the left */
 }
 
 #completedTasksCarousel .carousel-control-next {
-    right: 10%; /* Position to the right */
+    right: 20%; /* Position to the right */
 }
 
 #completedTasksCarousel .carousel-control-prev-icon,
 #completedTasksCarousel .carousel-control-next-icon {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #000000;
     border-radius: 50%;
 }
 
@@ -456,7 +462,7 @@
                         <div id="taskTableGrid2" class="ag-theme-quartz-auto-dark" style="height: 500px; width: 100%;"></div>
                     </div>
                 </div>
-
+                <h3 class="completed-tasks-header">Completed Tasks</h3>
                 <!-- Completed Tasks Carousel -->
                 <div id="completedTasksCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
