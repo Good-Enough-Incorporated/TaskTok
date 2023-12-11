@@ -9,7 +9,7 @@
 <style>
   body {
     font-family: Calibri, Helvetica, sans-serif;
-    background: #0f0f12;
+    background: #FBFBFF;
     margin: 0;
     padding: 0;
   }
@@ -54,13 +54,46 @@
 
   .main h2,
   .main p {
-    color: White;
+    color: #0D0106;
   }
 
   .main {
     max-width: 1200px;
     margin: 0 auto;
     padding-top: 40px;
+  }
+
+   /* Card for reminder quick glance*/
+.card.card-custom .card-header-custom {
+  background-color: #C6D8FF !important; /* Light blue background */
+  padding: 15px 20px;
+  font-size: 1.5rem;
+}
+
+
+  .card-body-custom {
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+
+  }
+
+  .reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd; /* for separation */
+    padding: 15px 0;
+  }
+
+  .reminder-title {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    color: #333;
+  }
+
+  .reminder-count {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 0;
   }
 
   .table-container {
@@ -73,13 +106,14 @@
     align-items: flex-start;
     padding-top: 30px;
     position: relative;
+
   }
   .table-wrapper {
     padding-left: 5px;
     padding-right: 5px;
     width: 100%;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    background-color: #17171c;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    background-color: #C6D8FF;
     transition: 0.3s;
     border-radius: 5px;
     position: relative; /* New positioning context for the button */
@@ -175,6 +209,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+      padding-left: 15px;
   }
   .edit-btn .icon {
     margin-right: 5px;
@@ -277,11 +312,11 @@
     align-self: center;
     width: 100%;
     margin-top: 5%;
-    background-color: #343a40;
-    color: #fff;
+    background-color: #C6D8FF;
+    color: #0D0106;
     padding-bottom: 60px;
     position: relative;
-    border: 2px solid #fff;
+    border: 4px solid #0D0106;
 }
 
 #completedTasksCarousel .carousel-item {
@@ -361,46 +396,7 @@
     position: relative;
   }
 
-  /* Card for reminder quick glance*/
-  .card-custom {
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-top: 60px;
-  }
 
-  .card-header-custom {
-    background-color: grey;
-    color: black;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    padding: 15px 20px;
-    font-size: 1.5rem;
-  }
-
-  .card-body-custom {
-    padding: 25px;
-  }
-
-  .reminder-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd; /* for separation */
-    padding: 15px 0;
-  }
-
-  .reminder-title {
-    font-size: 1.2rem;
-    margin-bottom: 0;
-    color: #333;
-  }
-
-  .reminder-count {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 0;
-  }
 </style>
 {% endblock %} {% block body %}
 <body>
