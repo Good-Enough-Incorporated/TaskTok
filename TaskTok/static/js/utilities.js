@@ -1,14 +1,20 @@
 export function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast-container");
     const toastContent = document.getElementById("toast-user-content");
-    toastContent.textContent = message;
-    toast.classList.add("show");
 
-    // Hide the toast after 'duration' milliseconds
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
+    if (toast && toastContent) {
+        toastContent.textContent = message;
+        toast.classList.add("show");
+
+        // Hide the toast after 'duration' milliseconds
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, duration);
+    } else {
+        console.error("Toast elements not found!");
+    }
 }
+
 
 export function clearModal(){
     var editModal = document.getElementById('editModal');
@@ -80,3 +86,16 @@ export function isValidEmailList(emailList) {
     // If all emails are valid, return true.
     return true;
 }
+
+// Used to update the top right of the nav bar with the current time.
+export function updateTime(timezone = null) {
+    const options = { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const now = new Date();
+    const timeString = timezone ? now.toLocaleTimeString('en-US', options) : now.toLocaleTimeString();
+    document.getElementById('currentTime').textContent = timeString;
+}
+
+
+
+
+

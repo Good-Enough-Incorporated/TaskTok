@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}TaskTok{% endblock %}
-    
+
 {% block style %}
 <head>
     <meta charset="UTF-8">
@@ -11,56 +11,48 @@
 
         body {
 			font-family: Calibri, Helvetica, sans-serif;
-			color: #FFBF00; 
-			background: #0F0F12 ;
+			color: #0D0106;
+            background: #FBFBFF;
         }
-        .header {
-            display: block;
-            width: 50%;
-            margin-left: calc((100% - 50%)/2 + 175px/2); 
-            padding: 0px 10px;
-            text-align: center;
-            
-        }
+
         .settings-container {
             padding-top: 20px;
             padding-bottom: 20px;
             width: 30%;
-            margin-left: calc((100% - 30%)/2 + 175px/2); 
+            margin: auto;
             display: block;
             flex-direction: column;
             align-items: center;
-            position: relative;			
-			background: #0F0F12;		
-						
-	
+            position: relative;
+
+
         }
         .settings-section {
-           
+
             display: flex;
             flex-direction: column;
             position: relative;
-			padding: 25px; 
-			background: #17171c;
+			padding: 25px;
+			background: #C6D8FF;
 			min-width: 400px;
 			width: 100%;
 			margin: auto;
-			border-right: 3px inset #ad7231;
+			border-right: 3px inset black;
 			border-radius: 0px 12px 12px 0px;
-		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0); 
+		-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
 		box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
         }
-        
+
         .taskTokInput, .taskTokButton {
             /* Shared styles for inputs and buttons */
             background: #17171c;
             width: 100%;
             padding: 12px 20px;
             margin: 8px 0;
-            box-sizing: border-box;     
+            box-sizing: border-box;
 			border: 2px solid rgba(51,51,61,0.48);
 			border-radius: 4px;
-			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
 			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
 			}
         .taskTokInput {
@@ -72,10 +64,10 @@
             width: 100%;
             padding: 12px 20px;
             margin: 8px 0;
-            box-sizing: border-box;     
+            box-sizing: border-box;
 			border: 2px solid rgba(51,51,61,0.48);
 			border-radius: 4px;
-			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0); 
+			-webkit-box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
 			box-shadow: 0px 10px 13px -7px #000000, 5px 5px 4px 1px rgba(0,0,0,0);
             color: gray;
         }
@@ -93,7 +85,7 @@
             font-size: 0.9em; /* Adjust the font size as needed */
         }
 
-        
+
 /* Style for flash message box */
 .flash-text {
   padding: 15px;
@@ -150,21 +142,21 @@
         }
 
         button {
-			background-color: #ad7231 ; 
+			background-color: #FBFBFF ;
 			width: 100%;
-			color: black; 
-			padding: 15px; 
-			margin: 10px 0px; 
-			border: none; 
-			cursor: pointer; 
+			color: black;
+			padding: 15px;
+			margin: 10px 0px;
+            border: 3px solid #0D0106;
+			cursor: pointer;
 			position: relative;
         }
         button:hover {
             opacity: 0.5;
         }
         .footer {
-            background-color: #0F0F12;
-            color: FFBF00;
+            background-color: #0D0106;
+            color: #FBFBFF;
             text-align: center;
             padding: 10px 0;
             margin-top: 20px;
@@ -201,12 +193,12 @@
         width: 100%; /* Match the width of the input box */
         max-height: 200px;
         overflow-y: auto;
-        
+
     }
 
     .dropdown-menu  {
         background-color: #17171c;
-        
+
     }
     .timezone-option {
         color: white;
@@ -244,13 +236,23 @@
         padding: 8px;
         font-size:  20px;
     }
+    .header{
+        display: block;
+        width: 50%;
+        margin: auto;
+        padding: 20px 10px 0px 10px;
+        text-align: center;
+    }
 
 
-    
+
+
 
 
     </style>
+{%  endblock %}
 </head>
+{% block body %}
 <body>
     <!-- Update Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -270,11 +272,7 @@
         </div>
     </div>
 </div>
-	<div class="sidenav">
-		{% for menuItem in sideNavMenuItems %}
-		<a href="{{ menuItem.url }}"> {{menuItem.title}}</a>
-		{% endfor %}
-	  </div>
+
     <div class="header">
         <h1>TaskTok - User Settings</h1>
     </div>
@@ -282,11 +280,11 @@
     <div class="settings-container">
         <div class="settings-section">
             <h3>Personal Information</h3>
-            
+
             <form action="{{ url_for('views.userSettings', form_id='update_information') }}" method="post">
-                
-                
-                
+
+
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 {{personal_info_form.hidden_tag()}}
 
@@ -361,7 +359,7 @@
     <div class="settings-container">
         <div class="settings-section">
             <h3>Credentials</h3>
-            
+
             <form id='form_credential' action="{{ url_for('views.userSettings', form_id='update_credentials') }}" method="post">
                 {{credential_form.hidden_tag()}}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
@@ -421,7 +419,7 @@
               {% endfor %}
             {% endif %}
           {% endwith %}
-            
+
         </div>
     </div>
 
@@ -457,7 +455,7 @@
                     {% endfor %}
                 </div>
             </div>
-            
+
 
         </div>
     </div>
@@ -473,8 +471,8 @@
     <div class="footer">
         <p>&copy; 2023 TaskTok Good Enough Incorporated</p>
     </div>
-   
-	
+
+
 
     <script type="module" src="{{ url_for('static', filename='js/settings.js') }}"></script>
 

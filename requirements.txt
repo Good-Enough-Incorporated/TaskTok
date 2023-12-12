@@ -33,6 +33,7 @@ mccabe==0.7.0
 packaging==23.2
 passlib==1.7.4
 prompt-toolkit==3.0.39
+psutil==5.9.6
 pycodestyle==2.11.1
 pycparser==2.21
 pyflakes==3.1.0

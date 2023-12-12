@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.setItem('scrollPosition', scrollPosition);
     });
 
+    // Nav timezone bar listener for timezone form setting updates.
+    var timezoneForm = document.getElementById('form_timezone');
+    if (timezoneForm) {
+        timezoneForm.addEventListener('submit', function(event) {
+            let timezone = document.getElementById('timezoneInput').value;
+            localStorage.setItem('userTimezone', timezone);
+        });
+    }
+
 
     //event handler for updating user info
     form.addEventListener('submit', function(event){
@@ -66,6 +75,13 @@ document.addEventListener('DOMContentLoaded', function () {
     timezoneInput.addEventListener('focus', function(){
         dropdownMenu.classList.add('show');
         dropDownOpen = true;
+    });
+    timezoneInput.addEventListener('input', function(){
+        if (!dropDownOpen){
+            dropdownMenu.classList.add('show');
+            dropDownOpen = true;
+        }
+
     });
 
     dropdownMenu.addEventListener('mousedown', function(e){

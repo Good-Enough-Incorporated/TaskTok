@@ -1,34 +1,43 @@
-from TaskTok.Server import create_app
-from TaskTok.extensions import db
-from TaskTok.models import User, TaskReminder
-from TaskTok.functions import verify_celery_worker
-from TaskTok.functions import verify_message_broker_online
+"""
+This module, 'app.py', serves as the entry point for the Flask application.
+It imports and configures the Flask app using 'create_app' and sets up
+various command-line interface (CLI) commands for database and application management.
+This module includes commands for checking the status of Celery workers and message brokers,
+creating administrative users and tasks, and managing the database through Flask-Migrate.
+It also determines the mode of operation based on command-line arguments, either
+running Flask commands or starting the Flask server.
+"""
+
 from flask_migrate import upgrade, migrate
 from TaskTok import app
 import click
 import datetime
 import sys
-
-#  -------------- Unused Imports: Needs review --------------
-#  from flask import Flask, jsonify, request
-#  from flask import render_template
-#  from flask.cli import with_appcontext, FlaskGroup
-#  from TaskTok.schema import UserSchema
-#  from RemindMeClient import task
-#  from TaskTok.extensions import jwtManager, flaskMail
-#  from TaskTok.models import NoNoTokens
-#  ----------------------------------------------------------
+from TaskTok.extensions import db
+from TaskTok.models import User, TaskReminder
+from TaskTok.functions import verify_celery_worker
+from TaskTok.functions import verify_message_broker_online
 
 
 
 
 @click.group()
 def cli():
+    """
+    Defines a Click command group for organizing custom Flask CLI
+    commands. This function acts as a decorator
+    to associate various CLI commands with the Flask application.
+    """
     pass
 
 
 @app.cli.command('checkCeleryStatus')
 def check_celery_status():
+    """
+    CLI command to check the status of the Celery worker.
+    It prints a status message indicating whether the
+    Celery worker is operational or not.
+    """
     try:
         celery_status = verify_celery_worker()
     except:
@@ -44,6 +53,11 @@ def check_celery_status():
 
 @app.cli.command('checkMessageBrokerStatus')
 def check_message_broker_status():
+    """
+    CLI command to check the status of the message broker (e.g., Redis).
+    It tries to establish a connection to the message broker
+    and prints a status message indicating its operational status.
+    """
     host = 'localhost'
     port = 6379
     timeout = 5
@@ -61,6 +75,10 @@ def check_message_broker_status():
 
 @app.cli.command('createAdminUser')
 def make_admin_user():
+    """
+    CLI command to create an administrative user.
+    It uses predefined credentials to create a user with administrative privileges.
+    """
     with app.app_context():
         print("\nCreating Admin User...\n")
         default_acc = User(username="admin", email="jason.supple.27@gmail.com")
@@ -70,6 +88,10 @@ def make_admin_user():
 
 @app.cli.command('createAdminTasks')
 def add_admin_tasks():
+    """
+    CLI command to create a set of tasks for the administrative user.
+    It generates a predefined number of tasks associated with the admin account.
+    """
     with app.app_context():
         count = 1
         
@@ -83,6 +105,10 @@ def add_admin_tasks():
 
 @app.cli.command('createDB')
 def create_db():
+    """
+    CLI command to create the database. It initializes
+    the database schema according to the defined models.
+    """
     with app.app_context():
         print("\nCreating database and default admin for first run.")
         db.create_all()
@@ -93,6 +119,9 @@ def create_db():
 
 @app.cli.command('dropDB')
 def drop_db():
+    """
+    CLI command to drop all tables in the database. This command is used to clear the database schema.
+    """
     with app.app_context():
         print("\nDropping all database tables!")
         db.drop_all()
@@ -101,12 +130,22 @@ def drop_db():
 @app.cli.command('migrateDB')
 @click.option('-m', '--message', default='Migration', help="Message for your migration script")
 def migrate_db(message):
+    """
+    CLI command to generate a migration script for the database.
+    It creates a migration based on the changes detected in the models.
+
+    :param message: An optional message to describe the migration.
+    """
     with app.app_context():
         migrate(message=message)
         print('Database migration generated')
 
 @app.cli.command('upgradeDB')
 def upgrade_db():
+    """
+    CLI command to apply the latest migration to the database.
+    It upgrades the database schema to the latest version based on the migration scripts.
+    """
     with app.app_context():
         upgrade()
         print('Database upgraded')
