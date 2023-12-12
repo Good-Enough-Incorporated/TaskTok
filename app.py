@@ -151,11 +151,6 @@ def upgrade_db():
         print('Database upgraded')
 
 if __name__ == "__main__":
-    """
-    The main execution block to run the Flask application.
-    It checks if command-line arguments are provided to execute
-    CLI commands or starts the Flask server if no arguments are provided.
-    """
     # If command line args are provided, assume they're for Click.
     if len(sys.argv) > 1:
         cli(app)
