@@ -24,7 +24,7 @@ class User(db.Model):
         """
         return str(uuid4())
 
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     id = db.Column(db.String(), primary_key=True, default=generate_uuid)
     username = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), unique=True)
