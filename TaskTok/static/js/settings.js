@@ -76,6 +76,13 @@ document.addEventListener('DOMContentLoaded', function () {
         dropdownMenu.classList.add('show');
         dropDownOpen = true;
     });
+    timezoneInput.addEventListener('input', function(){
+        if (!dropDownOpen){
+            dropdownMenu.classList.add('show');
+            dropDownOpen = true;
+        }
+
+    });
 
     dropdownMenu.addEventListener('mousedown', function(e){
         e.preventDefault();

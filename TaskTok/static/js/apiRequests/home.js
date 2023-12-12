@@ -475,10 +475,12 @@ async function deleteTask(taskID) {
 }
 
 const stringFormatter = (params) => {
-    var str = params.value;
-
-    return stringFormatter;
-}
+    const cellString = params.value;
+    if (typeof cellString === 'string' && cellString.length > 0) {
+        return cellString[0].toUpperCase() + cellString.substring(1);
+    }
+    return cellString;
+};
 
 const dateFormatter = (params) => {
     const date =  new Date(params.value).toLocaleDateString('en-us', {
@@ -540,12 +542,12 @@ overlayLoadingTemplate:
         columnDefs:[
            
             
-            {field: "task_name", headerName: "Name"},
-            {field: "task_description", headerName: "Description"},
+            {field: "task_name", headerName: "Name", valueFormatter: stringFormatter},
+            {field: "task_description", headerName: "Description", valueFormatter: stringFormatter},
             {field: "task_dueDate",  headerName: "Reminder Time", valueFormatter: dateFormatter},
             {field: "task_reminderOffSetTime", headerName: "Early Reminder Time", valueFormatter: dateFormatter},
-            {field: "task_emailList", headerName: "E-Mail Recipient List"},
-            {field: "task_message", headerName: "E-Mail Message"},
+            {field: "task_emailList", headerName: "E-Mail Recipient List",valueFormatter: stringFormatter},
+            {field: "task_message", headerName: "E-Mail Message", valueFormatter: stringFormatter},
             {field: "actions", headerName: "Actions", cellRenderer: renderButtonCells, cellRendererParams: {api: api}, width: 200, suppressSizeToFit: true },
   
         ]
