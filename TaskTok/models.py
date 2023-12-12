@@ -1,7 +1,15 @@
-from .extensions import db
+"""
+This module, `models.py`, defines the database models for the application.
+It includes classes representing different entities such as users, tokens,
+and tasks. Each class corresponds to a table in the database and includes fields
+that represent the table columns with their respective data types. The module
+also provides methods for various operations like adding, removing, updating
+records, and performing specific queries related to each model.
+"""
+from datetime import datetime
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from .extensions import db
 
 
 class User(db.Model):

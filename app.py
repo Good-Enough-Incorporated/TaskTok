@@ -1,23 +1,12 @@
-from TaskTok.Server import create_app
-from TaskTok.extensions import db
-from TaskTok.models import User, TaskReminder
-from TaskTok.functions import verify_celery_worker
-from TaskTok.functions import verify_message_broker_online
 from flask_migrate import upgrade, migrate
 from TaskTok import app
 import click
 import datetime
 import sys
-
-#  -------------- Unused Imports: Needs review --------------
-#  from flask import Flask, jsonify, request
-#  from flask import render_template
-#  from flask.cli import with_appcontext, FlaskGroup
-#  from TaskTok.schema import UserSchema
-#  from RemindMeClient import task
-#  from TaskTok.extensions import jwtManager, flaskMail
-#  from TaskTok.models import NoNoTokens
-#  ----------------------------------------------------------
+from TaskTok.extensions import db
+from TaskTok.models import User, TaskReminder
+from TaskTok.functions import verify_celery_worker
+from TaskTok.functions import verify_message_broker_online
 
 
 
